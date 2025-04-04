@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace _COBRA_
 {
-    public sealed partial class Command
+    public sealed partial class Command : IDisposable
     {
         public readonly Dictionary<string, Command> _commands = new(StringComparer.OrdinalIgnoreCase);
         public IEnumerable<string> ECommands_keys => _commands.Keys.OrderBy(key => key, StringComparer.OrdinalIgnoreCase);
@@ -16,17 +16,18 @@ namespace _COBRA_
 
         public readonly Traductions manual;
         public readonly bool stay_alive;
-        public readonly Action<Executor, Line> args;
-        public readonly Action<Executor> action;
+        public readonly Action<Executor> args, action;
         public readonly Action<Executor, string> on_stdin;
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
+
+        bool disposed;
 
         //--------------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoad()
         {
-            cmd_root_shell._commands.Clear();
+            cmd_root_shell.Dispose();
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ namespace _COBRA_
         public Command(
             in Traductions manual = default,
             in bool stay_alive = default,
-            in Action<Executor, Line> args = default,
+            in Action<Executor> args = default,
             in Action<Executor> action = default,
             in Action<Executor, string> on_stdin = default,
             in Func<Executor, IEnumerator<CMD_STATUS>> routine = default
@@ -55,7 +56,10 @@ namespace _COBRA_
             if (aliases == null || aliases.Length == 0)
                 throw new ArgumentException("Aliases cannot be null or empty.", nameof(aliases));
             for (int i = 0; i < aliases.Length; ++i)
+            {
+                Debug.Log($"Adding command '{aliases[i]}'");
                 _commands.Add(aliases[i], command);
+            }
             return command;
         }
 
@@ -76,6 +80,19 @@ namespace _COBRA_
                         line.read_i = line.start_i;
                 return path.Count > 0;
             }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        public void Dispose()
+        {
+            if (disposed)
+                return;
+            disposed = true;
+
+            foreach (Command command in _commands.Values)
+                command.Dispose();
+            _commands.Clear();
         }
     }
 }

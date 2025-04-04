@@ -10,9 +10,9 @@ namespace _COBRA_
         static void OnAfterSceneLoad()
         {
             Command.cmd_root_shell.AddCommand(new Command(
-                args: (exe, line) =>
+                args: exe =>
                 {
-                    if (line.TryReadArgument(out string scene_name, new string[] { "scene_test1", "scene_test2", "scene_test3", }))
+                    if (exe.line.TryReadArgument(out string scene_name, new string[] { "scene_test1", "scene_test2", "scene_test3", }))
                         exe.args.Add(scene_name);
                 },
                 action: exe =>
@@ -23,9 +23,9 @@ namespace _COBRA_
                 "load-scene", "LoadScene");
 
             Command.cmd_root_shell.AddCommand(new Command(
-                args: (exe, line) =>
+                args: exe =>
                 {
-                    if (line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(int.Parse(arg));
                 },
                 routine: EPipeTest),

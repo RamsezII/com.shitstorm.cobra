@@ -12,14 +12,13 @@ namespace _COBRA_
         {
             //prefixe = $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{NUCLEOR.terminal_path.SetColor("#73B2D9")}$",
 
-            static readonly Executor echo_executor = new(new() { new("echo", new(on_stdin: (exe, stdin) => Debug.Log(stdin))), }, Line.EMPTY_EXE, out _);
+            static readonly Executor echo_executor = new(new() { new("echo", new(on_stdin: (exe, stdin) => Debug.Log(stdin))), }, Line.EMPTY_EXE);
 
             public readonly string cmd_name;
             public readonly Command command;
             public readonly string cmd_path;
-            public readonly List<KeyValuePair<string, Command>> path;
 
-            public Line temp_line;
+            public Line line;
             readonly Executor stdout_exe = echo_executor;
             public readonly List<object> args;
             public IEnumerator<CMD_STATUS> routine;
@@ -43,9 +42,9 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            public Executor(in List<KeyValuePair<string, Command>> path, in Line line, out bool error)
+            public Executor(in List<KeyValuePair<string, Command>> path, in Line line)
             {
-                this.path = path;
+                this.line = line;
                 cmd_name = path[^1].Key;
                 command = path[^1].Value;
 
@@ -74,11 +73,15 @@ namespace _COBRA_
                 if (command.args != null)
                 {
                     args = new();
-                    command.args(this, line);
-                    if (this.error != null)
+                    command.args(this);
+
+                    if (error == null && args.Count == 0)
+                        error = new ArgumentException($"Command '{cmd_name}' has no arguments.", nameof(args));
+
+                    if (error != null)
                     {
                         if (line.signal == CMD_SIGNALS.EXEC || line.start_i > line.cpl_start_i)
-                            Debug.LogWarning($"Command '{cmd_name}' failed to parse arguments.");
+                            Debug.LogWarning($"Command '{cmd_name}' ({cmd_path}) failed to parse arguments.");
                         Dispose();
                         error = true;
                         return;
@@ -88,8 +91,8 @@ namespace _COBRA_
                 if (line.TryReadPipe())
                     if (cmd_root_shell.TryReadCommand(line, out var path2))
                     {
-                        stdout_exe = new(path2, line, out bool err);
-                        if (err)
+                        stdout_exe = new(path2, line);
+                        if (stdout_exe.error != null)
                         {
                             Dispose();
                             error = true;
@@ -104,6 +107,8 @@ namespace _COBRA_
 
             public IEnumerator<CMD_STATUS> Executate(in Line line)
             {
+                this.line = line;
+
                 if (line.signal == CMD_SIGNALS.EXEC)
                     ++executions;
 
@@ -112,8 +117,8 @@ namespace _COBRA_
                     {
                         if (command.TryReadCommand(line, out var path))
                         {
-                            Executor exe = new(path, line, out bool err);
-                            if (!err)
+                            Executor exe = new(path, line);
+                            if (exe.error == null)
                                 return routine = exe.Executate(line);
                         }
                         else if (line.signal == CMD_SIGNALS.EXEC)
@@ -135,13 +140,8 @@ namespace _COBRA_
                             return routine;
                         }
                     }
-                    else if (routine != null)
-                    {
-                        temp_line = line;
-                        if (!routine.MoveNext())
-                            routine = null;
-                        temp_line = null;
-                    }
+                    else if (routine != null && !routine.MoveNext())
+                        routine = null;
                 }
 
                 return null;

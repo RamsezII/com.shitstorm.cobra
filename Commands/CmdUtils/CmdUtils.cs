@@ -12,9 +12,9 @@ namespace _COBRA_
         {
             Command.cmd_root_shell.AddCommand(new Command(
                 manual: new("echo!"),
-                args: (exe, line) =>
+                args: exe =>
                 {
-                    if (line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(arg);
                 },
                 action: exe => exe.Stdout((string)exe.args[0]),
@@ -24,9 +24,9 @@ namespace _COBRA_
 
             Command.cmd_root_shell.AddCommand(new Command(
                 manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
-                args: (exe, line) =>
+                args: exe =>
                 {
-                    if (Command.cmd_root_shell.TryReadCommand(line, out var path))
+                    if (Command.cmd_root_shell.TryReadCommand(exe.line, out var path))
                         exe.args.Add(path);
                 },
                 action: exe =>
@@ -51,10 +51,10 @@ namespace _COBRA_
             "help", "manual");
 
             Command.cmd_root_shell.AddCommand(new Command(
-                manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
-                args: (exe, line) =>
+                manual: new("regex filter"),
+                args: exe =>
                 {
-                    if (line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(arg);
                 },
                 on_stdin: (exe, stdin) =>
@@ -63,7 +63,7 @@ namespace _COBRA_
                         exe.Stdout(stdin);
                 }
             ),
-            "grep");
+            "grep", "regex");
 
             Command.cmd_root_shell.AddCommand(new Command(
                 manual: new("quits the game... :("),
@@ -72,7 +72,7 @@ namespace _COBRA_
                 "shutdown");
 
             Command.cmd_root_shell.AddCommand(new Command(
-                manual: new("empty this terminal's logs"),
+                manual: new("clear all previous logs"),
                 action: exe => Application.Quit()
                 ),
                 "clear");
