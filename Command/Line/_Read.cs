@@ -7,6 +7,15 @@ namespace _COBRA_
     {
         partial class Line
         {
+            public bool TryReadPipe() => Util_ark.TryReadPipe(text, ref read_i);
+
+            public bool HasNext()
+            {
+                int read_i = this.read_i;
+                Util_ark.SkipCharactersUntil(text, ref read_i, true, false, Util_ark.CHAR_SPACE);
+                return read_i < text.Length;
+            }
+
             public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null)
             {
                 if (string.IsNullOrWhiteSpace(text))
@@ -51,8 +60,6 @@ namespace _COBRA_
 
                 return isNotEmpty;
             }
-
-            public bool TryReadPipe() => Util_ark.TryReadPipe(text, ref read_i);
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _COBRA_
 {
-    internal static class CommandTests
+    internal static class CmdTests
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()

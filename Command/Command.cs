@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace _COBRA_
 {
-    public sealed partial class Command : IDisposable
+    public sealed partial class Command
     {
         public readonly Dictionary<string, Command> _commands = new(StringComparer.OrdinalIgnoreCase);
         public IEnumerable<string> ECommands_keys => _commands.Keys.OrderBy(key => key, StringComparer.OrdinalIgnoreCase);
@@ -16,18 +16,18 @@ namespace _COBRA_
 
         public readonly Traductions manual;
         public readonly bool stay_alive;
+        public readonly int min_args_required;
         public readonly Action<Executor> args, action;
-        public readonly Action<Executor, string> on_stdin;
+        public readonly Action<Executor, object> on_data;
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
-
-        bool disposed;
 
         //--------------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoad()
         {
-            cmd_root_shell.Dispose();
+            Debug.Log("init shell".ToSubLog());
+            cmd_root_shell.PropagateOblivion();
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -35,17 +35,19 @@ namespace _COBRA_
         public Command(
             in Traductions manual = default,
             in bool stay_alive = default,
+            in int min_args_required = default,
             in Action<Executor> args = default,
             in Action<Executor> action = default,
-            in Action<Executor, string> on_stdin = default,
+            in Action<Executor, object> on_data = default,
             in Func<Executor, IEnumerator<CMD_STATUS>> routine = default
             )
         {
             this.manual = manual;
             this.stay_alive = stay_alive;
+            this.min_args_required = min_args_required;
             this.args = args;
             this.action = action;
-            this.on_stdin = on_stdin;
+            this.on_data = on_data;
             this.routine = routine;
         }
 
@@ -56,10 +58,7 @@ namespace _COBRA_
             if (aliases == null || aliases.Length == 0)
                 throw new ArgumentException("Aliases cannot be null or empty.", nameof(aliases));
             for (int i = 0; i < aliases.Length; ++i)
-            {
-                Debug.Log($"Adding command '{aliases[i]}'");
                 _commands.Add(aliases[i], command);
-            }
             return command;
         }
 
@@ -84,14 +83,10 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public void Dispose()
+        public void PropagateOblivion()
         {
-            if (disposed)
-                return;
-            disposed = true;
-
             foreach (Command command in _commands.Values)
-                command.Dispose();
+                command.PropagateOblivion();
             _commands.Clear();
         }
     }

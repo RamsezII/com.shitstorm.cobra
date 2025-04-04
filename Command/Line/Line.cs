@@ -1,4 +1,7 @@
-﻿namespace _COBRA_
+﻿using _ARK_;
+using UnityEngine;
+
+namespace _COBRA_
 {
     partial class Command
     {
@@ -14,6 +17,20 @@
 
             public bool IsCplThis => signal >= CMD_SIGNALS.TAB && cursor_i >= start_i && cursor_i <= read_i;
             public bool IsCplOverboard => signal >= CMD_SIGNALS.TAB && read_i > cursor_i;
+
+            //--------------------------------------------------------------------------------------------------------------
+
+            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+            static void OnBeforeSceneLoad()
+            {
+                LoadHistory();
+            }
+
+            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+            static void OnAfterSceneLoad()
+            {
+                NUCLEOR.delegates.onApplicationQuit += SaveHistory;
+            }
 
             //--------------------------------------------------------------------------------------------------------------
 
