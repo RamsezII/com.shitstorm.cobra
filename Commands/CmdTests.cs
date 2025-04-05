@@ -25,7 +25,7 @@ namespace _COBRA_
             Command.cmd_root_shell.AddCommand("test-options", new Command(
                 args: exe =>
                 {
-                    if (exe.line.TryReadFlags(exe, out var flags, "-f", "--file", "--enhance"))
+                    if (exe.line.TryReadFlags(exe, out var flags, "-m", "--meaning", "--enhance"))
                         foreach (var flag in flags)
                             exe.args.Add(flag);
                     if (exe.line.TryReadArgument(out string arg, new[] { "bush", "fire", "word", }))
