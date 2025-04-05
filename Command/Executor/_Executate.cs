@@ -35,7 +35,7 @@ namespace _COBRA_
                     if (line.signal == CMD_SIGNALS.EXEC)
                     {
                         if (command.action != null)
-                            if (args.Count < command.action_min_args_required)
+                            if (command.action_min_args_required > 0 && args != null && args.Count < command.action_min_args_required)
                                 error = $"[{nameof(command.action_min_args_required)}] '{cmd_name}' ({cmd_path}) requires {command.action_min_args_required} arguments to execute, {args.Count} were given.";
                             else
                                 command.action(this);

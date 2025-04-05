@@ -21,7 +21,7 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command.cmd_root_shell.AddCommand(new(
+            Command.cmd_root_shell.AddCommand("var", new(
                 manual: new("save and read variables"),
                 args: exe =>
                 {
@@ -56,8 +56,7 @@ namespace _COBRA_
                     string var_name = (string)exe.args[0];
                     variables[var_name] = data;
                 }
-                ),
-                "var");
+                ));
         }
     }
 }

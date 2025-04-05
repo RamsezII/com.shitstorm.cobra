@@ -9,7 +9,7 @@ namespace _COBRA_
     {
         static void InitManual()
         {
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("manual", new Command(
                 manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
                 args: exe =>
                 {
@@ -34,8 +34,8 @@ namespace _COBRA_
                         }
                     }
                 }
-            ),
-            "help", "manual");
+            ), 
+            "help");
         }
     }
 }

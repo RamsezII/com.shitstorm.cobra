@@ -9,7 +9,7 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("load-scene", new Command(
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string scene_name, new string[] { "scene_test1", "scene_test2", "scene_test3", }))
@@ -19,17 +19,15 @@ namespace _COBRA_
                 {
                     Debug.Log($"Loading scene: {exe.args[0]}");
                     NUCLEOR.instance.scheduler.AddRoutine(Util.EWaitForSeconds(3, false, null));
-                }),
-                "load-scene", "LoadScene");
+                }), "LoadScene");
 
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("pipe-test", new Command(
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(int.Parse(arg));
                 },
-                routine: EPipeTest),
-                "pipe-test");
+                routine: EPipeTest));
 
             static IEnumerator<CMD_STATUS> EPipeTest(Command.Executor executor)
             {

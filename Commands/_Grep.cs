@@ -7,7 +7,8 @@ namespace _COBRA_
     {
         static void InitGrep()
         {
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("grep",
+            new Command(
                 manual: new("regex filter"),
                 args: exe =>
                 {
@@ -53,8 +54,7 @@ namespace _COBRA_
                     if (Regex.IsMatch(data.ToString(), (string)exe.args[0]))
                         exe.Stdout(data);
                 }
-            ),
-            "grep", "regex");
+            ), "regex");
         }
     }
 }

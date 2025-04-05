@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using _ARK_;
+using UnityEngine;
 
 namespace _COBRA_
 {
@@ -13,23 +14,20 @@ namespace _COBRA_
 
             InitGrep();
 
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("shutdown", new Command(
                 manual: new("quits the game... :("),
                 action: exe => Application.Quit()
-                ),
-                "shutdown");
+                ));
 
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("clear", new Command(
                 manual: new("clear all previous logs"),
                 action: exe => Application.Quit()
-                ),
-                "clear");
+                ));
 
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("clear-history", new Command(
                 manual: new("clear all previous entries"),
-                action: exe => Command.Line.ClearHistory()
-                ),
-                "clear-history");
+                action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
+                ));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace _COBRA_
     {
         static void InitEcho()
         {
-            Command.cmd_root_shell.AddCommand(new Command(
+            Command.cmd_root_shell.AddCommand("echo", new Command(
                 manual: new("echo!"),
                 args: exe =>
                 {
@@ -31,8 +31,7 @@ namespace _COBRA_
                             Debug.Log(data);
                             break;
                     }
-                }),
-                "echo");
+                }));
         }
     }
 }
