@@ -83,7 +83,7 @@ namespace _COBRA_
 
                 if (error == null)
                     if (line.TryReadPipe())
-                        if (cmd_root_shell.TryReadCommand(line, out var path2))
+                        if (cmd_root_shell.TryReadCommand_path(line, out var path2))
                         {
                             Executor executor = new(path2, line);
                             error = executor.error;

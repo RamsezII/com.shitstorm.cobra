@@ -11,7 +11,6 @@ namespace _COBRA_
             InitEcho();
             InitManual();
             InitGrep();
-            Cmd_IF.Init();
 
             Command.cmd_root_shell.AddCommand("shutdown", new Command(
                 manual: new("quits the game... :("),

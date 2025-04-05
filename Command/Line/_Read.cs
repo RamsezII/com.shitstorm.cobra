@@ -24,7 +24,7 @@ namespace _COBRA_
                 read_i = start_i;
             }
 
-            public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null, in bool completeIfOption = false)
+            public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null, in bool complete_if_is_option = false)
             {
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -56,7 +56,7 @@ namespace _COBRA_
                     argument = string.Empty;
 
                 if (completions_candidates != null)
-                    if (!completeIfOption || argument.StartsWith('-'))
+                    if (!complete_if_is_option || argument.StartsWith('-'))
                         if (IsCplThis)
                         {
                             cpl_start_i = read_i;

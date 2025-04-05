@@ -66,7 +66,18 @@ namespace _COBRA_
             return command;
         }
 
-        public bool TryReadCommand(in Line line, out List<KeyValuePair<string, Command>> path)
+        public bool TryReadCommand(in Line line, out Command command)
+        {
+            if (TryReadCommand_path(line, out var path))
+            {
+                command = path[^1].Value;
+                return true;
+            }
+            command = null;
+            return false;
+        }
+
+        public bool TryReadCommand_path(in Line line, out List<KeyValuePair<string, Command>> path)
         {
             path = new();
             return TryReadCommand_ref(line, this, path);

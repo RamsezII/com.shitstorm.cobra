@@ -30,7 +30,7 @@ namespace _COBRA_
                     if (line.signal >= CMD_SIGNALS.TAB || executions == 0 || routine == null)
                         if (command._commands.Count > 0)
                         {
-                            if (command.TryReadCommand(line, out var path))
+                            if (command.TryReadCommand_path(line, out var path))
                             {
                                 Executor exe = new(path, line);
                                 error = exe.error;
@@ -50,20 +50,34 @@ namespace _COBRA_
                             if (command.action_min_args_required > 0 && args != null && args.Count < command.action_min_args_required)
                                 error = $"[{nameof(command.action_min_args_required)}] '{cmd_name}' ({cmd_path}) requires {command.action_min_args_required} arguments to execute, {args.Count} were given.";
                             else
-                                command.action(this);
+                                try
+                                {
+                                    command.action(this);
+                                }
+                                catch (System.Exception e)
+                                {
+                                    error = $"[{nameof(command.action)}] '{cmd_name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
+                                }
 
                         if (error == null)
-                            if (executions == 0)
+                            try
                             {
-                                if (command.routine != null)
+                                if (executions == 0)
                                 {
-                                    routine = command.routine(this);
-                                    routine.MoveNext();
-                                    return routine;
+                                    if (command.routine != null)
+                                    {
+                                        routine = command.routine(this);
+                                        routine.MoveNext();
+                                        return routine;
+                                    }
                                 }
+                                else if (routine != null && !routine.MoveNext())
+                                    routine = null;
                             }
-                            else if (routine != null && !routine.MoveNext())
-                                routine = null;
+                            catch (System.Exception e)
+                            {
+                                error = $"[{nameof(command.routine)}] '{cmd_name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
+                            }
                     }
 
                 if (error == null)
