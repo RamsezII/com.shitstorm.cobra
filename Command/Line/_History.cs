@@ -14,7 +14,9 @@ namespace _COBRA_
 
             const int max_history = 50;
             static readonly List<string> history = new(max_history);
-            public static int history_index;
+            static int history_index;
+            public static void ResetHistoryCount() => history_index = 0;
+            public static void ClearHistory() => history.Clear();
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -70,9 +72,15 @@ namespace _COBRA_
                 history_index += increment;
                 if (history_index < 0)
                     history_index += history.Count;
-                history_index %= history.Count;
+                history_index %= 1 + history.Count;
 
-                entry = history[history_index];
+                if (history_index < history.Count)
+                {
+                    entry = history[history_index];
+                    return true;
+                }
+
+                entry = string.Empty;
                 return true;
             }
         }

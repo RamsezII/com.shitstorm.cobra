@@ -56,10 +56,9 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public Command AddCommand(in Command command, params string[] aliases)
+        public Command AddCommand(in Command command, in string cmd_name, params string[] aliases)
         {
-            if (aliases == null || aliases.Length == 0)
-                throw new ArgumentException("Aliases cannot be null or empty.", nameof(aliases));
+            _commands.Add(cmd_name, command);
             for (int i = 0; i < aliases.Length; ++i)
                 _commands.Add(aliases[i], command);
             return command;

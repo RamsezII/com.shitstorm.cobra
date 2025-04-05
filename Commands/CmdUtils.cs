@@ -24,6 +24,12 @@ namespace _COBRA_
                 action: exe => Application.Quit()
                 ),
                 "clear");
+
+            Command.cmd_root_shell.AddCommand(new Command(
+                manual: new("clear all previous entries"),
+                action: exe => Command.Line.ClearHistory()
+                ),
+                "clear-history");
         }
     }
 }
