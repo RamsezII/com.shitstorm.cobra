@@ -7,6 +7,18 @@ namespace _COBRA_
     {
         partial class Executor
         {
+            public bool CanLogError()
+            {
+                if (command != null && line != null)
+                    switch (line.signal)
+                    {
+                        case CMD_SIGNALS.CHECK:
+                        case CMD_SIGNALS.EXEC:
+                            return command.log_error;
+                    }
+                return false;
+            }
+
             public IEnumerator<CMD_STATUS> Executate(in Line line)
             {
                 this.line = line;
@@ -58,7 +70,8 @@ namespace _COBRA_
                     return routine;
                 else
                 {
-                    Debug.LogWarning($"[ERROR] '{cmd_name}': {error}");
+                    if (CanLogError())
+                        Debug.LogWarning($"[ERROR] '{cmd_name}': {error}");
                     return null;
                 }
             }

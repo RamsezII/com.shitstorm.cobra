@@ -12,10 +12,10 @@ namespace _COBRA_
         public IEnumerable<string> ECommands_keys => _commands.Keys.OrderBy(key => key, StringComparer.OrdinalIgnoreCase);
         public IEnumerable<KeyValuePair<string, Command>> ECommands_pairs => _commands.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase);
 
-        public static readonly Command cmd_root_shell = new(stay_alive: true);
+        public static readonly Command cmd_root_shell = new(stay_alive: true, log_error: true);
 
         public readonly Traductions manual;
-        public readonly bool stay_alive;
+        public readonly bool stay_alive, log_error;
         public readonly int init_min_args_required;
         public readonly int action_min_args_required;
         public readonly Action<Executor> args, action;
@@ -36,6 +36,7 @@ namespace _COBRA_
         public Command(
             in Traductions manual = default,
             in bool stay_alive = default,
+            in bool log_error = default,
             in int init_min_args_required = default,
             in int action_min_args_required = default,
             in Action<Executor> args = default,
@@ -46,6 +47,7 @@ namespace _COBRA_
         {
             this.manual = manual;
             this.stay_alive = stay_alive;
+            this.log_error = log_error;
             this.init_min_args_required = init_min_args_required;
             this.action_min_args_required = action_min_args_required;
             this.args = args;

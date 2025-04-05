@@ -89,7 +89,7 @@ namespace _COBRA_
                             error = executor.error;
                             if (error == null)
                                 if (executor.command.on_data == null)
-                                    error = $"Command '{executor.cmd_name}' ({executor.cmd_path}) has {nameof(executor.command.on_data)} callback, it can not be piped into.";
+                                    error = $"Command '{executor.cmd_name}' ({executor.cmd_path}) has no '{nameof(executor.command.on_data)}' callback, it can not be piped into.";
                                 else
                                     stdout_exe = executor;
                         }
@@ -97,7 +97,8 @@ namespace _COBRA_
                             error = $"Command '{cmd_name}' ({cmd_path}) failed to parse pipe.";
 
                 if (error != null)
-                    Debug.LogWarning($"[ERROR] '{cmd_name}' ({cmd_path}): {error}");
+                    if (CanLogError())
+                        Debug.LogWarning($"[ERROR] '{cmd_name}' ({cmd_path}): {error}");
             }
 
             //--------------------------------------------------------------------------------------------------------------

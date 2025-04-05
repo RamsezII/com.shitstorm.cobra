@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace _COBRA_
 {
@@ -21,15 +20,15 @@ namespace _COBRA_
                     switch (data)
                     {
                         case string str:
-                            Debug.Log(str);
+                            exe.Stdout(str);
                             break;
 
                         case IEnumerable<object> lines:
-                            Debug.Log(lines.LinesToText(false));
+                            exe.Stdout(lines.LinesToText(false));
                             break;
 
                         default:
-                            Debug.Log(data);
+                            exe.Stdout(data);
                             break;
                     }
                 }));
