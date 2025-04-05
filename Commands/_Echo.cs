@@ -9,6 +9,7 @@ namespace _COBRA_
         {
             Command.cmd_root_shell.AddCommand("echo", new Command(
                 manual: new("echo!"),
+                action_min_args_required: 1,
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))

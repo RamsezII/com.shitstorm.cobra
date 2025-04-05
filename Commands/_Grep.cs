@@ -10,6 +10,7 @@ namespace _COBRA_
             Command.cmd_root_shell.AddCommand("grep",
             new Command(
                 manual: new("regex filter"),
+                init_min_args_required: 1,
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
@@ -39,7 +40,7 @@ namespace _COBRA_
                                         filtered.Add(obj);
                                 }
                                 if (filtered.Count > 0)
-                                    exe.Stdout(filtered);
+                                    exe.Stdout(filtered.LinesToText(false));
                             }
                             break;
 
@@ -51,8 +52,6 @@ namespace _COBRA_
                             }
                             break;
                     }
-                    if (Regex.IsMatch(data.ToString(), (string)exe.args[0]))
-                        exe.Stdout(data);
                 }
             ), "regex");
         }
