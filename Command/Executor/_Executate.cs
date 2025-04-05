@@ -14,39 +14,53 @@ namespace _COBRA_
                 if (line.signal == CMD_SIGNALS.EXEC)
                     ++executions;
 
-                if (line.signal >= CMD_SIGNALS.TAB || executions == 0 || routine == null)
-                    if (command._commands.Count > 0)
-                    {
-                        if (command.TryReadCommand(line, out var path))
+                if (line.notEmpty)
+                    if (line.signal >= CMD_SIGNALS.TAB || executions == 0 || routine == null)
+                        if (command._commands.Count > 0)
                         {
-                            Executor exe = new(path, line);
-                            if (exe.error == null)
-                                return routine = exe.Executate(line);
+                            if (command.TryReadCommand(line, out var path))
+                            {
+                                Executor exe = new(path, line);
+                                error = exe.error;
+                                if (exe.error == null)
+                                    return routine = exe.Executate(line);
+                                else
+                                    exe.Dispose();
+                            }
+                            else if (line.signal == CMD_SIGNALS.EXEC)
+                                error = $"Could not find '{line.arg_last}' in '{cmd_name}' ({cmd_path})";
                         }
-                        else if (line.signal == CMD_SIGNALS.EXEC)
-                            Debug.LogWarning($"Could not find '{line.arg_last}' in '{cmd_name}' ({cmd_path})");
-                        return null;
+
+                if (error == null)
+                    if (line.signal == CMD_SIGNALS.EXEC)
+                    {
+                        if (command.action != null)
+                            if (args.Count < command.action_min_args_required)
+                                error = $"[{nameof(command.action_min_args_required)}] '{cmd_name}' ({cmd_path}) requires {command.action_min_args_required} arguments to execute, {args.Count} were given.";
+                            else
+                                command.action(this);
+
+                        if (error == null)
+                            if (executions == 0)
+                            {
+                                if (command.routine != null)
+                                {
+                                    routine = command.routine(this);
+                                    routine.MoveNext();
+                                    return routine;
+                                }
+                            }
+                            else if (routine != null && !routine.MoveNext())
+                                routine = null;
                     }
 
-                if (line.signal == CMD_SIGNALS.EXEC)
+                if (error == null)
+                    return routine;
+                else
                 {
-                    Line.AddToHistory(line.text);
-                    command.action?.Invoke(this);
-
-                    if (executions == 0)
-                    {
-                        if (command.routine != null)
-                        {
-                            routine = command.routine(this);
-                            routine.MoveNext();
-                            return routine;
-                        }
-                    }
-                    else if (routine != null && !routine.MoveNext())
-                        routine = null;
+                    Debug.LogWarning($"[ERROR] '{cmd_name}': {error}");
+                    return null;
                 }
-
-                return routine;
             }
         }
     }

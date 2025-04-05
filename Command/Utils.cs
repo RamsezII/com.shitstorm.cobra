@@ -30,5 +30,6 @@ namespace _COBRA_
         public CMD_STATES state;
         public string prefixe;
         [Range(0, 1)] public float progress;
+        public string error;
     }
 }

@@ -73,29 +73,31 @@ namespace _COBRA_
 
                 if (command.args != null)
                 {
-                    args = new(command.min_args_required);
+                    args = new(command.init_min_args_required);
                     command.args(this);
 
                     if (error == null)
-                        if (args.Count < command.min_args_required)
-                            error = $"Command '{cmd_name}' found {args.Count} arguments, {command.min_args_required} are required.";
+                        if (args.Count < command.init_min_args_required)
+                            error = $"[{nameof(command.init_min_args_required)}] '{cmd_name}' ({cmd_path}) requires {command.init_min_args_required} arguments to init, {args.Count} were given.";
                 }
 
                 if (error == null)
                     if (line.TryReadPipe())
                         if (cmd_root_shell.TryReadCommand(line, out var path2))
                         {
-                            stdout_exe = new(path2, line);
-                            error = stdout_exe.error;
+                            Executor executor = new(path2, line);
+                            error = executor.error;
+                            if (error == null)
+                                if (executor.command.on_data == null)
+                                    error = $"Command '{executor.cmd_name}' ({executor.cmd_path}) has {nameof(executor.command.on_data)} callback, it can not be piped into.";
+                                else
+                                    stdout_exe = executor;
                         }
                         else if (line.signal == CMD_SIGNALS.EXEC && line.start_i != line.cpl_start_i)
                             error = $"Command '{cmd_name}' ({cmd_path}) failed to parse pipe.";
 
                 if (error != null)
-                {
-                    Debug.LogWarning($"[ERROR] '{cmd_name}': {error}");
-                    Dispose();
-                }
+                    Debug.LogWarning($"[ERROR] '{cmd_name}' ({cmd_path}): {error}");
             }
 
             //--------------------------------------------------------------------------------------------------------------
@@ -105,7 +107,10 @@ namespace _COBRA_
                 lock (disposed)
                 {
                     if (disposed._value)
+                    {
+                        Debug.LogWarning($"[{nameof(Dispose)}] '{cmd_name}' ({cmd_path}) is already disposed.");
                         return;
+                    }
                     disposed._value = true;
 
                     OnDispose();

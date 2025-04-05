@@ -16,7 +16,8 @@ namespace _COBRA_
 
         public readonly Traductions manual;
         public readonly bool stay_alive;
-        public readonly int min_args_required;
+        public readonly int init_min_args_required;
+        public readonly int action_min_args_required;
         public readonly Action<Executor> args, action;
         public readonly Action<Executor, object> on_data;
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
@@ -35,7 +36,8 @@ namespace _COBRA_
         public Command(
             in Traductions manual = default,
             in bool stay_alive = default,
-            in int min_args_required = default,
+            in int init_min_args_required = default,
+            in int action_min_args_required = default,
             in Action<Executor> args = default,
             in Action<Executor> action = default,
             in Action<Executor, object> on_data = default,
@@ -44,7 +46,8 @@ namespace _COBRA_
         {
             this.manual = manual;
             this.stay_alive = stay_alive;
-            this.min_args_required = min_args_required;
+            this.init_min_args_required = init_min_args_required;
+            this.action_min_args_required = action_min_args_required;
             this.args = args;
             this.action = action;
             this.on_data = on_data;

@@ -45,7 +45,9 @@ namespace _COBRA_
 
             public static void AddToHistory(in string entry)
             {
-                if (history.Count >= max_history)
+                if (history.Contains(entry))
+                    history.Remove(entry);
+                else if (history.Count >= max_history)
                     history.RemoveAt(0);
                 history.Add(entry);
             }
