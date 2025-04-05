@@ -10,7 +10,15 @@ namespace _COBRA_
         static void InitManual()
         {
             Command.cmd_root_shell.AddCommand("manual", new Command(
-                manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
+                manual: new
+                (
+@"Of the whats to and the hows to... nowamsayn [burp]
+command arguments work as this :
+  <...> = required
+  [ ... ] = optional
+  {a|b} = choice
+  ... = repeatable"
+                ),
                 args: exe =>
                 {
                     if (Command.cmd_root_shell.TryReadCommand(exe.line, out var path))
@@ -34,7 +42,7 @@ namespace _COBRA_
                         }
                     }
                 }
-            ), 
+            ),
             "help");
         }
     }

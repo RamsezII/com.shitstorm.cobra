@@ -19,22 +19,35 @@ namespace _COBRA_
                 {
                     Debug.Log($"Loading scene: {exe.args[0]}");
                     NUCLEOR.instance.scheduler.AddRoutine(Util.EWaitForSeconds(3, false, null));
-                }), "LoadScene");
+                }),
+                "LoadScene");
 
-            Command.cmd_root_shell.AddCommand("pipe-test", new Command(
+            Command.cmd_root_shell.AddCommand("test-options", new Command(
+                args: exe =>
+                {
+                    if (exe.line.TryReadFlags(exe, out var flags, "-f", "--file", "--enhance"))
+                        foreach (var flag in flags)
+                            exe.args.Add(flag);
+                    if (exe.line.TryReadArgument(out string arg, new[] { "bush", "fire", "word", }))
+                        exe.args.Add(arg);
+                },
+                action: exe => exe.Stdout(exe.args.LinesToText())
+                ));
+
+            Command.cmd_root_shell.AddCommand("routine-test", new Command(
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(int.Parse(arg));
                 },
-                routine: EPipeTest));
+                routine: ERoutineTest));
 
-            static IEnumerator<CMD_STATUS> EPipeTest(Command.Executor executor)
+            static IEnumerator<CMD_STATUS> ERoutineTest(Command.Executor executor)
             {
                 int loops = (int)executor.args[0];
                 for (int i = 0; i < loops; ++i)
                 {
-                    executor.Stdout($"pipe test: '{i}'");
+                    executor.Stdout(i);
                     float timer = 0;
                     while (timer < 1)
                     {

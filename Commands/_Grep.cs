@@ -40,7 +40,7 @@ namespace _COBRA_
                                         filtered.Add(obj);
                                 }
                                 if (filtered.Count > 0)
-                                    exe.Stdout(filtered.LinesToText(false));
+                                    exe.Stdout(filtered.LinesToText());
                             }
                             break;
 

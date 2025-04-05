@@ -9,14 +9,22 @@ namespace _COBRA_
         {
             public bool TryReadPipe() => Util_ark.TryReadPipe(text, ref read_i);
 
-            public bool HasNext()
+            public bool HasNext(in bool save_move)
             {
                 int read_i = this.read_i;
                 Util_ark.SkipCharactersUntil(text, ref read_i, true, false, Util_ark.CHAR_SPACE);
+                if (save_move)
+                    this.read_i = read_i;
                 return read_i < text.Length;
             }
 
-            public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null)
+            public void ReadBack()
+            {
+                --arg_i;
+                read_i = start_i;
+            }
+
+            public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null, in bool completeIfOption = false)
             {
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -47,16 +55,16 @@ namespace _COBRA_
                 else
                     argument = string.Empty;
 
-                // try completion
                 if (completions_candidates != null)
-                    if (IsCplThis)
-                    {
-                        cpl_start_i = read_i;
-                        if (signal == CMD_SIGNALS.TAB)
-                            ComputeCompletion_tab(argument, completions_candidates);
-                        else if (signal >= CMD_SIGNALS.ALT_UP)
-                            ComputeCompletion_alt(argument, completions_candidates);
-                    }
+                    if (!completeIfOption || argument.StartsWith('-'))
+                        if (IsCplThis)
+                        {
+                            cpl_start_i = read_i;
+                            if (signal == CMD_SIGNALS.TAB)
+                                ComputeCompletion_tab(argument, completions_candidates);
+                            else if (signal >= CMD_SIGNALS.ALT_UP)
+                                ComputeCompletion_alt(argument, completions_candidates);
+                        }
 
                 return isNotEmpty;
             }

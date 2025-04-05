@@ -80,7 +80,7 @@ namespace _COBRA_
                         TryReadCommand_ref(line, intermediate, path);
                     }
                     else
-                        line.read_i = line.start_i;
+                        line.ReadBack();
                 return path.Count > 0;
             }
         }

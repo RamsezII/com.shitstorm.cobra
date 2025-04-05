@@ -24,7 +24,7 @@ namespace _COBRA_
                             break;
 
                         case IEnumerable<object> lines:
-                            exe.Stdout(lines.LinesToText(false));
+                            exe.Stdout(lines.LinesToText());
                             break;
 
                         default:
