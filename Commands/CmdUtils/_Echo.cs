@@ -6,7 +6,8 @@ namespace _COBRA_
     {
         static void InitEcho()
         {
-            Command.cmd_root_shell.AddCommand("echo", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "echo",
                 manual: new("echo!"),
                 action_min_args_required: 1,
                 args: exe =>

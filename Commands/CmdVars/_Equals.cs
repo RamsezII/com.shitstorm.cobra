@@ -6,7 +6,8 @@ namespace _COBRA_
     {
         static void InitEquals()
         {
-            Command.cmd_root_shell.AddCommand("equals-literal", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "equals-literal",
                 manual: new("[pipe output] <value>"),
                 init_min_args_required: 1,
                 args: static exe =>
@@ -22,7 +23,8 @@ namespace _COBRA_
                 }
                 ));
 
-            Command.cmd_root_shell.AddCommand("equals-var", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "equals-var",
                 manual: new("[pipe output] <variable>"),
                 init_min_args_required: 1,
                 args: static exe =>

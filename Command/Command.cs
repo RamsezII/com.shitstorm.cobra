@@ -12,8 +12,9 @@ namespace _COBRA_
         public IEnumerable<string> ECommands_keys => _commands.Keys.OrderBy(key => key, StringComparer.OrdinalIgnoreCase);
         public IEnumerable<KeyValuePair<string, Command>> ECommands_pairs => _commands.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase);
 
-        public static readonly Command cmd_root_shell = new(stay_alive: true, log_error: true);
+        public static readonly Command cmd_root_shell = new("root_shell", stay_alive: true, log_error: true);
 
+        public readonly string name;
         public readonly Traductions manual;
         public readonly bool stay_alive, log_error;
         public readonly int init_min_args_required;
@@ -34,6 +35,7 @@ namespace _COBRA_
         //--------------------------------------------------------------------------------------------------------------
 
         public Command(
+            in string name,
             in Traductions manual = default,
             in bool stay_alive = default,
             in bool log_error = default,
@@ -45,6 +47,7 @@ namespace _COBRA_
             in Func<Executor, IEnumerator<CMD_STATUS>> routine = default
             )
         {
+            this.name = name;
             this.manual = manual;
             this.stay_alive = stay_alive;
             this.log_error = log_error;
@@ -58,9 +61,9 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public Command AddCommand(in string cmd_name, in Command command, params string[] aliases)
+        public Command AddCommand(in Command command, params string[] aliases)
         {
-            _commands.Add(cmd_name, command);
+            _commands.Add(command.name, command);
             for (int i = 0; i < aliases.Length; ++i)
                 _commands.Add(aliases[i], command);
             return command;

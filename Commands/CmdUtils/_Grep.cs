@@ -7,8 +7,8 @@ namespace _COBRA_
     {
         static void InitGrep()
         {
-            Command.cmd_root_shell.AddCommand("grep",
-            new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "grep",
                 manual: new("regex filter"),
                 init_min_args_required: 1,
                 args: exe =>

@@ -9,7 +9,8 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command.cmd_root_shell.AddCommand("load-scene", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "load-scene",
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string scene_name, new string[] { "scene_test1", "scene_test2", "scene_test3", }))
@@ -22,7 +23,8 @@ namespace _COBRA_
                 }),
                 "LoadScene");
 
-            Command.cmd_root_shell.AddCommand("test-options", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "test-options",
                 args: exe =>
                 {
                     if (exe.line.TryReadFlags(exe, out var flags, "-m", "--meaning", "--enhance"))
@@ -34,7 +36,8 @@ namespace _COBRA_
                 action: exe => exe.Stdout(exe.args.LinesToText())
                 ));
 
-            Command.cmd_root_shell.AddCommand("routine-test", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "routine-test",
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))

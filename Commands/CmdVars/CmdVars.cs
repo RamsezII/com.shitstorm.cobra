@@ -40,7 +40,8 @@ namespace _COBRA_
 
         static void InitVars()
         {
-            Command.cmd_root_shell.AddCommand("get-var", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "get-var",
                 manual: new("<variable name>"),
                 args: exe =>
                 {
@@ -53,7 +54,8 @@ namespace _COBRA_
                 action: exe => exe.Stdout(exe.args[0])
                 ));
 
-            Command.cmd_root_shell.AddCommand("set-var", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "set-var",
                 manual: new("<variable name> <value>"),
                 args: exe =>
                 {

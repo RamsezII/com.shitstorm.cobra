@@ -7,7 +7,8 @@ namespace _COBRA_
     {
         static void InitIf()
         {
-            Command.cmd_root_shell.AddCommand("not", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "not",
                 on_data: (exe, data) =>
                 {
                     switch (data)
@@ -31,7 +32,8 @@ namespace _COBRA_
                     }
                 }));
 
-            Command.cmd_root_shell.AddCommand("if", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "if",
                 manual: new("<if: {pipe|var}> <then: command> [else: command]"),
                 init_min_args_required: 1,
                 args: static exe =>

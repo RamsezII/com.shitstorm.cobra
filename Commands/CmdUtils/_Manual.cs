@@ -9,7 +9,8 @@ namespace _COBRA_
     {
         static void InitManual()
         {
-            Command.cmd_root_shell.AddCommand("manual", new Command(
+            Command.cmd_root_shell.AddCommand(new(
+                "manual",
                 manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
                 args: exe =>
                 {

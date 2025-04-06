@@ -12,7 +12,7 @@ namespace _COBRA_
         {
             //prefixe = $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{NUCLEOR.terminal_path.SetColor("#73B2D9")}$",
 
-            static readonly Executor echo_executor = new(new() { new("echo", new(on_data: (exe, stdin) => Debug.Log(stdin))), }, Line.EMPTY_EXE);
+            static readonly Executor echo_executor = new(new() { new("echo", new("echo", on_data: (exe, stdin) => Debug.Log(stdin))), }, Line.EMPTY_EXE);
 
             public readonly string cmd_name;
             public readonly Command command;
@@ -31,7 +31,7 @@ namespace _COBRA_
 
             public string error;
             public void Stdout(in object data) => stdout_exe.command.on_data(stdout_exe, data);
-            public void Stderr(in object data) => stderr_exe.command.on_data(stderr_exe, data);
+            void Stderr(in object data) => stderr_exe.command.on_data(stderr_exe, data);
 
             //--------------------------------------------------------------------------------------------------------------
 
