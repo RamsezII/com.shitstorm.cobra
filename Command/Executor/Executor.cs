@@ -12,7 +12,7 @@ namespace _COBRA_
         {
             //prefixe = $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{NUCLEOR.terminal_path.SetColor("#73B2D9")}$",
 
-            static readonly Executor echo_executor = new(new() { new("echo", new("echo", on_data: (exe, stdin) => Debug.Log(stdin))), }, Line.EMPTY_EXE);
+            static readonly Executor echo_executor = new(new() { new("echo", new("echo", on_pipe: (exe, stdin) => Debug.Log(stdin))), }, Line.EMPTY_EXE);
 
             public readonly string cmd_name;
             public readonly Command command;
@@ -30,8 +30,8 @@ namespace _COBRA_
             public byte id = ++id_counter;
 
             public string error;
-            public void Stdout(in object data) => stdout_exe.command.on_data(stdout_exe, data);
-            void Stderr(in object data) => stderr_exe.command.on_data(stderr_exe, data);
+            public void Stdout(in object data) => stdout_exe.command.on_pipe(stdout_exe, data);
+            void Stderr(in object data) => stderr_exe.command.on_pipe(stderr_exe, data);
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -73,12 +73,12 @@ namespace _COBRA_
 
                 if (command.args != null)
                 {
-                    args = new(command.init_min_args_required);
+                    args = new(command.pipe_min_args_required);
                     command.args(this);
 
                     if (error == null)
-                        if (args.Count < command.init_min_args_required)
-                            error = $"[{nameof(command.init_min_args_required)}] '{cmd_name}' ({cmd_path}) requires {command.init_min_args_required} arguments to init, {args.Count} were given.";
+                        if (args.Count < command.pipe_min_args_required)
+                            error = $"[{nameof(command.pipe_min_args_required)}] '{cmd_name}' ({cmd_path}) requires {command.pipe_min_args_required} arguments to init, {args.Count} were given.";
                 }
 
                 if (error == null)
@@ -88,8 +88,8 @@ namespace _COBRA_
                             Executor executor = new(path2, line);
                             error = executor.error;
                             if (error == null)
-                                if (executor.command.on_data == null)
-                                    error = $"Command '{executor.cmd_name}' ({executor.cmd_path}) has no '{nameof(executor.command.on_data)}' callback, it can not be piped into.";
+                                if (executor.command.on_pipe == null)
+                                    error = $"Command '{executor.cmd_name}' ({executor.cmd_path}) has no '{nameof(executor.command.on_pipe)}' callback, it can not be piped into.";
                                 else
                                     stdout_exe = executor;
                         }

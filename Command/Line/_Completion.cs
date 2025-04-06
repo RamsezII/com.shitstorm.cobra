@@ -11,7 +11,7 @@ namespace _COBRA_
             public void InsertCompletionCandidate(in string candidate)
             {
                 text = text[..start_i] + candidate + text[read_i..];
-                cursor_i = start_i + candidate.Length;
+                cursor_i = read_i = start_i + candidate.Length;
             }
 
             public void ComputeCompletion_tab(in string argument, in IEnumerable<string> candidates)

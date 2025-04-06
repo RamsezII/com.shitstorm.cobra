@@ -10,9 +10,11 @@ namespace _COBRA_
         {
             public bool TryReadFlags(in Executor executor, out HashSet<string> output, params string[] flags)
             {
+                SkipLintToThisPosition();
+
                 HashSet<string> flags_remaining = new(flags, StringComparer.OrdinalIgnoreCase);
 
-                while (TryReadArgument(out string split, flags_remaining, true))
+                while (TryReadArgument(out string split, flags_remaining, complete_if_is_option: true, lint: false))
                 {
                     if (!split.StartsWith('-'))
                     {
@@ -22,11 +24,14 @@ namespace _COBRA_
 
                     if (!flags_remaining.Contains(split))
                     {
+                        LintToThisPosition(linter.error);
+
                         executor.error = $"wrong or already used option '{split}'";
                         output = null;
                         return false;
                     }
 
+                    LintToThisPosition(linter.option);
                     flags_remaining.Remove(split);
                 }
 
@@ -36,9 +41,11 @@ namespace _COBRA_
 
             public bool TryReadOptions(in Executor executor, in Dictionary<string, Action<string>> onOption)
             {
+                SkipLintToThisPosition();
+
                 HashSet<string> options_remaining = new(onOption.Keys, StringComparer.OrdinalIgnoreCase);
 
-                while (TryReadArgument(out string split, options_remaining, true))
+                while (TryReadArgument(out string split, options_remaining, complete_if_is_option: true, lint: false))
                 {
                     if (!split.StartsWith('-'))
                     {
@@ -48,15 +55,18 @@ namespace _COBRA_
 
                     if (!onOption.ContainsKey(split))
                     {
+                        LintToThisPosition(linter.error);
                         executor.error = $"wrong option '{split}'";
                         return false;
                     }
                     else if (!options_remaining.Contains(split))
                     {
+                        LintToThisPosition(linter.error);
                         executor.error = $"option '{split}' already added";
                         return false;
                     }
 
+                    LintToThisPosition(linter.option);
                     options_remaining.Remove(split);
                     onOption[split]?.Invoke(split);
                 }

@@ -43,13 +43,17 @@ namespace _COBRA_
             Command.cmd_root_shell.AddCommand(new(
                 "get-var",
                 manual: new("<variable name>"),
+                action_min_args_required: 1,
                 args: exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg1, variables.Keys))
-                        if (variables.TryGetValue(arg1, out object value))
-                            exe.args.Add(value);
+                    if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
+                        if (variables.TryGetValue(var_name, out object var_value))
+                        {
+                            exe.line.LintToThisPosition(exe.line.linter.variable);
+                            exe.args.Add(var_value);
+                        }
                         else
-                            exe.error = $"variable '{arg1}' not found";
+                            exe.error = $"variable '{var_name}' not found";
                 },
                 action: exe => exe.Stdout(exe.args[0])
                 ));
@@ -57,19 +61,34 @@ namespace _COBRA_
             Command.cmd_root_shell.AddCommand(new(
                 "set-var",
                 manual: new("<variable name> <value>"),
+                action_min_args_required: 2,
+                pipe_min_args_required: 1,
                 args: exe =>
                 {
-                    if (exe.line.TryReadArgument(out string var_name))
+                    if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
                     {
+                        exe.line.LintToThisPosition(exe.line.linter.variable);
                         exe.args.Add(var_name);
-                        if (exe.line.TryReadArgument(out string var_value))
+
+                        if (exe.line.TryReadArgument(out string var_value, lint: false))
+                        {
+                            exe.line.LintToThisPosition(exe.line.linter.value);
                             exe.args.Add(var_value);
+                        }
+                        else
+                            exe.error = $"value not found";
                     }
                 },
                 action: exe =>
                 {
                     string var_name = (string)exe.args[0];
-                    string value = (string)exe.args[1];
+                    object value = exe.args[1];
+                    variables[var_name] = value;
+                },
+                on_pipe: (exe, data) =>
+                {
+                    string var_name = (string)exe.args[0];
+                    object value = data;
                     variables[var_name] = value;
                 }
                 ));

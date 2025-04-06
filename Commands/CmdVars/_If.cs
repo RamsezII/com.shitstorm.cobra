@@ -9,7 +9,7 @@ namespace _COBRA_
         {
             Command.cmd_root_shell.AddCommand(new(
                 "not",
-                on_data: (exe, data) =>
+                on_pipe: (exe, data) =>
                 {
                     switch (data)
                     {
@@ -35,7 +35,7 @@ namespace _COBRA_
             Command.cmd_root_shell.AddCommand(new(
                 "if",
                 manual: new("<if: {pipe|var}> <then: command> [else: command]"),
-                init_min_args_required: 1,
+                pipe_min_args_required: 1,
                 args: static exe =>
                 {
                     if (Command.cmd_root_shell.TryReadCommand_path(exe.line, out var cmd1_path))
@@ -52,23 +52,23 @@ namespace _COBRA_
                             exe.error = $"missing command after '{_else}'";
                     }
                 },
-                on_data: static (exe, data) =>
+                on_pipe: static (exe, data) =>
                 {
                     bool isTrue = (bool)data;
                     var cmd1 = (KeyValuePair<string, Command>)exe.args[0];
 
                     if (isTrue)
-                        if (cmd1.Value.on_data == null)
-                            exe.error = $"command '{cmd1.Key}' has no {nameof(cmd1.Value.on_data)} callback";
+                        if (cmd1.Value.on_pipe == null)
+                            exe.error = $"command '{cmd1.Key}' has no {nameof(cmd1.Value.on_pipe)} callback";
                         else
-                            cmd1.Value.on_data(exe, data);
+                            cmd1.Value.on_pipe(exe, data);
                     else if (exe.args.Count > 1)
                     {
                         var cmd2 = (KeyValuePair<string, Command>)exe.args[1];
-                        if (cmd2.Value.on_data == null)
-                            exe.error = $"command '{cmd2.Key}' has no {nameof(cmd2.Value.on_data)} callback";
+                        if (cmd2.Value.on_pipe == null)
+                            exe.error = $"command '{cmd2.Key}' has no {nameof(cmd2.Value.on_pipe)} callback";
                         else
-                            cmd2.Value.on_data(exe, data);
+                            cmd2.Value.on_pipe(exe, data);
                     }
                 }
                 ));

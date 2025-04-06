@@ -10,13 +10,13 @@ namespace _COBRA_
             Command.cmd_root_shell.AddCommand(new(
                 "grep",
                 manual: new("regex filter"),
-                init_min_args_required: 1,
+                pipe_min_args_required: 1,
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(arg);
                 },
-                on_data: (exe, data) =>
+                on_pipe: (exe, data) =>
                 {
                     Regex regex = new((string)exe.args[0], RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                     switch (data)

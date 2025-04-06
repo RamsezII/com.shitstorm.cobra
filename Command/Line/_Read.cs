@@ -1,5 +1,5 @@
-﻿using _ARK_;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace _COBRA_
 {
@@ -7,12 +7,19 @@ namespace _COBRA_
     {
         partial class Line
         {
-            public bool TryReadPipe() => Util_ark.TryReadPipe(text, ref read_i);
+            public bool TryReadPipe()
+            {
+                LintToThisPosition(Color.white);
+                bool res = Util_cobra.TryReadPipe(text, ref read_i);
+                if (res)
+                    LintToThisPosition(linter.pipe);
+                return res;
+            }
 
             public bool HasNext(in bool save_move)
             {
                 int read_i = this.read_i;
-                Util_ark.SkipCharactersUntil(text, ref read_i, true, false, Util_ark.CHAR_SPACE);
+                Util_cobra.SkipCharactersUntil(text, ref read_i, true, false, Util_cobra.CHAR_SPACE);
                 if (save_move)
                     this.read_i = read_i;
                 return read_i < text.Length;
@@ -24,7 +31,7 @@ namespace _COBRA_
                 read_i = start_i;
             }
 
-            public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null, in bool complete_if_is_option = false)
+            public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null, in bool complete_if_is_option = false, in bool lint = true)
             {
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -32,16 +39,19 @@ namespace _COBRA_
                     return false;
                 }
 
-                Util_ark.SkipCharactersUntil(text, ref read_i, true, false, Util_ark.CHAR_SPACE);
+                if (lint)
+                    LintToThisPosition(linter._default_);
 
-                if (read_i > 0 && text[read_i - 1] != Util_ark.CHAR_SPACE)
+                Util_cobra.SkipCharactersUntil(text, ref read_i, true, false, Util_cobra.CHAR_SPACE);
+
+                if (read_i > 0 && text[read_i - 1] != Util_cobra.CHAR_SPACE)
                 {
                     argument = string.Empty;
                     return false;
                 }
 
                 start_i = read_i;
-                Util_ark.SkipCharactersUntil(text, ref read_i, true, true, Util_ark.CHAR_SPACE, Util_ark.CHAR_PIPE, Util_ark.CHAR_CHAIN);
+                Util_cobra.SkipCharactersUntil(text, ref read_i, true, true, Util_cobra.CHAR_SPACE, Util_cobra.CHAR_PIPE, Util_cobra.CHAR_CHAIN);
 
                 bool isNotEmpty = false;
 
@@ -51,6 +61,9 @@ namespace _COBRA_
                     ++arg_i;
 
                     isNotEmpty = true;
+
+                    if (lint)
+                        LintToThisPosition(linter.argument);
                 }
                 else
                     argument = string.Empty;
