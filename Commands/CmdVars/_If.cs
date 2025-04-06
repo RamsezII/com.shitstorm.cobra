@@ -7,6 +7,30 @@ namespace _COBRA_
     {
         static void InitIf()
         {
+            Command.cmd_root_shell.AddCommand("not", new Command(
+                on_data: (exe, data) =>
+                {
+                    switch (data)
+                    {
+                        case bool bool_:
+                            exe.Stdout(!bool_);
+                            break;
+
+                        case string str:
+                            if (str.Equals("true", StringComparison.OrdinalIgnoreCase))
+                                exe.Stdout(false);
+                            else if (str.Equals("false", StringComparison.OrdinalIgnoreCase))
+                                exe.Stdout(true);
+                            else
+                                exe.error = $"wrong argument '{str}'";
+                            break;
+
+                        default:
+                            exe.error = $"wrong argument '{data}'";
+                            break;
+                    }
+                }));
+
             Command.cmd_root_shell.AddCommand("if", new Command(
                 manual: new("<if: {pipe|var}> <then: command> [else: command]"),
                 init_min_args_required: 1,

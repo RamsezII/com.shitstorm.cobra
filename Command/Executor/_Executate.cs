@@ -56,6 +56,7 @@ namespace _COBRA_
                                 }
                                 catch (System.Exception e)
                                 {
+                                    Debug.LogException(e);
                                     error = $"[{nameof(command.action)}] '{cmd_name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
                                 }
 
@@ -76,6 +77,7 @@ namespace _COBRA_
                             }
                             catch (System.Exception e)
                             {
+                                Debug.LogException(e);
                                 error = $"[{nameof(command.routine)}] '{cmd_name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
                             }
                     }

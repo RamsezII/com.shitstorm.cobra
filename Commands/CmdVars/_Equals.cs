@@ -17,7 +17,8 @@ namespace _COBRA_
                 on_data: (exe, data) =>
                 {
                     string literal = (string)exe.args[0];
-                    exe.Stdout(data.ToString().Equals(literal, StringComparison.Ordinal));
+                    string data_str = data.ToString();
+                    exe.Stdout(data_str.Equals(literal, StringComparison.Ordinal));
                 }
                 ));
 
