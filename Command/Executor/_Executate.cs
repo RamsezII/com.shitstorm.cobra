@@ -19,6 +19,20 @@ namespace _COBRA_
                 return false;
             }
 
+            public bool TryKill()
+            {
+                if (routine != null)
+                    if (cant_be_killed)
+                        Debug.LogWarning($"'{cmd_name}' ({cmd_path}) is immortal");
+                    else
+                    {
+                        routine.Dispose();
+                        routine = null;
+                        return true;
+                    }
+                return false;
+            }
+
             public IEnumerator<CMD_STATUS> Executate(in Line line)
             {
                 this.line = line;

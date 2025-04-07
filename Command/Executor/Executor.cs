@@ -19,6 +19,7 @@ namespace _COBRA_
             public readonly string cmd_path;
 
             public Line line;
+            public bool cant_be_killed;
             readonly Executor stdout_exe = echo_executor, stderr_exe = echo_executor;
             public readonly List<object> args;
             public IEnumerator<CMD_STATUS> routine;
@@ -105,6 +106,8 @@ namespace _COBRA_
 
             public void Dispose()
             {
+                routine?.Dispose();
+
                 lock (disposed)
                 {
                     if (disposed._value)

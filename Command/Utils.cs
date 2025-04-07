@@ -5,6 +5,7 @@ namespace _COBRA_
     public enum CMD_SIGNALS : byte
     {
         _NONE_,
+        KILL,
         LINT,
         CHECK,
         EXEC,

@@ -1,4 +1,5 @@
 ﻿using _ARK_;
+using _UTIL_;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -47,20 +48,27 @@ namespace _COBRA_
 
             static IEnumerator<CMD_STATUS> ERoutineTest(Command.Executor executor)
             {
-                int loops = (int)executor.args[0];
-                for (int i = 0; i < loops; ++i)
+                try
                 {
-                    executor.Stdout(i);
-                    float timer = 0;
-                    while (timer < 1)
+                    int loops = (int)executor.args[0];
+                    for (int i = 0; i < loops; ++i)
                     {
-                        timer += 3 * Time.deltaTime;
-                        yield return new CMD_STATUS()
+                        executor.Stdout(i);
+                        float timer = 0;
+                        while (timer < 1)
                         {
-                            state = CMD_STATES.BLOCKING,
-                            progress = (i + timer) / loops,
-                        };
+                            timer += 3 * Time.deltaTime;
+                            yield return new CMD_STATUS()
+                            {
+                                state = CMD_STATES.BLOCKING,
+                                progress = (i + timer) / loops,
+                            };
+                        }
                     }
+                }
+                finally
+                {
+                    executor.Stdout("cleaning");
                 }
             }
         }
