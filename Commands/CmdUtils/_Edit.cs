@@ -6,16 +6,16 @@ namespace _COBRA_
     {
         static void InitEdit()
         {
-            const string flag_force_file = "force-file";
+            const string flag_force_file = "--create-if-not-found";
 
             Command.cmd_root_shell.AddCommand(new(
                 "edit-file",
+                manual: new("create and edit a file"),
                 action_min_args_required: 1,
                 args: static exe =>
                 {
-                    const string flag_force = "--create-if-not-found";
-                    if (exe.line.TryReadFlags(exe, out var opts, flag_force))
-                        if (opts.Contains(flag_force))
+                    if (exe.line.TryReadFlags(exe, out var opts, flag_force_file))
+                        if (opts.Contains(flag_force_file))
                             exe.opts.Add(flag_force_file);
 
                     // read file path
