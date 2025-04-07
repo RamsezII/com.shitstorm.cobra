@@ -1,21 +1,43 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace _COBRA_
 {
-    public enum CMD_SIGNALS : byte
+    enum CMD_SIGNALS_enum : byte
     {
-        _NONE_,
-        KILL,
-        SAVE,
-        LINT,
-        CHECK,
-        EXEC,
-        ALT_DOUBLE,
-        TAB,
-        ALT_UP,
-        ALT_DOWN,
-        ALT_LEFT,
-        ALT_RIGHT,
+        _kill,
+        _save,
+        _lint,
+        _check,
+        _exec,
+        _double,
+        _tab,
+        _alt,
+        _up,
+        _down,
+        _left,
+        _right,
+    }
+
+    [Flags]
+    public enum CMD_SIGNALS : ushort
+    {
+        SAVE = 1 << CMD_SIGNALS_enum._save,
+        LINT = 1 << CMD_SIGNALS_enum._lint,
+        CHECK = 1 << CMD_SIGNALS_enum._check,
+        EXEC = 1 << CMD_SIGNALS_enum._exec,
+        DOUBLE = 1 << CMD_SIGNALS_enum._double,
+        TAB = 1 << CMD_SIGNALS_enum._tab,
+        ALT = 1 << CMD_SIGNALS_enum._alt,
+        UP = 1 << CMD_SIGNALS_enum._up,
+        RIGHT = 1 << CMD_SIGNALS_enum._right,
+        DOWN = 1 << CMD_SIGNALS_enum._down,
+        LEFT = 1 << CMD_SIGNALS_enum._left,
+
+        ALT_UP = ALT | UP,
+        ALT_RIGHT = ALT | RIGHT,
+        ALT_DOWN = ALT | DOWN,
+        ALT_LEFT = ALT | LEFT,
     }
 
     public enum CMD_STATES : byte
