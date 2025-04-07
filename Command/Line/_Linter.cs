@@ -33,7 +33,7 @@ namespace _COBRA_
 
                 public string GetLint(in Executor exe, in string input)
                 {
-                    Line line = new(input, CMD_SIGNALS.LINT, this);
+                    Line line = new(input, CMD_SIGNALS.LINT, exe.line.terminal, this);
                     exe.Executate(line);
                     line.EndLint(error);
                     string res = sb.PullValue();
