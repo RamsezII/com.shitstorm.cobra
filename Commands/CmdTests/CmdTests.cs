@@ -46,7 +46,7 @@ namespace _COBRA_
                 },
                 routine: ERoutineTest));
 
-            static IEnumerator<CMD_STATUS> ERoutineTest(Command.Executor executor)
+            static IEnumerator<STDIN_INFOS> ERoutineTest(Command.Executor executor)
             {
                 try
                 {
@@ -58,7 +58,7 @@ namespace _COBRA_
                         while (timer < 1)
                         {
                             timer += 3 * Time.deltaTime;
-                            yield return new CMD_STATUS()
+                            yield return new STDIN_INFOS()
                             {
                                 state = CMD_STATES.BLOCKING,
                                 progress = (i + timer) / loops,

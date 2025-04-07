@@ -31,9 +31,10 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                public string GetLint(in Executor exe, in string input)
+                public string GetLint(in Executor exe, in string input) => GetLint(exe, input, out _);
+                public string GetLint(in Executor exe, in string input, out Line line)
                 {
-                    Line line = new(input, CMD_SIGNALS.LINT, exe.line.terminal, this);
+                    line = new(input, CMD_SIGNALS.LINT, exe.line.terminal, this);
                     exe.Executate(line);
                     line.EndLint(error);
                     string res = sb.PullValue();

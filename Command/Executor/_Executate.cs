@@ -22,8 +22,8 @@ namespace _COBRA_
             public bool TryKill()
             {
                 if (routine != null)
-                    if (cant_be_killed)
-                        Debug.LogWarning($"'{cmd_name}' ({cmd_path}) is immortal");
+                    if (routine.Current.immortal)
+                        Debug.LogWarning($"'{cmd_name}' ({cmd_path}) {typeof(STDIN_INFOS).FullName}.{nameof(routine.Current.immortal)}: {routine.Current.immortal}");
                     else
                     {
                         routine.Dispose();
@@ -33,7 +33,7 @@ namespace _COBRA_
                 return false;
             }
 
-            public IEnumerator<CMD_STATUS> Executate(in Line line)
+            public IEnumerator<STDIN_INFOS> Executate(in Line line)
             {
                 this.line = line;
 

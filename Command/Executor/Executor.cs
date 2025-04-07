@@ -19,10 +19,10 @@ namespace _COBRA_
             public readonly string cmd_path;
 
             public Line line;
-            public bool cant_be_killed;
             readonly Executor stdout_exe = echo_executor, stderr_exe = echo_executor;
             public readonly List<object> args;
-            public IEnumerator<CMD_STATUS> routine;
+            public readonly HashSet<string> opts = new(StringComparer.OrdinalIgnoreCase);
+            public IEnumerator<STDIN_INFOS> routine;
 
             public readonly ThreadSafe_struct<bool> disposed = new();
 

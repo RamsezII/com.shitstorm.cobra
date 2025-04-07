@@ -12,16 +12,16 @@ namespace _COBRA_
         public IEnumerable<string> ECommands_keys => _commands.Keys.OrderBy(key => key, StringComparer.OrdinalIgnoreCase);
         public IEnumerable<KeyValuePair<string, Command>> ECommands_pairs => _commands.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase);
 
-        public static readonly Command cmd_root_shell = new("root_shell", stay_alive: true, log_error: true);
+        public static readonly Command cmd_root_shell = new("root_shell", log_error: true);
 
         public readonly string name;
         public readonly Traductions manual;
-        public readonly bool stay_alive, log_error;
+        public readonly bool log_error;
         public readonly int action_min_args_required;
         public readonly int pipe_min_args_required;
         public readonly Action<Executor> args, action;
         public readonly Action<Executor, object> on_pipe;
-        public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
+        public readonly Func<Executor, IEnumerator<STDIN_INFOS>> routine;
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -37,19 +37,17 @@ namespace _COBRA_
         public Command(
             in string name,
             in Traductions manual = default,
-            in bool stay_alive = default,
             in bool log_error = default,
             in int action_min_args_required = default,
             in int pipe_min_args_required = default,
             in Action<Executor> args = default,
             in Action<Executor> action = default,
             in Action<Executor, object> on_pipe = default,
-            in Func<Executor, IEnumerator<CMD_STATUS>> routine = default
+            in Func<Executor, IEnumerator<STDIN_INFOS>> routine = default
             )
         {
             this.name = name;
             this.manual = manual;
-            this.stay_alive = stay_alive;
             this.log_error = log_error;
             this.action_min_args_required = action_min_args_required;
             this.pipe_min_args_required = pipe_min_args_required;

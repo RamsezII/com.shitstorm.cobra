@@ -7,6 +7,8 @@ namespace _COBRA_
     {
         public const char
             CHAR_SPACE = ' ',
+            CHAR_TAB = '\t',
+            CHAR_NEWLINE = '\n',
             CHAR_CHAIN = '&',
             CHAR_PIPE = '|',
             CHAR_BACKPIPE = '!';
@@ -22,35 +24,45 @@ namespace _COBRA_
             _ => '?',
         };
 
-        public static void SkipCharactersUntil(this string text, ref int read_i, in bool left_to_right, in bool positive, params char[] key_chars)
+        static void Increment(ref int read_i, in bool left_to_right)
         {
-            static void Increment(ref int read_i, in bool left_to_right)
-            {
-                if (left_to_right)
-                    ++read_i;
-                else
-                    --read_i;
-            }
-
-            if (!left_to_right)
+            if (left_to_right)
+                ++read_i;
+            else
                 --read_i;
+        }
 
+        public static int SkipCharactersUntil(this string text, ref int read_i, in bool left_to_right, in bool positive, params char[] key_chars)
+        {
             HashSet<char> charSet = new(key_chars);
+            int skips = 0;
 
-            while (read_i >= 0 && read_i < text.Length)
+            while (left_to_right
+                ? read_i >= 0 && read_i < text.Length
+                : read_i > 0 && read_i <= text.Length)
             {
+                if (!left_to_right)
+                    Increment(ref read_i, left_to_right);
+
                 char c = text[read_i];
 
+                if (c == CHAR_NEWLINE)
+                    if (!charSet.Contains(CHAR_NEWLINE))
+                    {
+                        if (!left_to_right)
+                            ++read_i;
+                        return skips;
+                    }
+
                 if (positive == charSet.Contains(c))
-                    return;
+                {
+                    if (!left_to_right)
+                        ++read_i;
+                    return skips;
+                }
 
                 switch (c)
                 {
-                    case '\t':
-                    case '\r':
-                    case '\n':
-                        break;
-
                     case '"':
                     case '\'':
                         Increment(ref read_i, left_to_right);
@@ -61,9 +73,13 @@ namespace _COBRA_
                         Increment(ref read_i, left_to_right);
                         break;
                 }
-                Increment(ref read_i, left_to_right);
+
+                if (left_to_right)
+                    Increment(ref read_i, left_to_right);
+
+                ++skips;
             }
-            read_i = Mathf.Clamp(read_i, 0, text.Length);
+            return skips;
         }
 
         public static bool TryReadPipe(this string text, ref int read_i)
