@@ -73,9 +73,9 @@ namespace _COBRA_
                         if (IsCplThis)
                         {
                             cpl_start_i = read_i;
-                            if (signal == CMD_SIGNALS.TAB)
+                            if (signal.HasFlag(CMD_SIGNALS.CPL_TAB))
                                 ComputeCompletion_tab(argument, completions_candidates);
-                            else if (signal >= CMD_SIGNALS.ALT_UP)
+                            else if (signal.HasFlag(CMD_SIGNALS.CPL_ALT))
                                 ComputeCompletion_alt(argument, completions_candidates);
                         }
 

@@ -34,7 +34,7 @@ namespace _COBRA_
                 public string GetLint(in Executor exe, in string input) => GetLint(exe, input, out _);
                 public string GetLint(in Executor exe, in string input, out Line line)
                 {
-                    line = new(input, CMD_SIGNALS.LINT, exe.line.terminal, this);
+                    line = new(input, CMD_SIGNALS.LINT, exe.line.terminal);
                     exe.Executate(line);
                     line.EndLint(error);
                     string res = sb.PullValue();
@@ -54,6 +54,12 @@ namespace _COBRA_
 
             public void EndLint(in Color color)
             {
+                if (!signal.HasFlag(CMD_SIGNALS.LINT))
+                    return;
+
+                if (string.IsNullOrEmpty(text))
+                    return;
+
                 if (text.Length > linter.last_i)
                 {
                     linter.sb.Append(text[linter.last_i..].SetColor(color));
@@ -63,6 +69,9 @@ namespace _COBRA_
 
             public void SkipLintToThisPosition()
             {
+                if (!signal.HasFlag(CMD_SIGNALS.LINT))
+                    return;
+
                 if (read_i < linter.last_i)
                 {
                     if (!linter.fail_b && false)
@@ -84,6 +93,9 @@ namespace _COBRA_
 
             public void LintToThisPosition(in Color color)
             {
+                if (!signal.HasFlag(CMD_SIGNALS.LINT))
+                    return;
+
                 if (read_i < linter.last_i)
                 {
                     if (!linter.fail_b && false)

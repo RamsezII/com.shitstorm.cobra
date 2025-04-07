@@ -30,18 +30,14 @@ namespace _COBRA_
                 {
                     while (true)
                     {
-                        switch (exe.line.signal)
-                        {
-                            case CMD_SIGNALS.SAVE:
-                                exe.Stdout("Saving file...");
-                                yield break;
-                        }
+                        if (exe.root.line.signal.HasFlag(CMD_SIGNALS.SAVE))
+                            exe.Stdout("Saving file...");
                         yield return new(CMD_STATES.FULLSCREEN_write);
                     }
                 }
                 finally
                 {
-                    exe.Stdout("cleaning");
+                    exe.Stdout("cleaning after closing file");
                 }
             }
         }

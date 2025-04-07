@@ -11,12 +11,14 @@ namespace _COBRA_
         _check,
         _exec,
         _double,
+        _cpl,
         _tab,
         _alt,
         _up,
         _down,
         _left,
         _right,
+        _last_
     }
 
     [Flags]
@@ -27,6 +29,7 @@ namespace _COBRA_
         CHECK = 1 << CMD_SIGNALS_enum._check,
         EXEC = 1 << CMD_SIGNALS_enum._exec,
         DOUBLE = 1 << CMD_SIGNALS_enum._double,
+        CPL = 1 << CMD_SIGNALS_enum._cpl,
         TAB = 1 << CMD_SIGNALS_enum._tab,
         ALT = 1 << CMD_SIGNALS_enum._alt,
         UP = 1 << CMD_SIGNALS_enum._up,
@@ -34,10 +37,13 @@ namespace _COBRA_
         DOWN = 1 << CMD_SIGNALS_enum._down,
         LEFT = 1 << CMD_SIGNALS_enum._left,
 
-        ALT_UP = ALT | UP,
-        ALT_RIGHT = ALT | RIGHT,
-        ALT_DOWN = ALT | DOWN,
-        ALT_LEFT = ALT | LEFT,
+        CPL_TAB = CPL | TAB,
+        CPL_ALT = CPL | ALT,
+
+        ALT_UP = CPL_ALT | UP,
+        ALT_RIGHT = CPL_ALT | RIGHT,
+        ALT_DOWN = CPL_ALT | DOWN,
+        ALT_LEFT = CPL_ALT | LEFT,
     }
 
     public enum CMD_STATES : byte

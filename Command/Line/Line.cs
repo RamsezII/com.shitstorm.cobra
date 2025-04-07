@@ -7,8 +7,6 @@ namespace _COBRA_
     {
         public sealed partial class Line
         {
-            public static readonly Line EMPTY_EXE = new(default, CMD_SIGNALS.EXEC, null, new());
-
             public readonly ITerminal terminal;
             public readonly Linter linter = new();
             public string text;
@@ -17,7 +15,8 @@ namespace _COBRA_
             public CMD_SIGNALS signal;
             public int cursor_i, read_i, start_i, arg_i = -1, cpl_start_i;
             public string arg_last;
-            public bool IsCplThis => signal >= CMD_SIGNALS.TAB && cursor_i >= start_i && (cursor_i < read_i || cursor_i == read_i && cursor_i == text.Length);
+            public bool IsCplThis => signal.HasFlag(CMD_SIGNALS.CPL_TAB) && cursor_i >= start_i && (cursor_i < read_i || cursor_i == read_i && cursor_i == text.Length);
+            public bool HasFlags_any(in CMD_SIGNALS flags) => (signal & flags) != 0;
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -35,16 +34,20 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            public Line(in string text, in CMD_SIGNALS signal, in ITerminal terminal, in Linter linter, in int cursor_i = default, in int cpl_index = default)
+            public Line(in string text, in CMD_SIGNALS signal, in ITerminal terminal, in int cursor_i = default, in int cpl_index = default)
             {
-                this.linter = linter;
-                linter?.Clear();
-                this.terminal = terminal;
                 notEmpty = !string.IsNullOrWhiteSpace(text);
                 this.text = notEmpty ? text : string.Empty;
                 this.signal = signal;
+                this.terminal = terminal;
                 this.cursor_i = cursor_i;
                 this.cpl_index = cpl_index;
+
+                if (terminal == null)
+                    Debug.LogWarning("null terminal");
+
+                linter = terminal?.Linter;
+                linter?.Clear();
             }
         }
     }
