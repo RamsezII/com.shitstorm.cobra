@@ -46,14 +46,14 @@ namespace _COBRA_
                 },
                 routine: ERoutineTest));
 
-            static IEnumerator<STDIN_INFOS> ERoutineTest(Command.Executor executor)
+            static IEnumerator<STDIN_INFOS> ERoutineTest(Command.Executor exe)
             {
                 try
                 {
-                    int loops = (int)executor.args[0];
+                    int loops = (int)exe.args[0];
                     for (int i = 0; i < loops; ++i)
                     {
-                        executor.Stdout(i);
+                        exe.Stdout(i);
                         float timer = 0;
                         while (timer < 1)
                         {
@@ -68,7 +68,7 @@ namespace _COBRA_
                 }
                 finally
                 {
-                    executor.Stdout("cleaning");
+                    Debug.Log($"'{exe.cmd_name}' ({exe.cmd_path}) disposed".ToSubLog());
                 }
             }
         }
