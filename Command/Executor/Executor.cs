@@ -160,7 +160,11 @@ namespace _COBRA_
                                 if (exe.error == null && line.signal.HasFlag(CMD_SIGNALS.EXEC))
                                     return routine = exe.Executate(line);
                                 else
+                                {
+                                    if (exe.error != null)
+                                        error = $"'{exe.cmd_name}' ({exe.cmd_path}): {exe.error}";
                                     exe.Dispose();
+                                }
                             }
                             else
                                 error = $"Could not find '{line.arg_last}' in '{cmd_name}' ({cmd_path})";
@@ -191,11 +195,19 @@ namespace _COBRA_
                             {
                                 routine = command.routine(this);
                                 routine.MoveNext();
+                                if (error != null)
+                                    error = $"[{nameof(command.routine)}] {error}";
                                 return routine;
                             }
                         }
-                        else if (routine != null && !routine.MoveNext())
-                            routine = null;
+                        else if (routine != null)
+                        {
+                            if (!routine.MoveNext())
+                                routine = null;
+
+                            if (error != null)
+                                error = $"[{nameof(command.routine)}] {error}";
+                        }
                     }
                     catch (Exception e)
                     {
