@@ -22,7 +22,6 @@ namespace _COBRA_
             public readonly string cmd_name;
             public readonly Command command;
             public readonly string cmd_path;
-            public string GetPrefixe() => $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{cmd_path.SetColor("#73B2D9")}$";
 
             public readonly Executor root;
             public Line line;
@@ -112,6 +111,13 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
+            public string GetPrefixe(string user_name = null, string cmd_path = null)
+            {
+                user_name ??= MachineSettings.machine_name.Value;
+                cmd_path ??= this.cmd_path;
+                return $"{user_name.SetColor("#73CC26")}:{cmd_path.SetColor("#73B2D9")}$";
+            }
+
             public bool CanLogError()
             {
                 if (command != null && line != null)
@@ -136,6 +142,7 @@ namespace _COBRA_
 
             public IEnumerator<STDIN_INFOS> Executate(in Line line)
             {
+                error = null;
                 this.line = line;
 
                 if (line.signal.HasFlag(CMD_SIGNALS.EXEC))
