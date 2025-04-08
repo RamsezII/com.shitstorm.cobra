@@ -16,18 +16,21 @@ namespace _COBRA_
 
                 public readonly StringBuilder sb = new();
 
-                public Color
-                    _default_,
-                    command,
-                    argument,
-                    option,
-                    pipe,
-                    chain,
-                    background,
-                    variable,
-                    value,
-                    type,
-                    error;
+                public Color _default_ = Color.gray;
+                public Color command = Color.gray;
+                public Color argument = Color.gray;
+                public Color option = Color.gray;
+                public Color pipe = Color.gray;
+                public Color chain = Color.gray;
+                public Color background = Color.gray;
+                public Color variable = Color.gray;
+                public Color value = Color.gray;
+                public Color type = Color.gray;
+                public Color directory = Color.gray;
+                public Color file = Color.gray;
+                public Color bundle = Color.gray;
+                public Color asset = Color.gray;
+                public Color error = Color.gray;
 
                 //--------------------------------------------------------------------------------------------------------------
 

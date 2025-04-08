@@ -13,6 +13,7 @@ namespace _COBRA_
             InitManual();
             InitGrep();
             InitEdit();
+            InitLinter();
 
             Command.cmd_root_shell.AddCommand(new(
                 "shutdown",
