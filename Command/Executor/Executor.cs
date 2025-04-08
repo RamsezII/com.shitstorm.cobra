@@ -1,4 +1,5 @@
-﻿using _UTIL_;
+﻿using _ARK_;
+using _UTIL_;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +22,7 @@ namespace _COBRA_
             public readonly string cmd_name;
             public readonly Command command;
             public readonly string cmd_path;
+            public string GetPrefixe() => $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{cmd_path.SetColor("#73B2D9")}$";
 
             public readonly Executor root;
             public Line line;
@@ -139,20 +141,21 @@ namespace _COBRA_
                 if (line.signal.HasFlag(CMD_SIGNALS.EXEC))
                     ++executions;
 
-                if (line.notEmpty)
-                    if (line.HasFlags_any(CMD_SIGNALS.CPL_TAB | CMD_SIGNALS.CPL_ALT) || executions == 0 || routine == null)
+                if (routine == null)
+                    if (line.notEmpty)
                         if (command._commands.Count > 0)
                         {
                             if (command.TryReadCommand_path(line, out var path))
                             {
                                 Executor exe = new(root, path, line);
                                 error = exe.error;
-                                if (exe.error == null)
+
+                                if (exe.error == null && line.signal.HasFlag(CMD_SIGNALS.EXEC))
                                     return routine = exe.Executate(line);
                                 else
                                     exe.Dispose();
                             }
-                            else if (line.signal.HasFlag(CMD_SIGNALS.EXEC))
+                            else
                                 error = $"Could not find '{line.arg_last}' in '{cmd_name}' ({cmd_path})";
                         }
 
