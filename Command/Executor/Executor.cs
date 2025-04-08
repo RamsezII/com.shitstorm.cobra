@@ -158,7 +158,6 @@ namespace _COBRA_
 
                 if (error == null)
                     if (line.signal.HasFlag(CMD_SIGNALS.EXEC))
-                    {
                         if (command.action != null)
                             if (command.action_min_args_required > 0 && args != null && args.Count < command.action_min_args_required)
                                 error = $"[{nameof(command.action_min_args_required)}] '{cmd_name}' ({cmd_path}) requires {command.action_min_args_required} arguments to execute, {args.Count} were given.";
@@ -173,26 +172,25 @@ namespace _COBRA_
                                     error = $"[{nameof(command.action)}] '{cmd_name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
                                 }
 
-                        if (error == null)
-                            try
+                if (error == null)
+                    try
+                    {
+                        if (executions == 0 && line.signal.HasFlag(CMD_SIGNALS.EXEC))
+                        {
+                            if (command.routine != null)
                             {
-                                if (executions == 0)
-                                {
-                                    if (command.routine != null)
-                                    {
-                                        routine = command.routine(this);
-                                        routine.MoveNext();
-                                        return routine;
-                                    }
-                                }
-                                else if (routine != null && !routine.MoveNext())
-                                    routine = null;
+                                routine = command.routine(this);
+                                routine.MoveNext();
+                                return routine;
                             }
-                            catch (Exception e)
-                            {
-                                Debug.LogException(e);
-                                error = $"[{nameof(command.routine)}] '{cmd_name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
-                            }
+                        }
+                        else if (routine != null && !routine.MoveNext())
+                            routine = null;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                        error = $"[{nameof(command.routine)}] '{cmd_name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
                     }
 
                 if (error == null)
