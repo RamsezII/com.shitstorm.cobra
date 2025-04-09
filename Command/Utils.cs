@@ -55,7 +55,7 @@ namespace _COBRA_
         FULLSCREEN_write,
     }
 
-    public struct STDIN_INFOS
+    public struct CMD_STATUS
     {
         public CMD_STATES state;
         public string prefixe;
@@ -65,7 +65,7 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public STDIN_INFOS(in CMD_STATES state,
+        public CMD_STATUS(in CMD_STATES state,
             in string prefixe = null,
             in bool immortal = false,
             in float progress = 0,

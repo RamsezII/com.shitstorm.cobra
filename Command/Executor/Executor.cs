@@ -28,7 +28,7 @@ namespace _COBRA_
             readonly Executor stdout_exe = echo_executor, stderr_exe = echo_executor;
             public readonly List<object> args;
             public readonly HashSet<string> opts = new(StringComparer.OrdinalIgnoreCase);
-            public IEnumerator<STDIN_INFOS> routine;
+            public IEnumerator<CMD_STATUS> routine;
 
             public readonly ThreadSafe_struct<bool> disposed = new();
 
@@ -130,7 +130,7 @@ namespace _COBRA_
             {
                 if (routine != null)
                     if (routine.Current.immortal)
-                        Debug.LogWarning($"'{cmd_name}' ({cmd_path}) {typeof(STDIN_INFOS).FullName}.{nameof(routine.Current.immortal)}: {routine.Current.immortal}");
+                        Debug.LogWarning($"'{cmd_name}' ({cmd_path}) {typeof(CMD_STATUS).FullName}.{nameof(routine.Current.immortal)}: {routine.Current.immortal}");
                     else
                     {
                         routine.Dispose();
@@ -140,7 +140,7 @@ namespace _COBRA_
                 return false;
             }
 
-            public IEnumerator<STDIN_INFOS> Executate(in Line line)
+            public IEnumerator<CMD_STATUS> Executate(in Line line)
             {
                 error = null;
                 this.line = line;

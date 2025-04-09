@@ -24,7 +24,7 @@ namespace _COBRA_
                 routine: ERoutine
                 ));
 
-            static IEnumerator<STDIN_INFOS> ERoutine(Command.Executor exe)
+            static IEnumerator<CMD_STATUS> ERoutine(Command.Executor exe)
             {
                 try
                 {

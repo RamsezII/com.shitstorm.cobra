@@ -21,7 +21,7 @@ namespace _COBRA_
         public readonly int pipe_min_args_required;
         public readonly Action<Executor> args, action;
         public readonly Action<Executor, object> on_pipe;
-        public readonly Func<Executor, IEnumerator<STDIN_INFOS>> routine;
+        public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ namespace _COBRA_
             in Action<Executor> args = default,
             in Action<Executor> action = default,
             in Action<Executor, object> on_pipe = default,
-            in Func<Executor, IEnumerator<STDIN_INFOS>> routine = default
+            in Func<Executor, IEnumerator<CMD_STATUS>> routine = default
             )
         {
             this.name = name;
