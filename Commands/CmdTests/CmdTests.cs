@@ -1,5 +1,4 @@
-﻿using _ARK_;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace _COBRA_
@@ -9,20 +8,6 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command.cmd_root_shell.AddCommand(new(
-                "load-scene",
-                args: exe =>
-                {
-                    if (exe.line.TryReadArgument(out string scene_name, new string[] { "scene_test1", "scene_test2", "scene_test3", }))
-                        exe.args.Add(scene_name);
-                },
-                action: exe =>
-                {
-                    Debug.Log($"Loading scene: {exe.args[0]}");
-                    NUCLEOR.instance.scheduler.AddRoutine(Util.EWaitForSeconds(3, false, null));
-                }),
-                "LoadScene");
-
             Command.cmd_root_shell.AddCommand(new(
                 "test-options",
                 args: exe =>
