@@ -15,7 +15,6 @@ namespace _COBRA_
             public CMD_SIGNALS signal;
             public int cursor_i, read_i, start_i, arg_i = -1, cpl_start_i;
             public string arg_last;
-            public bool IsCplThis => signal.HasFlag(CMD_SIGNALS.CPL_TAB) && cursor_i >= start_i && (cursor_i < read_i || cursor_i == read_i && cursor_i == text.Length);
             public bool HasFlags_any(in CMD_SIGNALS flags) => (signal & flags) != 0;
 
             //--------------------------------------------------------------------------------------------------------------

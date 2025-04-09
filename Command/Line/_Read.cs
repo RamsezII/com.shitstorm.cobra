@@ -70,7 +70,7 @@ namespace _COBRA_
 
                 if (completions_candidates != null)
                     if (!complete_if_is_option || argument.StartsWith('-'))
-                        if (IsCplThis)
+                        if (signal.HasFlag(CMD_SIGNALS.CPL) && cursor_i >= start_i && cursor_i <= read_i)
                         {
                             cpl_start_i = read_i;
                             if (signal.HasFlag(CMD_SIGNALS.CPL_TAB))
