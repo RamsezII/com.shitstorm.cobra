@@ -12,14 +12,19 @@ namespace _COBRA_
                 LintToThisPosition(Color.white);
                 bool res = Util_cobra.TryReadPipe(text, ref read_i);
                 if (res)
+                {
+                    --read_i;
+                    LintToThisPosition(Color.white);
+                    ++read_i;
                     LintToThisPosition(linter.pipe);
+                }
                 return res;
             }
 
             public bool HasNext(in bool save_move)
             {
                 int read_i = this.read_i;
-                Util_cobra.SkipCharactersUntil(text, ref read_i, true, false, Util_cobra.CHAR_SPACE);
+                Util_cobra.SkipCharactersUntilNo(text, ref read_i, Util_cobra.char_SPACE);
                 if (save_move)
                     this.read_i = read_i;
                 return read_i < text.Length;
@@ -33,40 +38,19 @@ namespace _COBRA_
 
             public bool TryReadArgument(out string argument, in IEnumerable<string> completions_candidates = null, in bool complete_if_is_option = false, in bool lint = true)
             {
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    argument = string.Empty;
-                    return false;
-                }
-
                 if (lint)
                     LintToThisPosition(linter._default_);
 
-                Util_cobra.SkipCharactersUntil(text, ref read_i, true, false, Util_cobra.CHAR_SPACE);
+                bool isNotEmpty = Util_cobra.TryReadArgument(text, out start_i, ref read_i, out argument);
 
-                if (read_i > 0 && text[read_i - 1] != Util_cobra.CHAR_SPACE)
+                if (isNotEmpty)
                 {
-                    argument = string.Empty;
-                    return false;
-                }
-
-                start_i = read_i;
-                Util_cobra.SkipCharactersUntil(text, ref read_i, true, true, Util_cobra.CHAR_SPACE, Util_cobra.CHAR_PIPE, Util_cobra.CHAR_CHAIN);
-
-                bool isNotEmpty = false;
-
-                if (start_i < read_i)
-                {
-                    arg_last = argument = text[start_i..read_i];
+                    arg_last = argument;
                     ++arg_i;
-
-                    isNotEmpty = true;
 
                     if (lint)
                         LintToThisPosition(linter.argument);
                 }
-                else
-                    argument = string.Empty;
 
                 if (completions_candidates != null)
                     if (!complete_if_is_option || argument.StartsWith('-'))
