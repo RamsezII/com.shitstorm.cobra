@@ -50,25 +50,24 @@ namespace _COBRA_
                 return Conclude(ref read_i);
 
             char c = text[read_i - 1];
-
             switch (c)
             {
                 case char_NEWLINE:
                     --read_i;
-                    while (read_i > 0 && text[read_i] == c)
+                    while (read_i > 0 && text[read_i - 1] == c)
                         --read_i;
+                    if (read_i > 0)
+                        if (start_i - read_i > 1)
+                            ++read_i;
                     return Conclude(ref read_i);
 
                 case char_SPACE:
                 case char_TAB:
                     --read_i;
-                    while (read_i > 0 && text[read_i - 1] switch
-                    {
-                        char_SPACE => true,
-                        char_TAB => true,
-                        _ => false,
-                    })
+                    while (read_i > 0 && text[read_i - 1] == c)
                         --read_i;
+                    if (read_i > 0 && text[read_i - 1] == char_NEWLINE)
+                        return Conclude(ref read_i);
                     goto reset;
 
                 case char_SQUOTE:
@@ -90,7 +89,7 @@ namespace _COBRA_
                 default:
                     while (read_i > 0 && text[read_i - 1] switch
                     {
-                        char_SPACE or char_TAB => false,
+                        char_SPACE or char_TAB or char_NEWLINE => false,
                         _ => true,
                     })
                         --read_i;
