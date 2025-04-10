@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace _COBRA_
 {
@@ -6,13 +7,14 @@ namespace _COBRA_
     {
         static void InitLinter()
         {
-            Command cmd_gui = Command.cmd_root_shell.AddCommand(new("gui"));
-
-            cmd_gui.AddCommand(new(
+            Command.cmd_root_shell.AddCommand(new(
                 "linter-test",
                 args: exe =>
                 {
                     var dict = exe.line.linter.GetColorProperties();
+                    if (exe.line.TryReadOptions(exe, new(StringComparer.OrdinalIgnoreCase) { { "--option", new[] { "yes", "no", "maybe", } } }, out var output))
+                        ;
+
                     while (exe.line.TryReadArgument(out string arg, dict.Keys, lint: false))
                         if (dict.TryGetValue(arg, out Color color))
                             exe.line.LintToThisPosition(color);

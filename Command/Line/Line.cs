@@ -13,6 +13,7 @@ namespace _COBRA_
             public bool notEmpty;
             public int cpl_index;
             public CMD_SIGNALS signal;
+            public bool cpl_stop, cpl_done;
             public int cursor_i, read_i, start_i, end_i, arg_i = -1, cpl_start_i;
             public string arg_last;
             public bool HasFlags_any(in CMD_SIGNALS flags) => (signal & flags) != 0;

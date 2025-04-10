@@ -20,6 +20,7 @@ namespace _COBRA_
                 public Color command = Color.gray;
                 public Color argument = Color.gray;
                 public Color option = Color.gray;
+                public Color option_value = Color.gray;
                 public Color pipe = Color.gray;
                 public Color chain = Color.gray;
                 public Color background = Color.gray;

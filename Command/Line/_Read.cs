@@ -32,7 +32,12 @@ namespace _COBRA_
             public void ReadBack()
             {
                 --arg_i;
+                if (cpl_start_i == read_i)
+                    cpl_done = false;
                 end_i = read_i = start_i;
+                text.GroupedErase(ref start_i);
+                if (!cpl_done)
+                    cpl_start_i = start_i;
             }
 
             public bool TryReadArgument(
@@ -56,17 +61,20 @@ namespace _COBRA_
                         LintToThisPosition(linter.argument);
                 }
 
-                if (signal.HasFlag(CMD_SIGNALS.CPL))
-                    if (cursor_i >= start_i && cursor_i <= read_i)
-                        if (completions_candidates != null)
-                            if (!complete_if_is_option || argument.StartsWith('-'))
-                            {
-                                cpl_start_i = read_i;
-                                if (signal.HasFlag(CMD_SIGNALS.CPL_TAB))
-                                    ComputeCompletion_tab(argument, completions_candidates);
-                                else if (signal.HasFlag(CMD_SIGNALS.CPL_ALT))
-                                    ComputeCompletion_alt(argument, completions_candidates);
-                            }
+                //if (cpl_start_i == 0 || cpl_start_i != start_i)
+                if (!cpl_done)
+                    if (signal.HasFlag(CMD_SIGNALS.CPL))
+                        if (cursor_i >= start_i && cursor_i <= read_i)
+                            if (completions_candidates != null)
+                                if (!complete_if_is_option || argument.StartsWith('-'))
+                                {
+                                    cpl_done = true;
+                                    cpl_start_i = read_i;
+                                    if (signal.HasFlag(CMD_SIGNALS.CPL_TAB))
+                                        ComputeCompletion_tab(argument, completions_candidates);
+                                    else if (signal.HasFlag(CMD_SIGNALS.CPL_ALT))
+                                        ComputeCompletion_alt(argument, completions_candidates);
+                                }
 
                 return isNotEmpty;
             }

@@ -52,6 +52,7 @@ namespace _COBRA_
                         ReadBack();
                         break;
                     }
+                    cpl_stop = true;
 
                     if (!onOption.ContainsKey(split))
                     {
@@ -69,6 +70,48 @@ namespace _COBRA_
                     LintToThisPosition(linter.option);
                     options_remaining.Remove(split);
                     onOption[split]?.Invoke(split);
+                }
+                return true;
+            }
+
+            public bool TryReadOptions(in Executor executor, in Dictionary<string, IEnumerable<string>> options, out Dictionary<string, string> output)
+            {
+                SkipLintToThisPosition();
+
+                HashSet<string> options_remaining = new(options.Keys, StringComparer.OrdinalIgnoreCase);
+                output = new(0, StringComparer.OrdinalIgnoreCase);
+
+                while (TryReadArgument(out string split, options_remaining, complete_if_is_option: true, lint: false))
+                {
+                    if (!split.StartsWith('-'))
+                    {
+                        ReadBack();
+                        break;
+                    }
+
+                    if (!options.ContainsKey(split))
+                    {
+                        LintToThisPosition(linter.error);
+                        executor.error = $"wrong option '{split}'";
+                        return false;
+                    }
+                    else if (!options_remaining.Contains(split))
+                    {
+                        LintToThisPosition(linter.error);
+                        executor.error = $"option '{split}' already added";
+                        return false;
+                    }
+
+                    LintToThisPosition(linter.option);
+                    options_remaining.Remove(split);
+
+                    if (TryReadArgument(out string arg, options[split], lint: false))
+                    {
+                        LintToThisPosition(linter.option_value);
+                        output[split] = arg;
+                    }
+                    else
+                        return false;
                 }
                 return true;
             }
