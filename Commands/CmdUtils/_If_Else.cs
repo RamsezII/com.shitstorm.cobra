@@ -9,8 +9,9 @@ namespace _COBRA_
             const string
                 flag_else = "--else";
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddPipe(
                 "not",
+                args: null,
                 on_pipe: static (exe, args, data) =>
                 {
                     switch (data)
@@ -32,39 +33,38 @@ namespace _COBRA_
                             exe.error = $"wrong argument '{data}'";
                             break;
                     }
-                }));
+                });
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddPipe(
                 "if",
                 manual: new("<command> {--else <command>}"),
-                pipe_min_args_required: 1,
+                min_args: 1,
+                max_args: 2,
                 args: static exe =>
                 {
-                    if (Command.cmd_root_shell.TryReadCommand_path(exe.line, out var cmd1_path))
+                    if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd1_path))
                     {
-                        Command cmd = cmd1_path[^1].Value;
-                        string cmd_name = cmd1_path[^1].Key;
+                        Command cmd = cmd1_path[^1];
+                        Command.Executor exe1 = new(exe.shell, exe.line, cmd1_path);
 
-                        Command.Executor exe1 = new(exe.root, cmd1_path, exe.line);
                         if (exe1.error != null)
                             exe.error = exe1.error;
                         else
                             exe.args.Add(exe1);
                     }
                     else
-                        exe.error = $"command '{exe.cmd_name}' could not find command '{exe.line.arg_last}'";
+                        exe.error = $"command '{exe.command.name}' could not find command '{exe.line.arg_last}'";
 
                     if (exe.error != null)
                         return;
 
                     if (exe.line.TryReadFlags(exe, out var flags, flag_else))
                         if (flags.Contains(flag_else))
-                            if (Command.cmd_root_shell.TryReadCommand_path(exe.line, out var cmd2_path))
+                            if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd2_path))
                             {
-                                Command cmd = cmd2_path[^1].Value;
-                                string cmd_name = cmd2_path[^1].Key;
+                                Command cmd = cmd2_path[^1];
+                                Command.Executor exe2 = new(exe.shell, exe.line, cmd2_path);
 
-                                Command.Executor exe2 = new(exe.root, cmd2_path, exe.line);
                                 if (exe2.error != null)
                                     exe.error = exe2.error;
                                 else
@@ -84,14 +84,14 @@ namespace _COBRA_
                     Command.Executor exe1 = (Command.Executor)exe.args[0];
 
                     if (isTrue)
-                        exe1.Executate(exe.line);
+                        exe.shell.active_executors_stack.Add(exe1);
                     else if (exe.args.Count > 1)
                     {
                         Command.Executor exe2 = (Command.Executor)exe.args[1];
-                        exe2.Executate(exe.line);
+                        exe.shell.active_executors_stack.Add(exe2);
                     }
                 }
-                ));
+                );
         }
     }
 }

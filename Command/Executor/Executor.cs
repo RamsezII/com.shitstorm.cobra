@@ -11,19 +11,19 @@ namespace _COBRA_
     {
         public class Executor : IDisposable
         {
-            static readonly Executor echo_executor = new(
-                null,
-                new() { new("echo", new("echo", on_pipe: static (exe, args, stdin) => Debug.Log(stdin))), },
-                new Line(string.Empty, CMD_SIGNALS.EXEC, null)
+            internal static readonly Executor exe_log = new(
+                shell: null,
+                line: new Line(string.Empty, SIGNAL_FLAGS._none_, null),
+                path: new() { new Command("_log", on_pipe: (exe, args, data) => Debug.Log(data)), }
                 );
 
-            public readonly string cmd_name;
+            public readonly Shell shell;
             public readonly Command command;
             public readonly string cmd_path;
 
-            public readonly Executor root;
+            public bool background;
             public Line line;
-            readonly Executor stdout_exe = echo_executor, stderr_exe = echo_executor;
+            public Executor stdout_exe = exe_log, stderr_exe = exe_log;
             public readonly List<object> args;
             public readonly HashSet<string> opts = new(StringComparer.OrdinalIgnoreCase);
             public IEnumerator<CMD_STATUS> routine;
@@ -36,7 +36,7 @@ namespace _COBRA_
 
             public string error;
             public void Stdout(in object data) => stdout_exe.command.on_pipe(stdout_exe, stdout_exe.args, data);
-            void Stderr(in object data) => stderr_exe.command.on_pipe(stderr_exe, stderr_exe.args, data);
+            public void Stderr(in object data) => stderr_exe.command.on_pipe(stderr_exe, stderr_exe.args, data);
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -48,30 +48,28 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            public Executor(in Executor root, in List<KeyValuePair<string, Command>> path, in Line line)
+            internal Executor(in Shell shell, in Line line, in List<Command> path)
             {
-                this.root = root ?? this;
-                this.line = line;
-                cmd_name = path[^1].Key;
-                command = path[^1].Value;
+                this.shell = shell;
+                command = path[^1];
 
                 switch (path.Count)
                 {
                     case 0:
                         throw new ArgumentException($"Command path is empty.", nameof(path));
 
-                    case 1 when path[0].Value == cmd_root_shell:
+                    case 1 when path[0] == Shell.static_domain:
                         cmd_path = "~";
                         break;
 
                     case 1:
-                        cmd_path = path[0].Key;
+                        cmd_path = path[0].name;
                         break;
 
                     default:
                         StringBuilder path_sb = new();
                         for (int i = 0; i < path.Count; i++)
-                            path_sb.Append(path[i].Key + "/");
+                            path_sb.Append(path[i].name + "/");
                         path_sb.Remove(path_sb.Length - 1, 1);
                         cmd_path = path_sb.ToString();
                         break;
@@ -79,40 +77,43 @@ namespace _COBRA_
 
                 if (command.args != null)
                 {
-                    args = new(command.pipe_min_args_required);
+                    args = new(command.min_args);
+                    this.line = line;
                     command.args(this);
+                    this.line = null;
 
                     if (error == null)
-                        if (args.Count < command.pipe_min_args_required)
-                            error = $"'{command.name}' ({cmd_path}) requires {command.pipe_min_args_required} arguments to init, {args.Count} were given.";
+                        if (args.Count < command.min_args || args.Count > command.max_args)
+                            if (command.min_args == command.max_args)
+                                error = $"'{command.name}' ({cmd_path}) expects {command.min_args} arguments, {args.Count} were given.";
+                            else
+                                error = $"'{command.name}' ({cmd_path}) accepts from {command.min_args} to {command.max_args} arguments, {args.Count} were given.";
                 }
 
                 if (error == null)
-                    if (line.HasNext(true))
-                    {
-                        line.LintToThisPosition(Color.white);
-                        if (line.TryReadPipe())
-                            if (cmd_root_shell.TryReadCommand_path(line, out var path2))
-                            {
-                                Executor executor = new(root, path2, line);
-                                error = executor.error;
-                                if (error == null)
-                                    if (executor.command.on_pipe == null)
-                                        error = $"Command '{executor.command.name}' ({executor.cmd_path}) has no '{nameof(executor.command.on_pipe)}' callback, it can not be piped into.";
-                                    else
-                                        stdout_exe = executor;
-                            }
-                            else if (line.signal.HasFlag(CMD_SIGNALS.EXEC) && line.start_i != line.cpl_start_i)
-                                error = $"Command '{command.name}' ({cmd_path}) failed to parse pipe.";
-                    }
+                    if (line.TryReadPipe())
+                        if (Shell.static_domain.TryReadCommand_path(line, out var path2, pipe_only: true))
+                        {
+                            Executor exe = new(shell, line, path2);
+                            if (exe.error != null)
+                                error = $"'{command.name}' ({cmd_path}) -> {exe.error}";
+                            else if (exe.command.on_pipe == null)
+                                error = $"'{command.name}' ({cmd_path}) -> '{exe.command.name}' ({exe.cmd_path}) has no '{nameof(exe.command.on_pipe)}' callback, it can not be piped into.";
+                            else
+                                stdout_exe = exe;
+                        }
+                        else if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC) && line.start_i != line.cpl_start_i)
+                            error = $"'{command.name}' ({cmd_path}) failed to parse pipe.";
 
-                if (error != null)
-                    if (CanLogError())
-                        Debug.LogWarning($"[ERROR] '{command.name}' ({cmd_path}): {error}");
+                if (error == null)
+                    if (command.routine != null)
+                        if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                            routine = command.routine(this);
             }
 
             //--------------------------------------------------------------------------------------------------------------
 
+            public static string GetPrefixe() => $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{"~".SetColor("#73B2D9")}$";
             public string GetPrefixe(string user_name = null, string cmd_path = null)
             {
                 user_name ??= MachineSettings.machine_name.Value;
@@ -120,118 +121,19 @@ namespace _COBRA_
                 return $"{user_name.SetColor("#73CC26")}:{cmd_path.SetColor("#73B2D9")}$";
             }
 
-            public bool CanLogError()
+            public void PropagateBackground()
             {
-                if (command != null && line != null)
-                    if (line.HasFlags_any(CMD_SIGNALS.CHECK | CMD_SIGNALS.EXEC))
-                        return command.log_error;
-                return false;
-            }
-
-            public bool TryKill()
-            {
-                if (routine != null)
-                    if (routine.Current.immortal)
-                        Debug.LogWarning($"'{command.name}' ({cmd_path}) {typeof(CMD_STATUS).FullName}.{nameof(routine.Current.immortal)}: {routine.Current.immortal}");
-                    else
-                    {
-                        routine.Dispose();
-                        routine = null;
-                        return true;
-                    }
-                return false;
-            }
-
-            public IEnumerator<CMD_STATUS> Executate(in Line line)
-            {
-                error = null;
-                this.line = line;
-
-                if (line.signal.HasFlag(CMD_SIGNALS.EXEC))
-                    ++executions;
-
-                if (routine == null)
-                    if (line.notEmpty)
-                        if (command._commands.Count > 0)
-                        {
-                            if (command.TryReadCommand_path(line, out var path))
-                            {
-                                Executor exe = new(root, path, line);
-                                error = exe.error;
-
-                                if (exe.error == null && line.signal.HasFlag(CMD_SIGNALS.EXEC))
-                                    return routine = exe.Executate(line);
-                                else
-                                {
-                                    if (exe.error != null)
-                                        error = $"'{exe.cmd_name}' ({exe.cmd_path}): {exe.error}";
-                                    exe.Dispose();
-                                }
-                            }
-                            else
-                                error = $"Could not find '{line.arg_last}' in '{command.name}' ({cmd_path})";
-                        }
-
-                if (error == null)
-                    if (line.signal.HasFlag(CMD_SIGNALS.EXEC))
-                        if (command.action != null)
-                            if (command.action_min_args_required > 0 && args != null && args.Count < command.action_min_args_required)
-                                error = $"'{command.name}' ({cmd_path}) requires {command.action_min_args_required} arguments to execute, {args.Count} were given.";
-                            else
-                                try
-                                {
-                                    command.action(this);
-                                }
-                                catch (Exception e)
-                                {
-                                    Debug.LogException(e);
-                                    error = $"'{command.name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
-                                }
-
-                if (error == null)
-                    try
-                    {
-                        if (executions == 0 && line.signal.HasFlag(CMD_SIGNALS.EXEC))
-                        {
-                            if (command.routine != null)
-                            {
-                                routine = command.routine(this);
-                                routine.MoveNext();
-                                if (error != null)
-                                    error = $"[{nameof(command.routine)}] {error}";
-                                return routine;
-                            }
-                        }
-                        else if (routine != null)
-                        {
-                            if (!routine.MoveNext())
-                                routine = null;
-
-                            if (error != null)
-                                error = $"[{nameof(command.routine)}] {error}";
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        error = $"[{nameof(command.routine)}] '{command.name}' ({cmd_path}) failed to execute: \"{e.TrimMessage()}\"";
-                    }
-
-                if (error == null)
-                    return routine;
-                else
-                {
-                    if (CanLogError())
-                        Debug.LogWarning($"[ERROR] '{command.name}' ({cmd_path}): {error}");
-                    return null;
-                }
+                background = true;
+                stdout_exe?.PropagateBackground();
             }
 
             //--------------------------------------------------------------------------------------------------------------
 
             public void Dispose()
             {
+                line = null;
                 routine?.Dispose();
+                routine = null;
 
                 if (args != null)
                 {
@@ -241,11 +143,20 @@ namespace _COBRA_
                     args.Clear();
                 }
 
+                if (!disposed.Value)
+                {
+                    if (stdout_exe != exe_log)
+                        stdout_exe.Dispose();
+                    if (stderr_exe != exe_log)
+                        stderr_exe.Dispose();
+                }
+
                 lock (disposed)
                 {
                     if (disposed._value)
                     {
-                        Debug.LogWarning($"[{nameof(Dispose)}] '{command.name}' ({cmd_path}) is already disposed.");
+                        if (false)
+                            Debug.LogWarning($"[{nameof(Dispose)}] '{command.name}' ({cmd_path}) was already disposed.");
                         return;
                     }
                     disposed._value = true;

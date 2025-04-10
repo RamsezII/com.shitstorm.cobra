@@ -39,10 +39,10 @@ namespace _COBRA_
 
         static void InitVars()
         {
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddAction(
                 "get-var",
                 manual: new("<variable name>"),
-                action_min_args_required: 1,
+                min_args: 1,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
@@ -55,13 +55,12 @@ namespace _COBRA_
                             exe.error = $"variable '{var_name}' not found";
                 },
                 action: exe => exe.Stdout(exe.args[0])
-                ));
+                );
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddAction(
                 "set-var",
                 manual: new("<variable name> <value>"),
-                action_min_args_required: 2,
-                pipe_min_args_required: 1,
+                min_args: 2,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
@@ -81,14 +80,8 @@ namespace _COBRA_
                     string var_name = (string)exe.args[0];
                     object value = exe.args[1];
                     variables[var_name] = value;
-                },
-                on_pipe: static (exe, args, data) =>
-                {
-                    string var_name = (string)exe.args[0];
-                    object value = data;
-                    variables[var_name] = value;
                 }
-                ));
+                );
         }
     }
 }

@@ -7,16 +7,57 @@ namespace _COBRA_
     {
         partial class Line
         {
-            public bool TryReadPipe()
+            public bool TryReadAny(out string any)
+            {
+                if (HasNext(true))
+                    return Util_cobra.TryReadArgument(text, out start_i, ref read_i, out any, false);
+                else
+                {
+                    any = string.Empty;
+                    return false;
+                }
+            }
+
+            public bool TryReadChainSeparator(out string argument)
             {
                 text.SkipSpaces(ref read_i);
+                LintToThisPosition(linter._default_);
+
+                if (read_i < text.Length)
+                {
+                    int start_i = read_i;
+
+                    while (read_i < text.Length && text[read_i] switch
+                    {
+                        Util_cobra.char_SPACE => true,
+                        Util_cobra.char_TAB => true,
+                        _ => false,
+                    })
+                        ++read_i;
+
+                    LintToThisPosition(linter.argument);
+                    argument = text[start_i..read_i];
+
+                    return true;
+                }
+                argument = string.Empty;
+                return false;
+            }
+
+            public bool TryReadPipe()
+            {
+                text.SkipSpaces(ref this.read_i);
                 LintToThisPosition(Color.white);
+
+                int read_i = this.read_i;
                 bool res = Util_cobra.TryReadPipe(text, ref read_i);
+
                 if (res)
                 {
-                    ++read_i;
+                    this.read_i = read_i + 1;
                     LintToThisPosition(linter.pipe);
                 }
+
                 return res;
             }
 
@@ -24,6 +65,7 @@ namespace _COBRA_
             {
                 int read_i = this.read_i;
                 text.SkipSpaces(ref read_i);
+                LintToThisPosition(linter._default_);
                 if (save_move)
                     this.read_i = read_i;
                 return read_i < text.Length;
@@ -44,6 +86,7 @@ namespace _COBRA_
                 out string argument,
                 in IEnumerable<string> completions_candidates = null,
                 in bool complete_if_is_option = false,
+                in bool accept_only_candidate = false,
                 in bool lint = true)
             {
                 if (lint)
@@ -61,18 +104,17 @@ namespace _COBRA_
                         LintToThisPosition(linter.argument);
                 }
 
-                //if (cpl_start_i == 0 || cpl_start_i != start_i)
                 if (!cpl_done)
-                    if (signal.HasFlag(CMD_SIGNALS.CPL))
+                    if (signal.HasFlag(SIGNAL_FLAGS.CPL))
                         if (cursor_i >= start_i && cursor_i <= read_i)
                             if (completions_candidates != null)
                                 if (!complete_if_is_option || argument.StartsWith('-'))
                                 {
                                     cpl_done = true;
                                     cpl_start_i = read_i;
-                                    if (signal.HasFlag(CMD_SIGNALS.CPL_TAB))
+                                    if (signal.HasFlag(SIGNAL_FLAGS.CPL_TAB))
                                         ComputeCompletion_tab(argument, completions_candidates);
-                                    else if (signal.HasFlag(CMD_SIGNALS.CPL_ALT))
+                                    else if (signal.HasFlag(SIGNAL_FLAGS.CPL_ALT))
                                         ComputeCompletion_alt(argument, completions_candidates);
                                 }
 

@@ -8,7 +8,7 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddAction(
                 "test-options",
                 args: exe =>
                 {
@@ -19,16 +19,16 @@ namespace _COBRA_
                         exe.args.Add(arg);
                 },
                 action: exe => exe.Stdout(exe.args.LinesToText())
-                ));
+                );
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddRoutine(
                 "routine-test",
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(int.Parse(arg));
                 },
-                routine: ERoutineTest));
+                routine: ERoutineTest);
 
             static IEnumerator<CMD_STATUS> ERoutineTest(Command.Executor exe)
             {
@@ -52,7 +52,7 @@ namespace _COBRA_
                 }
                 finally
                 {
-                    Debug.Log($"'{exe.cmd_name}' ({exe.cmd_path}) disposed".ToSubLog());
+                    Debug.Log($"'{exe.command.name}' ({exe.cmd_path}) disposed".ToSubLog());
                 }
             }
         }

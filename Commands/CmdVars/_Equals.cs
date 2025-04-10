@@ -6,10 +6,10 @@ namespace _COBRA_
     {
         static void InitEquals()
         {
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddPipe(
                 "equals-literal",
                 manual: new("[pipe output] <value>"),
-                pipe_min_args_required: 1,
+                max_args: 1,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string literal))
@@ -21,12 +21,12 @@ namespace _COBRA_
                     string data_str = data.ToString();
                     exe.Stdout(data_str.Equals(literal, StringComparison.Ordinal));
                 }
-                ));
+                );
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddPipe(
                 "equals-var",
                 manual: new("[pipe output] <variable>"),
-                pipe_min_args_required: 1,
+                max_args: 1,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys))
@@ -38,7 +38,7 @@ namespace _COBRA_
                     object value = variables[var_name];
                     exe.Stdout(data.ToString().Equals(value.ToString(), StringComparison.Ordinal));
                 }
-                ));
+                );
         }
     }
 }

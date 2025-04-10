@@ -8,10 +8,10 @@ namespace _COBRA_
         {
             const string flag_force_file = "--create-if-not-found";
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddRoutine(
                 "edit-file",
                 manual: new("create and edit a file"),
-                action_min_args_required: 1,
+                min_args: 1,
                 args: static exe =>
                 {
                     if (exe.line.TryReadFlags(exe, out var opts, flag_force_file))
@@ -22,7 +22,7 @@ namespace _COBRA_
                     // (reparer tab avant)
                 },
                 routine: ERoutine
-                ));
+                );
 
             static IEnumerator<CMD_STATUS> ERoutine(Command.Executor exe)
             {
@@ -30,7 +30,7 @@ namespace _COBRA_
                 {
                     while (true)
                     {
-                        if (exe.root.line.signal.HasFlag(CMD_SIGNALS.SAVE))
+                        if (exe.line.signal.HasFlag(SIGNAL_FLAGS.SAVE))
                             exe.Stdout("Saving file...");
                         yield return new(CMD_STATES.FULLSCREEN_write);
                     }

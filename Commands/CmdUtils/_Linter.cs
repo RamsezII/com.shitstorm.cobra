@@ -7,7 +7,7 @@ namespace _COBRA_
     {
         static void InitLinter()
         {
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddAction(
                 "linter-test",
                 args: exe =>
                 {
@@ -20,8 +20,9 @@ namespace _COBRA_
                             exe.line.LintToThisPosition(color);
                         else
                             exe.line.LintToThisPosition(exe.line.linter.error);
-                }
-                ));
+                },
+                action: null
+                );
         }
     }
 }

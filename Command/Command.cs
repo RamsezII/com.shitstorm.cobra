@@ -1,45 +1,30 @@
 ﻿using _UTIL_;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace _COBRA_
 {
     public sealed partial class Command
     {
-        public readonly Dictionary<string, Command> _commands = new(StringComparer.OrdinalIgnoreCase);
-        public IEnumerable<string> ECommands_keys => _commands.Keys.OrderBy(key => key, StringComparer.OrdinalIgnoreCase);
-        public IEnumerable<KeyValuePair<string, Command>> ECommands_pairs => _commands.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase);
-
-        public static readonly Command cmd_root_shell = new("root_shell", log_error: true);
-
         public readonly string name;
         public readonly Traductions manual;
-        public readonly bool log_error;
-        public readonly int action_min_args_required;
-        public readonly int pipe_min_args_required;
-        public readonly Action<Executor> args, action;
+        public readonly int min_args, max_args;
+        public readonly Action<Executor> args;
+
         public readonly Action<Executor, List<object>, object> on_pipe;
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
+        public readonly Action<Executor> action;
+
+        public bool IsDomain => _commands.Count >= 0 || action == null && on_pipe == null && routine == null;
 
         //--------------------------------------------------------------------------------------------------------------
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void OnBeforeSceneLoad()
-        {
-            Debug.Log("init shell".ToSubLog());
-            cmd_root_shell.PropagateOblivion();
-        }
-
-        //--------------------------------------------------------------------------------------------------------------
-
-        public Command(
+        internal Command(
             in string name,
             in Traductions manual = default,
-            in bool log_error = default,
-            in int action_min_args_required = default,
-            in int pipe_min_args_required = default,
+            in int min_args = default,
+            in int max_args = default,
             in Action<Executor> args = default,
             in Action<Executor> action = default,
             in Action<Executor, List<object>, object> on_pipe = default,
@@ -48,9 +33,8 @@ namespace _COBRA_
         {
             this.name = name;
             this.manual = manual;
-            this.log_error = log_error;
-            this.action_min_args_required = action_min_args_required;
-            this.pipe_min_args_required = pipe_min_args_required;
+            this.min_args = min_args;
+            this.max_args = Mathf.Max(min_args, max_args);
             this.args = args;
             this.action = action;
             this.on_pipe = on_pipe;
@@ -59,7 +43,7 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public Command AddCommand(in Command command, params string[] aliases)
+        private Command AddCommand(in Command command, params string[] aliases)
         {
             _commands.Add(command.name, command);
             for (int i = 0; i < aliases.Length; ++i)
@@ -67,54 +51,40 @@ namespace _COBRA_
             return command;
         }
 
-        public bool TryReadCommand(in Line line, out (string name, Command command) command)
-        {
-            if (TryReadCommand_path(line, out var path))
-            {
-                command = (path[^1].Key, path[^1].Value);
-                return true;
-            }
-            command = default;
-            return false;
-        }
+        public Command AddDomain(
+            in string name,
+            in Traductions manual = default,
+            params string[] aliases
+            ) => AddCommand(new(name, manual), aliases);
 
-        public bool TryReadCommand_path(in Line line, out List<KeyValuePair<string, Command>> path)
-        {
-            path = new();
-            line.LintToThisPosition(Color.white);
+        public Command AddAction(
+            in string name,
+            in Action<Executor> args,
+            in Action<Executor> action,
+            in Traductions manual = default,
+            in int min_args = default,
+            in int max_args = default,
+            params string[] aliases
+            ) => AddCommand(new(name, manual, min_args, max_args, args, action: action), aliases);
 
-            bool res = TryReadCommand_ref(line, this, path);
+        public Command AddPipe(
+            in string name,
+            in Action<Executor> args,
+            in Action<Executor, List<object>, object> on_pipe,
+            in Traductions manual = default,
+            in int min_args = default,
+            in int max_args = default,
+            params string[] aliases
+            ) => AddCommand(new(name, manual, min_args, max_args, args, on_pipe: on_pipe), aliases);
 
-            if (res)
-                line.LintToThisPosition(line.linter.command);
-            else
-                line.LintToThisPosition(line.linter.error);
-
-            return res;
-
-            static bool TryReadCommand_ref(in Line line, in Command parent, in List<KeyValuePair<string, Command>> path)
-            {
-                if (line.TryReadArgument(out string cmd_name, parent.ECommands_keys, lint: false))
-                    if (parent._commands.TryGetValue(cmd_name, out Command intermediate))
-                    {
-                        path.Add(new(cmd_name, intermediate));
-                        TryReadCommand_ref(line, intermediate, path);
-                    }
-                    else
-                        line.ReadBack();
-                else
-                    line.ReadBack();
-                return path.Count > 0;
-            }
-        }
-
-        //--------------------------------------------------------------------------------------------------------------
-
-        public void PropagateOblivion()
-        {
-            foreach (Command command in _commands.Values)
-                command.PropagateOblivion();
-            _commands.Clear();
-        }
+        public Command AddRoutine(
+            in string name,
+            in Action<Executor> args,
+            in Func<Executor, IEnumerator<CMD_STATUS>> routine,
+            in Traductions manual = default,
+            in int min_args = default,
+            in int max_args = default,
+            params string[] aliases
+            ) => AddCommand(new(name, manual, min_args, max_args, args, routine: routine), aliases);
     }
 }

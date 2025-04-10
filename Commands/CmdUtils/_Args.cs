@@ -7,15 +7,17 @@ namespace _COBRA_
     {
         static void Init_Args()
         {
-            Command.cmd_root_shell.AddCommand(new Command(
+            Shell.static_domain.AddPipe(
                 "args",
-                pipe_min_args_required: 1,
+                manual: new("pipes data as arguments to a command"),
+                min_args: 1,
+                max_args: 1,
                 args: static exe =>
                 {
-                    if (exe.root.command.TryReadCommand_path(exe.line, out var cmd_path))
+                    if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd_path))
                         exe.args.Add(cmd_path);
                     else
-                        exe.error = $"command '{exe.cmd_name}' could not find command '{exe.line.arg_last}'";
+                        exe.error = $"command '{exe.command.name}' could not find command '{exe.line.arg_last}'";
                 },
                 on_pipe: static (exe, args, data) =>
                 {
@@ -27,14 +29,14 @@ namespace _COBRA_
                     };
 
                     Command.Line line = new(cmd_line, exe.line.signal, exe.line.terminal);
-                    Command.Executor exe2 = new(exe.root, (List<KeyValuePair<string, Command>>)exe.args[0], line);
+                    Command.Executor exe2 = new(exe.shell, line, (List<Command>)exe.args[0]);
 
                     if (exe2.error != null)
                         exe.error = exe2.error;
                     else
-                        exe2.Executate(line);
-                }),
-                "xargs");
+                        exe.shell.pending_executors_queue.Enqueue(exe2);
+                },
+                aliases: "xargs");
         }
     }
 }

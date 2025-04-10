@@ -9,12 +9,13 @@ namespace _COBRA_
     {
         static void InitManual()
         {
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddAction(
                 "manual",
                 manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
+                max_args: 1,
                 args: exe =>
                 {
-                    if (Command.cmd_root_shell.TryReadCommand_path(exe.line, out var path))
+                    if (Shell.static_domain.TryReadCommand_path(exe.line, out var path))
                         exe.args.Add(path);
                 },
                 action: exe =>
@@ -35,7 +36,7 @@ command arguments work as this :
 
                         sb.AppendLine("Commands :");
 
-                        foreach (var group in Command.cmd_root_shell._commands.GroupBy(pair => pair.Value))
+                        foreach (var group in Shell.static_domain._commands.GroupBy(pair => pair.Value))
                         {
                             foreach (var pair in group)
                                 sb.Append($"{pair.Key}, ");
@@ -46,9 +47,8 @@ command arguments work as this :
 
                         exe.Stdout(sb.TroncatedForLog());
                     }
-                }
-            ),
-            "help");
+                },
+                aliases: "help");
         }
     }
 }

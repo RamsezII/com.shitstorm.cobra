@@ -8,13 +8,38 @@ namespace _COBRA_
     {
         partial class Line
         {
+            public bool TryReadOneOfFlags(in Executor executor, out string output, params string[] flags)
+            {
+                SkipLintToThisPosition();
+
+                HashSet<string> flags_remaining = new(flags, StringComparer.OrdinalIgnoreCase);
+
+                if (TryReadArgument(out string split, flags_remaining, complete_if_is_option: true, accept_only_candidate: false, lint: false))
+                    if (!split.StartsWith('-'))
+                        ReadBack();
+                    else if (!flags_remaining.Contains(split))
+                    {
+                        LintToThisPosition(linter.error);
+                        executor.error = $"wrong or already used option '{split}'";
+                    }
+                    else
+                    {
+                        LintToThisPosition(linter.option);
+                        output = split;
+                        return true;
+                    }
+
+                output = string.Empty;
+                return true;
+            }
+
             public bool TryReadFlags(in Executor executor, out HashSet<string> output, params string[] flags)
             {
                 SkipLintToThisPosition();
 
                 HashSet<string> flags_remaining = new(flags, StringComparer.OrdinalIgnoreCase);
 
-                while (TryReadArgument(out string split, flags_remaining, complete_if_is_option: true, lint: false))
+                while (TryReadArgument(out string split, flags_remaining, complete_if_is_option: true, accept_only_candidate: false, lint: false))
                 {
                     if (!split.StartsWith('-'))
                     {
@@ -45,7 +70,7 @@ namespace _COBRA_
 
                 HashSet<string> options_remaining = new(onOption.Keys, StringComparer.OrdinalIgnoreCase);
 
-                while (TryReadArgument(out string split, options_remaining, complete_if_is_option: true, lint: false))
+                while (TryReadArgument(out string split, options_remaining, complete_if_is_option: true, accept_only_candidate: false, lint: false))
                 {
                     if (!split.StartsWith('-'))
                     {
@@ -81,7 +106,7 @@ namespace _COBRA_
                 HashSet<string> options_remaining = new(options.Keys, StringComparer.OrdinalIgnoreCase);
                 output = new(0, StringComparer.OrdinalIgnoreCase);
 
-                while (TryReadArgument(out string split, options_remaining, complete_if_is_option: true, lint: false))
+                while (TryReadArgument(out string split, options_remaining, complete_if_is_option: true, accept_only_candidate: false, lint: false))
                 {
                     if (!split.StartsWith('-'))
                     {
@@ -105,7 +130,7 @@ namespace _COBRA_
                     LintToThisPosition(linter.option);
                     options_remaining.Remove(split);
 
-                    if (TryReadArgument(out string arg, options[split], lint: false))
+                    if (TryReadArgument(out string arg, options[split], accept_only_candidate: false, lint: false))
                     {
                         LintToThisPosition(linter.option_value);
                         output[split] = arg;

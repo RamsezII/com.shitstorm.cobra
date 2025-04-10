@@ -7,10 +7,10 @@ namespace _COBRA_
     {
         static void InitGrep()
         {
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddPipe(
                 "grep",
                 manual: new("regex filter"),
-                pipe_min_args_required: 1,
+                min_args: 1,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
@@ -52,8 +52,8 @@ namespace _COBRA_
                             }
                             break;
                     }
-                }
-            ), "regex");
+                },
+                aliases: "regex");
         }
     }
 }

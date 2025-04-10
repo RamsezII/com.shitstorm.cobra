@@ -2,8 +2,8 @@
 {
     public interface ITerminal
     {
-        public Command.Line.Linter Linter { get; }
-        public Command.Executor RootExecutor { get; }
+        public Command.Line.Linter GetLinter { get; }
+        public Shell GetShell { get; }
         void ToggleWindow(bool toggle);
     }
 }

@@ -9,7 +9,6 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            InitEcho();
             Init_Args();
             InitManual();
             InitGrep();
@@ -18,31 +17,45 @@ namespace _COBRA_
             Init_If_Else();
             Init_Skip();
             Init_Stop();
-
+            Init_Logs();
 
             const string
                 flag_remove_empties = "--remove-empties",
                 flag_no_white_space = "--no-white-space";
 
-            Command.cmd_root_shell.AddCommand(new(
-                "shutdown",
-                manual: new("quits the game... :("),
-                action: exe => Application.Quit()
-                ));
+            Shell.static_domain.AddAction("echo",
+                manual: new("echo!"),
+                min_args: 1,
+                args: exe =>
+                {
+                    if (exe.line.TryReadArgument(out string arg))
+                        exe.args.Add(arg);
+                },
+                action: exe => exe.Stdout(exe.args[0])
+                );
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddAction(
+                "shutdown",
+                manual: new("closes the application"),
+                args: null,
+                action: exe => Application.Quit()
+                );
+
+            Shell.static_domain.AddAction(
                 "clear",
                 manual: new("clear all previous logs"),
+                args: null,
                 action: exe => Application.Quit()
-                ));
+                );
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddAction(
                 "clear-history",
                 manual: new("clear all previous entries"),
+                args: null,
                 action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
-                ));
+                );
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddPipe(
                 "split",
                 args: static exe =>
                 {
@@ -64,11 +77,11 @@ namespace _COBRA_
                     else
                         exe.Stdout(data);
                 }
-                ));
+                );
 
-            Command.cmd_root_shell.AddCommand(new(
+            Shell.static_domain.AddPipe(
                 "prefixe",
-                pipe_min_args_required: 1,
+                min_args: 1,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string prefixe))
@@ -87,7 +100,7 @@ namespace _COBRA_
                     else
                         exe.Stdout($"{prefixe}{data}");
                 }
-                ));
+                );
         }
     }
 }
