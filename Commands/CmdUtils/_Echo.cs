@@ -16,7 +16,7 @@ namespace _COBRA_
                         exe.args.Add(arg);
                 },
                 action: exe => exe.Stdout((string)exe.args[0]),
-                on_pipe: (exe, data) =>
+                on_pipe: (exe, args, data) =>
                 {
                     switch (data)
                     {

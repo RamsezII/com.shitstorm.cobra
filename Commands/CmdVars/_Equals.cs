@@ -15,7 +15,7 @@ namespace _COBRA_
                     if (exe.line.TryReadArgument(out string literal))
                         exe.args.Add(literal);
                 },
-                on_pipe: (exe, data) =>
+                on_pipe: static (exe, args, data) =>
                 {
                     string literal = (string)exe.args[0];
                     string data_str = data.ToString();
@@ -32,7 +32,7 @@ namespace _COBRA_
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys))
                         exe.args.Add(var_name);
                 },
-                on_pipe: (exe, data) =>
+                on_pipe: static (exe, args, data) =>
                 {
                     string var_name = (string)exe.args[0];
                     object value = variables[var_name];

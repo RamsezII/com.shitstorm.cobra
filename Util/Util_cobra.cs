@@ -13,20 +13,25 @@ namespace _COBRA_
             char_BACKSLASH = '\\',
             char_TAB = '\t',
             char_NEWLINE = '\n',
-            char_CHAIN = '&',
-            char_PIPE = '|',
-            char_BACKPIPE = '!';
+            char_BACKGROUND = '&',
+            char_PIPE = '|';
+
+        public const string
+            str_CHAIN = "&&",
+            str_PIPE = "|";
+
+        public static readonly string[]
+            str_OPERATORS = new string[]
+            {
+                "==", "!=", "<=", ">=", "<", ">", "=", "+", "-", "*", "/", "%", "&", "|", "^", "~",
+                "<<", ">>", "&&", "||", "??"
+            },
+            str_CMD_SEPARATORS = new string[]
+            {
+                "&&", "|", "&",
+            };
 
         //--------------------------------------------------------------------------------------------------------------
-
-        public static char GetRotator(in float speed = 10) => ((int)(Time.unscaledTime * speed) % 4) switch
-        {
-            0 => '|',
-            1 => '/',
-            2 => '-',
-            3 => '\\',
-            _ => '?',
-        };
 
         public static int SkipSpaces(this string text, ref int read_i)
         {
@@ -39,6 +44,29 @@ namespace _COBRA_
             })
                 ++read_i;
             return read_i - start_i;
+        }
+
+        public static bool HasNext(this string text, ref int read_i)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+                if (read_i < text.Length)
+                    while (read_i < text.Length)
+                        if (text[read_i] switch
+                        {
+                            char_SPACE or char_TAB or char_NEWLINE => true,
+                            _ => false,
+                        })
+                            ++read_i;
+                        else
+                            return read_i < text.Length;
+            return false;
+        }
+
+        public static bool TryReadPipe(this string text, ref int read_i)
+        {
+            if (text.HasNext(ref read_i))
+                return text[read_i] == char_PIPE;
+            return false;
         }
 
         public static int GroupedErase(this string text, ref int read_i)
@@ -104,7 +132,7 @@ namespace _COBRA_
             }
         }
 
-        public static bool TryReadArgument(this string text, out int start_i, ref int read_i, out string argument)
+        public static bool TryReadArgument(this string text, out int start_i, ref int read_i, out string argument, in bool stop_at_separators)
         {
             start_i = read_i;
             if (string.IsNullOrWhiteSpace(text))
@@ -126,6 +154,16 @@ namespace _COBRA_
                         argument = text[start_i..read_i];
                     else
                         argument = text[start_i..];
+
+                    if (argument.Length >= 2 && argument[0] == argument[^1])
+                        switch (argument[0])
+                        {
+                            case char_SQUOTE:
+                            case char_DQUOTE:
+                                argument = argument[1..^1];
+                                break;
+                        }
+
                     return true;
                 }
                 argument = string.Empty;
@@ -142,11 +180,8 @@ namespace _COBRA_
                         ++read_i;
                         break;
 
-                    case char_SPACE:
-                    case char_TAB:
-                    case char_NEWLINE:
-                    case char_CHAIN:
-                    case char_PIPE:
+                    case char_BACKGROUND or char_PIPE when stop_at_separators:
+                    case char_SPACE or char_TAB or char_NEWLINE:
                         return TryRead(start_i, ref read_i, out argument);
 
                     case '"':
@@ -165,60 +200,6 @@ namespace _COBRA_
             }
 
             return TryRead(start_i, ref read_i, out argument);
-        }
-
-        public static int SkipCharactersUntil(this string text, ref int read_i, params char[] key_chars)
-        {
-            HashSet<char> charSet = new(key_chars);
-            int skips = 0;
-
-            while (read_i >= 0 && read_i < text.Length)
-            {
-                char c = text[read_i];
-
-                if (skips == 0)
-                    switch (c)
-                    {
-                        case '"':
-                        case '\'':
-                            ++read_i;
-                            while (read_i < text.Length && text[read_i] != c)
-                            {
-                                if (text[read_i] == '\\')
-                                    ++read_i;
-                                ++read_i;
-                                ++skips;
-                            }
-                            if (read_i < text.Length)
-                                ++read_i;
-                            return skips;
-                    }
-
-                if (c == char_NEWLINE)
-                    if (!charSet.Contains(char_NEWLINE))
-                        return skips;
-
-                if (charSet.Contains(c))
-                    return skips;
-
-                switch (c)
-                {
-                    case '"':
-                    case '\'':
-                        --read_i;
-                        return skips;
-
-                    case '\\':
-                        ++read_i;
-                        break;
-                }
-
-                if (read_i < text.Length)
-                    ++read_i;
-
-                ++skips;
-            }
-            return skips;
         }
 
         public static int SkipCharactersUntilNo(this string text, ref int read_i, params char[] key_chars)
@@ -255,64 +236,6 @@ namespace _COBRA_
                 ++skips;
             }
             return skips;
-        }
-
-        public static int SkipCharactersUntil_inverted(this string text, ref int read_i, in bool positive, params char[] key_chars)
-        {
-            HashSet<char> charSet = new(key_chars);
-            int skips = 0;
-
-            while (read_i > 0 && read_i <= text.Length)
-            {
-                if (read_i > 0)
-                    --read_i;
-
-                char c = text[read_i];
-
-                if (c == char_NEWLINE)
-                    if (!charSet.Contains(char_NEWLINE))
-                    {
-                        ++read_i;
-                        return skips;
-                    }
-
-                if (positive == charSet.Contains(c))
-                {
-                    ++read_i;
-                    return skips;
-                }
-
-                if (read_i < text.Length)
-                    --read_i;
-
-                ++skips;
-            }
-            return skips;
-        }
-
-        public static bool TryReadPipe(this string text, ref int read_i)
-        {
-            SkipCharactersUntil(text, ref read_i, char_CHAIN, char_PIPE);
-            if (read_i < text.Length && text[read_i] == char_PIPE)
-            {
-                ++read_i;
-                return true;
-            }
-            else
-                return false;
-        }
-
-        public static bool TryReadChain(this string text, ref int read_i)
-        {
-            SkipCharactersUntil(text, ref read_i, char_CHAIN, char_PIPE);
-            if (read_i + 1 < text.Length && text[read_i] == char_CHAIN && text[read_i + 1] == char_CHAIN)
-            {
-                ++read_i;
-                ++read_i;
-                return true;
-            }
-            else
-                return false;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace _COBRA_
         public readonly int action_min_args_required;
         public readonly int pipe_min_args_required;
         public readonly Action<Executor> args, action;
-        public readonly Action<Executor, object> on_pipe;
+        public readonly Action<Executor, List<object>, object> on_pipe;
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
 
         //--------------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ namespace _COBRA_
             in int pipe_min_args_required = default,
             in Action<Executor> args = default,
             in Action<Executor> action = default,
-            in Action<Executor, object> on_pipe = default,
+            in Action<Executor, List<object>, object> on_pipe = default,
             in Func<Executor, IEnumerator<CMD_STATUS>> routine = default
             )
         {
@@ -65,6 +65,17 @@ namespace _COBRA_
             for (int i = 0; i < aliases.Length; ++i)
                 _commands.Add(aliases[i], command);
             return command;
+        }
+
+        public bool TryReadCommand(in Line line, out (string name, Command command) command)
+        {
+            if (TryReadCommand_path(line, out var path))
+            {
+                command = (path[^1].Key, path[^1].Value);
+                return true;
+            }
+            command = default;
+            return false;
         }
 
         public bool TryReadCommand_path(in Line line, out List<KeyValuePair<string, Command>> path)
@@ -91,6 +102,8 @@ namespace _COBRA_
                     }
                     else
                         line.ReadBack();
+                else
+                    line.ReadBack();
                 return path.Count > 0;
             }
         }

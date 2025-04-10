@@ -33,7 +33,6 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            InitIf();
             InitEquals();
             InitVars();
         }
@@ -44,7 +43,7 @@ namespace _COBRA_
                 "get-var",
                 manual: new("<variable name>"),
                 action_min_args_required: 1,
-                args: exe =>
+                args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
                         if (variables.TryGetValue(var_name, out object var_value))
@@ -63,7 +62,7 @@ namespace _COBRA_
                 manual: new("<variable name> <value>"),
                 action_min_args_required: 2,
                 pipe_min_args_required: 1,
-                args: exe =>
+                args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
                     {
@@ -75,17 +74,15 @@ namespace _COBRA_
                             exe.line.LintToThisPosition(exe.line.linter.value);
                             exe.args.Add(var_value);
                         }
-                        else
-                            exe.error = $"value not found";
                     }
                 },
-                action: exe =>
+                action: static exe =>
                 {
                     string var_name = (string)exe.args[0];
                     object value = exe.args[1];
                     variables[var_name] = value;
                 },
-                on_pipe: (exe, data) =>
+                on_pipe: static (exe, args, data) =>
                 {
                     string var_name = (string)exe.args[0];
                     object value = data;

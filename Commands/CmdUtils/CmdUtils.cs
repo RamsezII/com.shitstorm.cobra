@@ -1,5 +1,5 @@
 ﻿using _ARK_;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace _COBRA_
@@ -10,10 +10,19 @@ namespace _COBRA_
         static void OnAfterSceneLoad()
         {
             InitEcho();
+            Init_Args();
             InitManual();
             InitGrep();
             InitEdit();
             InitLinter();
+            Init_If_Else();
+            Init_Skip();
+            Init_Stop();
+
+
+            const string
+                flag_remove_empties = "--remove-empties",
+                flag_no_white_space = "--no-white-space";
 
             Command.cmd_root_shell.AddCommand(new(
                 "shutdown",
@@ -34,90 +43,49 @@ namespace _COBRA_
                 ));
 
             Command.cmd_root_shell.AddCommand(new(
-                "skip",
-                manual: new("skip <int> first entries from pipe"),
-                pipe_min_args_required: 1,
-                args: exe =>
+                "split",
+                args: static exe =>
                 {
-                    if (exe.root.line.TryReadArgument(out string arg))
-                        if (int.TryParse(arg, out int count))
-                            exe.args.Add(count);
-                        else
-                            exe.root.error = $"could not parse into int value: '{arg}'";
-                    exe.args.Add(0);
+                    if (exe.line.TryReadFlags(exe, out var flags, flag_remove_empties))
+                        foreach (string flag in flags)
+                            exe.args.Add(flag);
                 },
-                on_pipe: (exe, data) =>
+                on_pipe: static (exe, args, data) =>
                 {
-                    int skips = (int)exe.args[0];
-                    int iterations = (int)exe.args[1];
-
-                    bool Check() => iterations++ >= skips;
-
-                    switch (data)
+                    if (data is string str)
                     {
-                        case string str:
-                            foreach (string line in str.TextToLines(true))
-                                if (Check())
-                                    exe.Stdout(line);
-                            break;
+                        StringSplitOptions options = 0;
+                        if (exe.args.Contains(flag_remove_empties))
+                            options |= StringSplitOptions.RemoveEmptyEntries;
 
-                        case IEnumerable<object> objects:
-                            foreach (object obj in objects)
-                                if (Check())
-                                    exe.Stdout(obj);
-                            break;
-
-                        default:
-                            if (Check())
-                                exe.Stdout(data);
-                            break;
+                        foreach (string line in str.Split(new[] { '\n' }, options))
+                            exe.Stdout(line);
                     }
-
-                    exe.args[1] = iterations;
-                }));
+                    else
+                        exe.Stdout(data);
+                }
+                ));
 
             Command.cmd_root_shell.AddCommand(new(
-                "stop",
+                "prefixe",
                 pipe_min_args_required: 1,
-                args: exe =>
+                args: static exe =>
                 {
-                    if (exe.root.line.TryReadArgument(out string arg))
-                        if (int.TryParse(arg, out int count))
-                            exe.args.Add(count);
-                        else
-                            exe.root.error = $"could not parse into int value: '{arg}'";
-                    else
-                        exe.args.Add(0);
-                    exe.args.Add(0);
+                    if (exe.line.TryReadArgument(out string prefixe))
+                        exe.args.Add(prefixe);
+                    if (exe.line.TryReadFlags(exe, out var flags, flag_no_white_space))
+                        foreach (string flag in flags)
+                            exe.args.Add(flag);
                 },
-                on_pipe: (exe, data) =>
+                on_pipe: static (exe, args, data) =>
                 {
-                    int skips = (int)exe.args[0];
-                    int iterations = (int)exe.args[1];
+                    string prefixe = (string)args[0];
+                    bool no_space = args.Count > 1 && args[1].ToString().Equals(flag_no_white_space, StringComparison.InvariantCultureIgnoreCase);
 
-                    bool Check() => iterations++ < skips;
-
-                    switch (data)
-                    {
-                        case string str:
-                            foreach (string line in str.TextToLines(true))
-                                if (Check())
-                                    exe.Stdout(line);
-                            break;
-
-                        case IEnumerable<object> objects:
-                            foreach (object obj in objects)
-                                if (Check())
-                                    exe.Stdout(obj);
-                            break;
-
-                        default:
-                            if (Check())
-                                exe.Stdout(data);
-                            break;
-                    }
-
-                    exe.args[1] = iterations;
+                    if (!no_space && !prefixe.EndsWith(' '))
+                        exe.Stdout($"{prefixe} {data}");
+                    else
+                        exe.Stdout($"{prefixe}{data}");
                 }
                 ));
         }
