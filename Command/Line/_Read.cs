@@ -33,9 +33,9 @@ namespace _COBRA_
 
                 switch (c)
                 {
-                    case Util_cobra.char_BACKGROUND:
+                    case '&':
                         ++read_i;
-                        if (read_i < text.Length && text[read_i] == Util_cobra.char_BACKGROUND)
+                        if (read_i < text.Length && text[read_i] == '&')
                         {
                             ++read_i;
                             LintToThisPosition(linter.chain);
@@ -45,7 +45,7 @@ namespace _COBRA_
                         argument = text[start_i..read_i];
                         return true;
 
-                    case Util_cobra.char_PIPE:
+                    case '|':
                         ++read_i;
                         LintToThisPosition(linter.pipe);
                         argument = text[start_i..read_i];
@@ -78,9 +78,15 @@ namespace _COBRA_
             {
                 int read_i = this.read_i;
                 text.SkipSpaces(ref read_i);
-                LintToThisPosition(linter._default_);
+
+                if (linter == null)
+                    LintToThisPosition(Color.gray);
+                else
+                    LintToThisPosition(linter._default_);
+
                 if (save_move)
                     this.read_i = read_i;
+
                 return read_i < text.Length;
             }
 

@@ -11,13 +11,16 @@ namespace _COBRA_
             Shell.static_domain.AddRoutine(
                 "edit-file",
                 manual: new("create and edit a file"),
-                min_args: 1,
-                args: static exe =>
+                min_args: 0,
+                no_background: true,
+                opts: static exe =>
                 {
                     if (exe.line.TryRead_flags(exe, out var opts, flag_force_file))
                         if (opts.Contains(flag_force_file))
                             exe.opts.Add(flag_force_file, null);
-
+                },
+                args: static exe =>
+                {
                     // read file path
                     // (reparer tab avant)
                 },

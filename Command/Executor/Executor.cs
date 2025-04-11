@@ -18,12 +18,12 @@ namespace _COBRA_
             public Line line;
             internal ExecutorPipeline pipeline;
             public bool background;
-            public Executor stdout_exe = exe_log;
+            internal Executor stdout_exe = exe_log, next_exe;
             public readonly List<object> args;
             public readonly Dictionary<string, object> opts;
             public IEnumerator<CMD_STATUS> routine;
 
-            public readonly ThreadSafe_struct<bool> disposed = new();
+            internal bool disposed;
 
             public int executions = -1;
             static ushort PID_counter;
@@ -39,7 +39,6 @@ namespace _COBRA_
 
                 this.shell = shell;
                 command = path[^1];
-                background |= command.background;
 
                 switch (path.Count)
                 {
@@ -79,20 +78,51 @@ namespace _COBRA_
                             ParseArguments(line);
                     }
 
+                before_parsing_separator:
                 if (error == null)
-                    if (line.TryReadPipe())
-                        if (Shell.static_domain.TryReadCommand_path(line, out var path2, pipe_only: true))
-                        {
-                            Executor exe = new(shell, line, path2);
-                            if (exe.error != null)
-                                error = $"'{command.name}' ({cmd_path}) -> {exe.error}";
-                            else if (exe.command.on_pipe == null)
-                                error = $"'{command.name}' ({cmd_path}) -> '{exe.command.name}' ({exe.cmd_path}) has no '{nameof(exe.command.on_pipe)}' callback, it can not be piped into.";
-                            else
-                                stdout_exe = exe;
-                        }
-                        else
-                            error = $"'{command.name}' ({cmd_path}) failed to pipe into unknown command '{line.arg_last}'";
+                    if (line.TryReadCommandSeparator(out string spr))
+                    {
+                        bool
+                            is_pipe = spr.Equals("|", StringComparison.OrdinalIgnoreCase),
+                            is_chain = spr.Equals("&&", StringComparison.OrdinalIgnoreCase),
+                            is_background = spr.Equals("&", StringComparison.OrdinalIgnoreCase);
+
+                        if (!is_pipe && !is_chain && !is_background)
+                            error = $"'{line.arg_last}' is no valid command separator";
+
+                        if (error == null)
+                            if (is_background)
+                                if (background)
+                                    error = $"already informed background status.";
+                                else
+                                {
+                                    background = true;
+                                    goto before_parsing_separator;
+                                }
+
+                        if (error == null)
+                            if (is_pipe || is_chain)
+                                if (Shell.static_domain.TryReadCommand_path(line, out var path2, pipe_only: is_pipe))
+                                {
+                                    Executor exe = new(shell, line, path2);
+                                    if (exe.error != null)
+                                        error = $"'{command.name}' ({cmd_path}) -> {exe.error}";
+                                    else if (is_pipe && exe.command.on_pipe == null)
+                                        error = $"'{command.name}' ({cmd_path}) -> '{exe.command.name}' ({exe.cmd_path}) has no '{nameof(exe.command.on_pipe)}' callback, it can not be piped into.";
+                                    else if (is_pipe)
+                                        stdout_exe = exe;
+                                    else
+                                        next_exe = exe;
+                                }
+                                else if (is_pipe)
+                                    error = $"'{command.name}' ({cmd_path}) failed to pipe into unknown command '{line.arg_last}'";
+                                else if (is_chain)
+                                    error = $"'{command.name}' ({cmd_path}) failed to chain into unknown command '{line.arg_last}'";
+                    }
+
+                if (error == null)
+                    if (background)
+                        PropagateBackground();
 
                 if (error == null)
                     if (command.routine != null)
@@ -131,11 +161,24 @@ namespace _COBRA_
 
             internal void LogBackgroundStart() => Debug.Log($"[{PID}] '{command.name}'({cmd_path}) started running in background".ToSubLog());
 
-            public void PropagateBackground()
+            internal void PropagateBackground()
             {
                 background = true;
                 if (stdout_exe != exe_log)
                     stdout_exe.background = true;
+                next_exe?.PropagateBackground();
+            }
+
+            internal bool TryPullNext(out Executor exe)
+            {
+                if (next_exe == null)
+                {
+                    exe = null;
+                    return false;
+                }
+                exe = next_exe;
+                next_exe = null;
+                return true;
             }
 
             public static string GetPrefixe() => $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{"~".SetColor("#73B2D9")}$";
@@ -157,9 +200,9 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            public void PropagateDispose()
+            internal void PropagateDispose()
             {
-                if (!disposed.Value)
+                if (!disposed)
                     if (stdout_exe != exe_log)
                         stdout_exe.Dispose();
                 Dispose();
@@ -169,17 +212,14 @@ namespace _COBRA_
             {
                 instances.Remove(this);
 
-                lock (disposed)
-                {
 #if UNITY_EDITOR
-                    if (shell != null)
-                        shell.Janitize($"[{PID}] {cmd_path} (already janitized: {disposed._value})");
+                if (shell != null)
+                    shell.Janitize($"[{PID}] {cmd_path} (already janitized: {disposed})");
 #endif
 
-                    if (disposed._value)
-                        return;
-                    disposed.Value = true;
-                }
+                if (disposed)
+                    return;
+                disposed = true;
 
                 routine?.Dispose();
                 routine = null;

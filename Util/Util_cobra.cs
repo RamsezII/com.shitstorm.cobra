@@ -2,42 +2,13 @@
 
 public static class Util_cobra
 {
-    public const char
-        char_SPACE = ' ',
-        char_DQUOTE = '"',
-        char_SQUOTE = '\'',
-        char_SLASH = '/',
-        char_BACKSLASH = '\\',
-        char_TAB = '\t',
-        char_NEWLINE = '\n',
-        char_BACKGROUND = '&',
-        char_PIPE = '|';
-
-    public const string
-        str_CHAIN = "&&",
-        str_PIPE = "|",
-        str_BACKGROUND = "&";
-
-    public static readonly string[]
-        str_OPERATORS = new string[]
-        {
-                "==", "!=", "<=", ">=", "<", ">", "=", "+", "-", "*", "/", "%", "&", "|", "^", "~",
-                "<<", ">>", "&&", "||", "??"
-        },
-        str_CMD_SEPARATORS = new string[]
-        {
-                "&&", "|", "&",
-        };
-
-    //--------------------------------------------------------------------------------------------------------------
-
     public static int SkipSpaces(this string text, ref int read_i)
     {
         int start_i = read_i;
         while (read_i < text.Length && text[read_i] switch
         {
-            char_SPACE => true,
-            char_TAB => true,
+            ' ' => true,
+            '\t' => true,
             _ => false,
         })
             ++read_i;
@@ -51,7 +22,7 @@ public static class Util_cobra
                 while (read_i < text.Length)
                     if (text[read_i] switch
                     {
-                        char_SPACE or char_TAB or char_NEWLINE => true,
+                        ' ' or '\t' or '\n' => true,
                         _ => false,
                     })
                         ++read_i;
@@ -63,7 +34,7 @@ public static class Util_cobra
     public static bool TryReadPipe(this string text, ref int read_i)
     {
         if (text.HasNext(ref read_i))
-            return text[read_i] == char_PIPE;
+            return text[read_i] == '|';
         return false;
     }
 
@@ -78,7 +49,7 @@ public static class Util_cobra
         char c = text[read_i - 1];
         switch (c)
         {
-            case char_NEWLINE:
+            case '\n':
                 --read_i;
                 while (read_i > 0 && text[read_i - 1] == c)
                     --read_i;
@@ -87,21 +58,21 @@ public static class Util_cobra
                         ++read_i;
                 return Conclude(ref read_i);
 
-            case char_SPACE:
-            case char_TAB:
+            case ' ':
+            case '\t':
                 --read_i;
                 while (read_i > 0 && text[read_i - 1] == c)
                     --read_i;
-                if (read_i > 0 && text[read_i - 1] == char_NEWLINE)
+                if (read_i > 0 && text[read_i - 1] == '\n')
                     return Conclude(ref read_i);
                 goto reset;
 
-            case char_SQUOTE:
-            case char_DQUOTE:
+            case '"':
+            case '\'':
                 --read_i;
                 while (read_i > 0)
                 {
-                    if (read_i > 2 && text[read_i - 2] == char_BACKSLASH)
+                    if (read_i > 2 && text[read_i - 2] == '\\')
                         --read_i;
                     else if (text[read_i - 1] == c)
                     {
@@ -115,7 +86,7 @@ public static class Util_cobra
             default:
                 while (read_i > 0 && text[read_i - 1] switch
                 {
-                    char_SPACE or char_TAB or char_NEWLINE => false,
+                    ' ' or '\t' or '\n' => false,
                     _ => true,
                 })
                     --read_i;
@@ -147,12 +118,12 @@ public static class Util_cobra
             char c = text[read_i];
             switch (c)
             {
-                case char_BACKSLASH:
+                case '\\':
                     ++read_i;
                     break;
 
-                case char_BACKGROUND or char_PIPE when stop_at_separators:
-                case char_SPACE or char_TAB or char_NEWLINE:
+                case '&' or '|' when stop_at_separators:
+                case ' ' or '\t' or '\n':
                     return TryRead(start_i, ref read_i, out argument);
 
                 case '"':
@@ -160,7 +131,7 @@ public static class Util_cobra
                     ++read_i;
                     while (read_i < text.Length && text[read_i] != c)
                     {
-                        if (text[read_i] == char_BACKSLASH)
+                        if (text[read_i] == '\\')
                             ++read_i;
                         ++read_i;
                     }
@@ -187,8 +158,8 @@ public static class Util_cobra
                 if (argument.Length >= 2 && argument[0] == argument[^1])
                     switch (argument[0])
                     {
-                        case char_SQUOTE:
-                        case char_DQUOTE:
+                        case '"':
+                        case '\'':
                             argument = argument[1..^1];
                             break;
                     }
@@ -209,8 +180,8 @@ public static class Util_cobra
         {
             char c = text[read_i];
 
-            if (c == char_NEWLINE)
-                if (!charSet.Contains(char_NEWLINE))
+            if (c == '\n')
+                if (!charSet.Contains('\n'))
                     return skips;
 
             if (!charSet.Contains(c))

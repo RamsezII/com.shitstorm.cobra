@@ -20,12 +20,28 @@ namespace _COBRA_
             if (disposed)
                 Debug.LogError($"adding {executor.GetType().FullName} '{executor.command.name}' ({executor.cmd_path}) to a disposed {GetType().FullName}.");
             executor.pipeline = this;
-            _executors.Remove(executor);
+            if (!_executors.Remove(executor) && executor.background)
+                executor.LogBackgroundStart();
             _executors.Add(executor);
+        }
+
+        internal bool TryGetCurrent(out Command.Executor executor)
+        {
+            for (int i = 0; i < _executors.Count; i++)
+            {
+                executor = _executors[i];
+                if (!executor.disposed)
+                    return true;
+                else if (executor.TryPullNext(out executor))
+                    return true;
+            }
+            executor = null;
+            return false;
         }
 
         internal bool TryExecuteCurrent(in Command.Line line, out Command.Executor exe)
         {
+        before_execution:
             if (!TryGetCurrent(out exe))
             {
                 Dispose();
@@ -54,19 +70,10 @@ namespace _COBRA_
 
             exe.line = null;
 
-            return true;
-        }
+            if (exe.disposed)
+                goto before_execution;
 
-        internal bool TryGetCurrent(out Command.Executor executor)
-        {
-            for (int i = 0; i < _executors.Count; i++)
-                if (!_executors[i].disposed.Value)
-                {
-                    executor = _executors[i];
-                    return true;
-                }
-            executor = null;
-            return false;
+            return true;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -74,7 +81,7 @@ namespace _COBRA_
         internal bool AreAllDisposed()
         {
             for (int i = 0; i < _executors.Count; i++)
-                if (!_executors[i].disposed.Value)
+                if (!_executors[i].disposed)
                     return false;
             return true;
         }
