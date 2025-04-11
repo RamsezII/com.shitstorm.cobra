@@ -16,24 +16,24 @@ namespace _COBRA_
             }
 
             if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
-                if (background_executors_pipelines.Count > 0)
-                    for (int i = 0; i < background_executors_pipelines.Count; ++i)
+                if (background_janitors.Count > 0)
+                    for (int i = 0; i < background_janitors.Count; ++i)
                     {
-                        ExecutorPipeline pipeline = background_executors_pipelines[i];
-                        if (!pipeline.TryExecuteCurrent(line, background_executors_pipelines, out _))
-                            background_executors_pipelines.RemoveAt(i--);
+                        Command.Executor.Janitor janitor = background_janitors[i];
+                        if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
+                            background_janitors.RemoveAt(i--);
                     }
 
                 before_active_executors:
 
             if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
-                if (active_executor_pipelines_stack.Count > 0)
+                if (front_janitors.Count > 0)
                 {
-                    ExecutorPipeline pipeline = active_executor_pipelines_stack[^1];
-                    if (!pipeline.TryExecuteCurrent(line, background_executors_pipelines, out _))
+                    Command.Executor.Janitor janitor = front_janitors[^1];
+                    if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
                     {
-                        active_executor_pipelines_stack.RemoveAt(active_executor_pipelines_stack.Count - 1);
-                        pipeline.Dispose();
+                        front_janitors.RemoveAt(front_janitors.Count - 1);
+                        janitor.Dispose();
                         goto before_active_executors;
                     }
                 }
@@ -41,18 +41,18 @@ namespace _COBRA_
             before_pending_queue:
 
             if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
-                if (active_executor_pipelines_stack.Count == 0 && pending_executors_queue.Count > 0)
+                if (front_janitors.Count == 0 && pending_executors.Count > 0)
                 {
-                    var exe = pending_executors_queue.Dequeue();
+                    var exe = pending_executors.Dequeue();
                     if (exe == null)
-                        error = $"[SHELL_WARNING] presence of NULL {exe.GetType().FullName} in {nameof(pending_executors_queue)}";
+                        error = $"[SHELL_WARNING] presence of NULL {exe.GetType().FullName} in {nameof(pending_executors)}";
                     else if (exe.disposed)
-                        error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} in {nameof(pending_executors_queue)}";
+                        error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} in {nameof(pending_executors)}";
                     else if (exe.background)
-                        background_executors_pipelines.Add(new ExecutorPipeline(exe));
+                        background_janitors.Add(new Command.Executor.Janitor(exe));
                     else
                     {
-                        active_executor_pipelines_stack.Add(new ExecutorPipeline(exe));
+                        front_janitors.Add(new Command.Executor.Janitor(exe));
                         goto before_active_executors;
                     }
                 }
@@ -70,18 +70,18 @@ namespace _COBRA_
                         if (exe.background)
                         {
                             exe.PropagateBackground();
-                            background_executors_pipelines.Add(new ExecutorPipeline(exe));
+                            background_janitors.Add(new Command.Executor.Janitor(exe));
                         }
                         else
                         {
-                            pending_executors_queue.Enqueue(exe);
+                            pending_executors.Enqueue(exe);
                             goto before_pending_queue;
                         }
                 }
                 else if (!string.IsNullOrWhiteSpace(line.arg_last))
                     error = $"'{line.arg_last}' not found in '{static_domain.name}'";
 
-            if (active_executor_pipelines_stack.Count > 0 && active_executor_pipelines_stack[^1].TryGetCurrent(out Command.Executor active_exe))
+            if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe))
                 status = active_exe.routine.Current;
             else
                 status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: Command.Executor.GetPrefixe(), immortal: true);

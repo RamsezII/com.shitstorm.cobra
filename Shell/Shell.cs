@@ -8,15 +8,14 @@ namespace _COBRA_
     {
         public static readonly Command static_domain;
 
-        readonly List<ExecutorPipeline> active_executor_pipelines_stack = new();
-        readonly Queue<Command.Executor> pending_executors_queue = new();
-        readonly List<ExecutorPipeline> background_executors_pipelines = new();
+        readonly Queue<Command.Executor> pending_executors = new();
+        readonly List<Command.Executor.Janitor> front_janitors = new(), background_janitors = new();
 
         static byte id_counter = 0;
         public readonly byte shell_ID = ++id_counter;
 
         internal CMD_STATUS status;
-        public bool IsIdle => active_executor_pipelines_stack.Count == 0;
+        public bool IsIdle => front_janitors.Count == 0;
         public CMD_STATUS CurrentStatus => status;
         public ITerminal terminal;
 
@@ -50,18 +49,17 @@ namespace _COBRA_
         {
             NUCLEOR.delegates.update_shells -= TickExecutors;
 
-            foreach (Command.Executor executor in pending_executors_queue)
+            foreach (Command.Executor executor in pending_executors)
                 executor.Dispose();
-            pending_executors_queue.Clear();
+            pending_executors.Clear();
 
-            for (int i = 0; i < active_executor_pipelines_stack.Count; i++)
-                active_executor_pipelines_stack[i].Dispose();
-            active_executor_pipelines_stack.Clear();
+            for (int i = 0; i < front_janitors.Count; i++)
+                front_janitors[i].Dispose();
+            front_janitors.Clear();
 
-            for (int i1 = 0; i1 < background_executors_pipelines.Count; i1++)
-                background_executors_pipelines[i1].Dispose();
-
-            background_executors_pipelines.Clear();
+            for (int i1 = 0; i1 < background_janitors.Count; i1++)
+                background_janitors[i1].Dispose();
+            background_janitors.Clear();
         }
     }
 }

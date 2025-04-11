@@ -16,7 +16,7 @@ namespace _COBRA_
             public readonly string cmd_path;
 
             public Line line;
-            internal ExecutorPipeline pipeline;
+            internal Janitor janitor;
             public bool background;
             internal Executor stdout_exe = exe_log, next_exe;
             public readonly List<object> args;
@@ -30,7 +30,7 @@ namespace _COBRA_
             public readonly ushort executor_ID;
 
             public string error;
-            public override string ToString() => $"[{parent?.executor_ID ?? 0} {executor_ID}] '{command?.name ?? "~"}' ({cmd_path})";
+            public override string ToString() => $"[{parent?.executor_ID ?? 0}-{executor_ID} {cmd_path}]";
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -201,14 +201,14 @@ namespace _COBRA_
             {
                 stdout_exe.line = line;
                 if (stdout_exe != exe_log)
-                    stdout_exe.pipeline = pipeline;
+                    stdout_exe.janitor = janitor;
                 stdout_exe.command.on_pipe(stdout_exe, stdout_exe.args, data);
                 stdout_exe.line = null;
             }
 
             //--------------------------------------------------------------------------------------------------------------
 
-            internal void PropagateDispose()
+            internal void Janitize()
             {
                 if (!disposed)
                     if (stdout_exe != exe_log)
@@ -219,11 +219,6 @@ namespace _COBRA_
             public void Dispose()
             {
                 instances.Remove(this);
-
-#if UNITY_EDITOR
-                if (shell != null)
-                    shell.Janitize($"[{executor_ID}] {cmd_path} (already janitized: {disposed})");
-#endif
 
                 if (disposed)
                     return;
