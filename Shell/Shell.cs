@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     public sealed partial class Shell : MonoBehaviour
     {
-        public static readonly Command static_domain = new("shell_root");
+        public static readonly Command static_domain;
 
         readonly List<ExecutorPipeline> active_executor_pipelines_stack = new();
         readonly Queue<Command.Executor> pending_executors_queue = new();
@@ -19,6 +19,13 @@ namespace _COBRA_
         public bool IsIdle => active_executor_pipelines_stack.Count == 0;
         public CMD_STATUS CurrentStatus => status;
         public ITerminal terminal;
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        static Shell()
+        {
+            static_domain = new Command(nameof(static_domain));
+        }
 
         //--------------------------------------------------------------------------------------------------------------
 

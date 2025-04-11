@@ -11,32 +11,6 @@ namespace _COBRA_
     {
         public partial class Executor : IDisposable
         {
-            internal static readonly Executor exe_log = new(
-                shell: null,
-                line: new Line(string.Empty, SIGNAL_FLAGS._none_, null),
-                path: new()
-                {
-                    new Command("_log", on_pipe: (exe, args, data) =>
-                    {
-                        switch (data)
-                        {
-                            case IEnumerable<string> lines:
-                                foreach (string line in lines)
-                                    Debug.Log(line);
-                                break;
-
-                            case string str:
-                                Debug.Log(str);
-                                break;
-
-                            default:
-                                Debug.Log(data);
-                                break;
-                        }
-                    }),
-                }
-                );
-
             public readonly Shell shell;
             public readonly Command command;
             public readonly string cmd_path;
@@ -59,26 +33,13 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-            static void OnBeforeSceneLoad()
-            {
-                PID_counter = 0;
-            }
-
-            //--------------------------------------------------------------------------------------------------------------
-
-            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-            static void OnAfterSceneLoad()
-            {
-                Init_Execs();
-            }
-
-            //--------------------------------------------------------------------------------------------------------------
-
             internal Executor(in Shell shell, in Line line, in List<Command> path, in bool parse_options = true, in bool parse_arguments = true)
             {
+                instances.Add(this);
+
                 this.shell = shell;
                 command = path[^1];
+                background |= command.background;
 
                 switch (path.Count)
                 {
@@ -168,6 +129,8 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
+            internal void LogBackgroundStart() => Debug.Log($"[{PID}] '{command.name}'({cmd_path}) started running in background".ToSubLog());
+
             public void PropagateBackground()
             {
                 background = true;
@@ -204,6 +167,8 @@ namespace _COBRA_
 
             public void Dispose()
             {
+                instances.Remove(this);
+
                 lock (disposed)
                 {
 #if UNITY_EDITOR

@@ -64,7 +64,10 @@ namespace _COBRA_
                     else
                     {
                         if (exe.background)
+                        {
+                            exe.LogBackgroundStart();
                             background_executors_pipelines.Add(new ExecutorPipeline(exe));
+                        }
                         else
                             active_executor_pipelines_stack.Add(new ExecutorPipeline(exe));
                         goto before_active_executors;
@@ -73,17 +76,11 @@ namespace _COBRA_
 
             if (error == null && line.HasNext(true))
             {
-                List<Command.Executor>
-                    add_to_chain = null,
-                    add_to_background = null;
-
+                List<Command.Executor> add_to_chain = null;
                 if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                {
                     add_to_chain = new();
-                    add_to_background = new();
-                }
 
-            before_loop:
+                before_loop:
 
                 if (error == null && line.HasNext(true))
                     if (!static_domain.TryReadCommand_path(line, out var path))
@@ -115,16 +112,14 @@ namespace _COBRA_
                                         break;
 
                                     case Util_cobra.str_BACKGROUND:
-                                        if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                                        {
-                                            exe.PropagateBackground();
-                                            add_to_chain.Add(exe);
-                                        }
-
+                                        exe.PropagateBackground();
                                         if (line.HasNext(true))
                                             goto before_separator;
                                         else
+                                        {
+                                            add_to_chain.Add(exe);
                                             break;
+                                        }
 
                                     default:
                                         if (line.TryReadAny(out string any))
@@ -141,22 +136,24 @@ namespace _COBRA_
 
                 if (error == null)
                     if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                    {
-                        if (add_to_background.Count > 0)
-                        {
-                            for (int i = 0; i < add_to_background.Count; ++i)
-                                background_executors_pipelines.Add(new(add_to_background[i]));
-                            add_to_background.Clear();
-                        }
-
                         if (add_to_chain.Count > 0)
                         {
                             for (int i = 0; i < add_to_chain.Count; i++)
-                                pending_executors_queue.Enqueue(add_to_chain[i]);
+                            {
+                                Command.Executor exe = add_to_chain[i];
+                                if (!exe.background)
+                                    pending_executors_queue.Enqueue(exe);
+                                else
+                                {
+                                    exe.LogBackgroundStart();
+                                    exe.PropagateBackground();
+                                    background_executors_pipelines.Add(new ExecutorPipeline(exe));
+                                }
+                            }
+
                             add_to_chain.Clear();
                             goto before_pending_queue;
                         }
-                    }
             }
             else
                 line.ReadBack();

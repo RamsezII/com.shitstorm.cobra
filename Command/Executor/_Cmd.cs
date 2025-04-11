@@ -6,7 +6,7 @@ namespace _COBRA_
     {
         partial class Executor
         {
-            static void Init_Execs()
+            static void Init_Cmd()
             {
                 Shell.static_domain.AddAction(
                     "current-executors",
