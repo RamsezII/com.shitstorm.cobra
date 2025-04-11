@@ -14,11 +14,10 @@ namespace _COBRA_
         static byte id_counter = 0;
         public readonly byte shell_ID = ++id_counter;
 
-        internal CMD_STATUS status;
+        public CMD_STATUS current_status;
         public CMD_STATES previous_state;
         public bool state_changed;
         public bool IsIdle => front_janitors.Count == 0;
-        public CMD_STATUS CurrentStatus => status;
         public ITerminal terminal;
         public override string ToString() => $"{GetType().FullName}[{shell_ID}]";
 

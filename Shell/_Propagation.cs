@@ -100,12 +100,12 @@ namespace _COBRA_
                 else if (!string.IsNullOrWhiteSpace(line.arg_last))
                     error = $"'{line.arg_last}' not found in '{static_domain.name}'";
 
-            previous_state = status.state;
+            previous_state = current_status.state;
             if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe))
-                status = active_exe.routine.Current;
+                current_status = active_exe.routine.Current;
             else
-                status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: Command.Executor.GetPrefixe(), immortal: true);
-            state_changed = previous_state != status.state;
+                current_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: Command.Executor.GetPrefixe(), immortal: true);
+            state_changed = previous_state != current_status.state;
 
             if (error != null)
                 if (line.signal.HasFlag(SIGNALS.CHECK))
