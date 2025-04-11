@@ -2,7 +2,7 @@
 
 namespace _COBRA_
 {
-    enum SIGNAL_ENUM : byte
+    enum SIGNALS_enum : byte
     {
         _kill,
         _save,
@@ -23,24 +23,24 @@ namespace _COBRA_
     }
 
     [Flags]
-    public enum SIGNAL_FLAGS : ushort
+    public enum SIGNALS : ushort
     {
         _none_,
-        KILL = 1 << SIGNAL_ENUM._kill,
-        SAVE = 1 << SIGNAL_ENUM._save,
-        LINT = 1 << SIGNAL_ENUM._lint,
-        VALIDATE = 1 << SIGNAL_ENUM._validate,
-        CHECK = 1 << SIGNAL_ENUM._check,
-        EXEC = 1 << SIGNAL_ENUM._exec,
-        TICK = 1 << SIGNAL_ENUM._thick,
-        DOUBLE = 1 << SIGNAL_ENUM._double,
-        CPL = 1 << SIGNAL_ENUM._cpl,
-        TAB = 1 << SIGNAL_ENUM._tab,
-        ALT = 1 << SIGNAL_ENUM._alt,
-        UP = 1 << SIGNAL_ENUM._up,
-        RIGHT = 1 << SIGNAL_ENUM._right,
-        DOWN = 1 << SIGNAL_ENUM._down,
-        LEFT = 1 << SIGNAL_ENUM._left,
+        KILL = 1 << SIGNALS_enum._kill,
+        SAVE = 1 << SIGNALS_enum._save,
+        LINT = 1 << SIGNALS_enum._lint,
+        VALIDATE = 1 << SIGNALS_enum._validate,
+        CHECK = 1 << SIGNALS_enum._check,
+        EXEC = 1 << SIGNALS_enum._exec,
+        TICK = 1 << SIGNALS_enum._thick,
+        DOUBLE = 1 << SIGNALS_enum._double,
+        CPL = 1 << SIGNALS_enum._cpl,
+        TAB = 1 << SIGNALS_enum._tab,
+        ALT = 1 << SIGNALS_enum._alt,
+        UP = 1 << SIGNALS_enum._up,
+        RIGHT = 1 << SIGNALS_enum._right,
+        DOWN = 1 << SIGNALS_enum._down,
+        LEFT = 1 << SIGNALS_enum._left,
 
         CPL_TAB = CPL | TAB,
         CPL_ALT = CPL | ALT,

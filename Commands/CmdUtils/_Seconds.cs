@@ -41,7 +41,7 @@ namespace _COBRA_
                         float timer = 0;
                         while (timer < 1)
                         {
-                            if (exe.line.signal.HasFlag(SIGNAL_FLAGS.TICK))
+                            if (exe.line.signal.HasFlag(SIGNALS.TICK))
                                 timer += 3 * Time.deltaTime;
 
                             yield return new CMD_STATUS()

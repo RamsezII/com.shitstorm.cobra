@@ -4,58 +4,77 @@ namespace _COBRA_
 {
     partial class Shell
     {
-        void TickExecutors() => PropagateLine(new Command.Line(string.Empty, SIGNAL_FLAGS.TICK, terminal));
+        void TickExecutors() => PropagateLine(new Command.Line(string.Empty, SIGNALS.TICK, terminal));
         public string PropagateLine(in Command.Line line)
         {
             string error = null;
 
-            if (line.signal.HasFlag(SIGNAL_FLAGS.KILL))
-            {
-                Debug.LogWarning($"'{GetType().FullName}[{shell_ID}] {nameof(line.signal)}: '{line.signal}' to be repaired");
-                error = $"[SHELL_WARNING] {nameof(SIGNAL_FLAGS.KILL)} signal received";
-            }
-
-            if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
-                if (background_janitors.Count > 0)
-                    for (int i = 0; i < background_janitors.Count; ++i)
+            if (error == null)
+                if (line.signal.HasFlag(SIGNALS.KILL))
+                    if (front_janitors.Count > 0)
                     {
-                        Command.Executor.Janitor janitor = background_janitors[i];
+                        var janitor = front_janitors[^1];
+                        if (janitor.TryGetCurrent(out var exe))
+                            if (exe.routine != null)
+                                if (exe.command.immortal)
+                                {
+                                    error = $"{line.signal} signal received on an immortal executor: {exe}";
+                                    line.data = new CMDLINE_DATA(CMDLINE_STATUS.REJECT, error);
+                                }
+                                else
+                                {
+                                    exe.line = line;
+                                    exe.routine.MoveNext();
+                                    line.data = new CMDLINE_DATA(CMDLINE_STATUS.CONFIRM, $"{line.signal} killed current executor: {exe}");
+                                    exe.line = null;
+                                    exe.Dispose();
+                                }
+                    }
+
+            if (error == null)
+                if (line.signal.HasFlag(SIGNALS.TICK))
+                    if (background_janitors.Count > 0)
+                        for (int i = 0; i < background_janitors.Count; ++i)
+                        {
+                            var janitor = background_janitors[i];
+                            if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
+                                background_janitors.RemoveAt(i--);
+                        }
+
+                    before_active_executors:
+
+            if (error == null)
+                if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                    if (front_janitors.Count > 0)
+                    {
+                        var janitor = front_janitors[^1];
                         if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
-                            background_janitors.RemoveAt(i--);
+                        {
+                            front_janitors.RemoveAt(front_janitors.Count - 1);
+                            janitor.Dispose();
+                            goto before_active_executors;
+                        }
                     }
 
-                before_active_executors:
+                before_pending_queue:
 
-            if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
-                if (front_janitors.Count > 0)
-                {
-                    Command.Executor.Janitor janitor = front_janitors[^1];
-                    if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
+            if (error == null)
+                if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                    if (front_janitors.Count == 0 && pending_executors.Count > 0)
                     {
-                        front_janitors.RemoveAt(front_janitors.Count - 1);
-                        janitor.Dispose();
-                        goto before_active_executors;
+                        var exe = pending_executors.Dequeue();
+                        if (exe == null)
+                            error = $"[SHELL_WARNING] presence of NULL {exe.GetType().FullName} in {nameof(pending_executors)}";
+                        else if (exe.disposed)
+                            error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} ({exe}) in {nameof(pending_executors)}";
+                        else if (exe.background)
+                            background_janitors.Add(new Command.Executor.Janitor(exe));
+                        else
+                        {
+                            front_janitors.Add(new Command.Executor.Janitor(exe));
+                            goto before_active_executors;
+                        }
                     }
-                }
-
-            before_pending_queue:
-
-            if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
-                if (front_janitors.Count == 0 && pending_executors.Count > 0)
-                {
-                    var exe = pending_executors.Dequeue();
-                    if (exe == null)
-                        error = $"[SHELL_WARNING] presence of NULL {exe.GetType().FullName} in {nameof(pending_executors)}";
-                    else if (exe.disposed)
-                        error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} ({exe}) in {nameof(pending_executors)}";
-                    else if (exe.background)
-                        background_janitors.Add(new Command.Executor.Janitor(exe));
-                    else
-                    {
-                        front_janitors.Add(new Command.Executor.Janitor(exe));
-                        goto before_active_executors;
-                    }
-                }
 
             if (error == null && line.HasNext(true))
                 if (static_domain.TryReadCommand_path(line, out var path))
@@ -66,7 +85,7 @@ namespace _COBRA_
                         error = exe.error;
                         exe.Dispose();
                     }
-                    else if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                    else if (line.signal.HasFlag(SIGNALS.EXEC))
                         if (exe.background)
                         {
                             exe.PropagateBackground();
@@ -89,9 +108,9 @@ namespace _COBRA_
             state_changed = previous_state != status.state;
 
             if (error != null)
-                if (line.signal.HasFlag(SIGNAL_FLAGS.CHECK))
+                if (line.signal.HasFlag(SIGNALS.CHECK))
                     Debug.LogWarning($"[WARN {this}] -> {error}");
-                else if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                else if (line.signal.HasFlag(SIGNALS.EXEC))
                     Debug.LogError($"[ERROR {this}] -> {error}");
 
             return error;

@@ -28,7 +28,7 @@ namespace _COBRA_
                 exe_log = new(
                     shell: null,
                     parent: null,
-                    line: new Line(string.Empty, SIGNAL_FLAGS._none_, null),
+                    line: new Line(string.Empty, SIGNALS._none_, null),
                     path: new()
                     {
                         new Command("_log", on_pipe: (exe, args, data) =>

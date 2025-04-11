@@ -42,7 +42,7 @@ namespace _COBRA_
                 this.parent = parent;
                 command = path[^1];
 
-                if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                if (line.signal.HasFlag(SIGNALS.EXEC))
                     executor_ID = ++PID_counter;
 
                 switch (path.Count)
@@ -134,7 +134,7 @@ namespace _COBRA_
 
                 if (error == null)
                     if (command.routine != null)
-                        if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                        if (line.signal.HasFlag(SIGNALS.EXEC))
                             routine = command.routine(this);
             }
 

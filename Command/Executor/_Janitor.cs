@@ -84,7 +84,7 @@ namespace _COBRA_
                     exe.line = line;
 
                     if (exe.command.action != null)
-                        if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
+                        if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
                         {
                             if (exe.started)
                                 Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_path}) has already been started.");
@@ -98,7 +98,7 @@ namespace _COBRA_
                         }
 
                     if (exe.routine != null)
-                        if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
+                        if (line.signal.HasFlag(SIGNALS.TICK))
                         {
                             if (!exe.started && exe.background)
                                 exe.LogBackgroundStart();

@@ -20,7 +20,7 @@ namespace _COBRA_
         public bool IsIdle => front_janitors.Count == 0;
         public CMD_STATUS CurrentStatus => status;
         public ITerminal terminal;
-        public override string ToString() => $"[{shell_ID}]{GetType().FullName}";
+        public override string ToString() => $"{GetType().FullName}[{shell_ID}]";
 
         //--------------------------------------------------------------------------------------------------------------
 

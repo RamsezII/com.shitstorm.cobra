@@ -33,7 +33,7 @@ namespace _COBRA_
                 {
                     while (true)
                     {
-                        if (exe.line.signal.HasFlag(SIGNAL_FLAGS.SAVE))
+                        if (exe.line.signal.HasFlag(SIGNALS.SAVE))
                             exe.Stdout("Saving file...");
                         yield return new(CMD_STATES.FULLSCREEN_write);
                     }

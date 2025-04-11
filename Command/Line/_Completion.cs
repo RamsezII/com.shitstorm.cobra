@@ -52,8 +52,8 @@ namespace _COBRA_
                 {
                     cpl_index = indexOf + signal switch
                     {
-                        SIGNAL_FLAGS.ALT_UP => -1,
-                        SIGNAL_FLAGS.ALT_DOWN => 1,
+                        SIGNALS.ALT_UP => -1,
+                        SIGNALS.ALT_DOWN => 1,
                         _ => 0,
                     };
 

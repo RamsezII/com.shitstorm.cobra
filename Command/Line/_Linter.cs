@@ -37,7 +37,7 @@ namespace _COBRA_
 
                 public string GetLint(in ITerminal terminal, in string input, out Line line)
                 {
-                    line = new(input, SIGNAL_FLAGS.LINT, terminal);
+                    line = new(input, SIGNALS.LINT, terminal);
                     terminal.GetShell.PropagateLine(line);
                     line.EndLint(error);
                     string res = sb.PullValue();
@@ -57,7 +57,7 @@ namespace _COBRA_
 
             public void EndLint(in Color color)
             {
-                if (!signal.HasFlag(SIGNAL_FLAGS.LINT))
+                if (!signal.HasFlag(SIGNALS.LINT))
                     return;
 
                 if (string.IsNullOrEmpty(text))
@@ -72,7 +72,7 @@ namespace _COBRA_
 
             public void SkipLintToThisPosition()
             {
-                if (!signal.HasFlag(SIGNAL_FLAGS.LINT))
+                if (!signal.HasFlag(SIGNALS.LINT))
                     return;
 
                 if (read_i < linter.last_i)
@@ -96,7 +96,7 @@ namespace _COBRA_
 
             public void LintToThisPosition(in Color color)
             {
-                if (!signal.HasFlag(SIGNAL_FLAGS.LINT))
+                if (!signal.HasFlag(SIGNALS.LINT))
                     return;
 
                 if (read_i < linter.last_i)

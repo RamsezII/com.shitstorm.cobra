@@ -13,7 +13,7 @@ namespace _COBRA_
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
 
         public readonly Traductions manual;
-        public readonly bool background, no_background;
+        public readonly bool immortal, no_background;
         public readonly int min_args, max_args;
         public readonly Action<Executor> opts, args;
         public readonly Type input_type, output_type;
@@ -28,7 +28,7 @@ namespace _COBRA_
             in Action<Executor, List<object>, object> on_pipe = default,
             in Func<Executor, IEnumerator<CMD_STATUS>> routine = default,
             in Traductions manual = default,
-            in bool background = default,
+            in bool immortal = default,
             in bool no_background = default,
             in int min_args = default,
             in int max_args = default,
@@ -44,7 +44,7 @@ namespace _COBRA_
             this.output_type = output_type ?? typeof(object);
             this.routine = routine;
             this.manual = manual;
-            this.background = background;
+            this.immortal = immortal;
             this.no_background = no_background;
             this.min_args = min_args;
             this.max_args = Mathf.Max(min_args, max_args);
@@ -81,7 +81,6 @@ namespace _COBRA_
             ) => AddCommand(new(name,
                                 action: action,
                                 manual: manual,
-                                background: background,
                                 no_background: no_background,
                                 min_args: min_args,
                                 max_args: max_args,
@@ -104,7 +103,6 @@ namespace _COBRA_
             params string[] aliases
             ) => AddCommand(new(name,
                                 manual: manual,
-                                background: background,
                                 no_background: no_background,
                                 opts: opts,
                                 args: args,
@@ -117,6 +115,7 @@ namespace _COBRA_
         public Command AddRoutine(
             in string name,
             in Func<Executor, IEnumerator<CMD_STATUS>> routine,
+            in bool immortal = default,
             in Action<Executor> opts = null,
             in Action<Executor> args = null,
             in Type output_type = null,
@@ -129,10 +128,10 @@ namespace _COBRA_
             ) => AddCommand(new(name,
                                 routine: routine,
                                 manual: manual,
-                                background: background,
                                 no_background: no_background,
                                 min_args: min_args,
                                 max_args: max_args,
+                                immortal: immortal,
                                 output_type: output_type,
                                 opts: opts,
                                 args: args), aliases);

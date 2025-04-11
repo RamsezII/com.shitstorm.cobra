@@ -124,16 +124,16 @@ namespace _COBRA_
                 }
 
                 if (!cpl_done)
-                    if (signal.HasFlag(SIGNAL_FLAGS.CPL))
+                    if (signal.HasFlag(SIGNALS.CPL))
                         if (cursor_i >= start_i && cursor_i <= read_i)
                             if (completions_candidates != null)
                                 if (!complete_if_is_option || argument.StartsWith('-'))
                                 {
                                     cpl_done = true;
                                     cpl_start_i = read_i;
-                                    if (signal.HasFlag(SIGNAL_FLAGS.CPL_TAB))
+                                    if (signal.HasFlag(SIGNALS.CPL_TAB))
                                         ComputeCompletion_tab(argument, completions_candidates);
-                                    else if (signal.HasFlag(SIGNAL_FLAGS.CPL_ALT))
+                                    else if (signal.HasFlag(SIGNALS.CPL_ALT))
                                         ComputeCompletion_alt(argument, completions_candidates);
                                 }
 
