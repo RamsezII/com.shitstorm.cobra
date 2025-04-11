@@ -30,7 +30,7 @@ namespace _COBRA_
             public readonly ushort executor_ID;
 
             public string error;
-            public override string ToString() => $"[{parent?.executor_ID ?? 0}.{executor_ID}|{cmd_path}]";
+            public override string ToString() => $"[{parent?.executor_ID ?? 0} {executor_ID}] '{command?.name ?? "~"}' ({cmd_path})";
 
             //--------------------------------------------------------------------------------------------------------------
 

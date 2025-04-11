@@ -48,13 +48,27 @@ namespace _COBRA_
             return false;
         }
 
-        internal bool TryExecuteCurrent(in Command.Line line, out Command.Executor exe)
+        internal bool TryExecuteCurrent(in Command.Line line, in List<ExecutorPipeline> background_pipelines, out Command.Executor exe)
         {
         before_execution:
-            if (!TryGetCurrent(out exe))
+            exe = null;
+            for (int i = 0; i <= _executors.Count; i++)
             {
-                Dispose();
-                return false;
+                if (i == _executors.Count)
+                {
+                    exe = null;
+                    return false;
+                }
+
+                exe = _executors[i];
+
+                if (!exe.disposed)
+                    break;
+                else if (exe.TryPullNext(out exe))
+                {
+                    background_pipelines.Add(new ExecutorPipeline(exe));
+                    return true;
+                }
             }
 
             if (exe.command.action == null && exe.routine == null)

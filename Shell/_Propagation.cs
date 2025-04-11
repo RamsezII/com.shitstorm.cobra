@@ -20,7 +20,7 @@ namespace _COBRA_
                     for (int i = 0; i < background_executors_pipelines.Count; ++i)
                     {
                         ExecutorPipeline pipeline = background_executors_pipelines[i];
-                        if (!pipeline.TryExecuteCurrent(line, out _))
+                        if (!pipeline.TryExecuteCurrent(line, background_executors_pipelines, out _))
                             background_executors_pipelines.RemoveAt(i--);
                     }
 
@@ -30,7 +30,7 @@ namespace _COBRA_
                 if (active_executor_pipelines_stack.Count > 0)
                 {
                     ExecutorPipeline pipeline = active_executor_pipelines_stack[^1];
-                    if (!pipeline.TryExecuteCurrent(line, out _))
+                    if (!pipeline.TryExecuteCurrent(line, background_executors_pipelines, out _))
                     {
                         active_executor_pipelines_stack.RemoveAt(active_executor_pipelines_stack.Count - 1);
                         pipeline.Dispose();
