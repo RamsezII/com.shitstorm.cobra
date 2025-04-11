@@ -9,6 +9,9 @@ namespace _COBRA_
         readonly List<Command.Executor> _executors = new();
         bool disposed;
 
+        static ushort id_counter;
+        public readonly ushort pipeline_ID = ++id_counter;
+
         //--------------------------------------------------------------------------------------------------------------
 
         internal ExecutorPipeline(in Command.Executor executor) => AddExecutor(executor);
@@ -18,10 +21,13 @@ namespace _COBRA_
         internal void AddExecutor(in Command.Executor executor)
         {
             if (disposed)
-                Debug.LogError($"adding {executor.GetType().FullName} '{executor.command.name}' ({executor.cmd_path}) to a disposed {GetType().FullName}.");
+                Debug.LogError($"adding {executor.GetType().FullName} '{executor.command.name}' ({executor.cmd_path}) to disposed pipeline[{pipeline_ID}].");
+
             executor.pipeline = this;
-            if (!_executors.Remove(executor) && executor.background)
-                executor.LogBackgroundStart();
+
+            if (_executors.Remove(executor))
+                Debug.LogWarning($"'{executor.GetType().FullName}' '{executor.command.name}' ({executor.cmd_path}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
+
             _executors.Add(executor);
         }
 
@@ -33,7 +39,10 @@ namespace _COBRA_
                 if (!executor.disposed)
                     return true;
                 else if (executor.TryPullNext(out executor))
+                {
+                    _executors.Add(executor);
                     return true;
+                }
             }
             executor = null;
             return false;
@@ -59,30 +68,33 @@ namespace _COBRA_
             if (exe.command.action != null)
                 if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
                 {
+                    if (exe.started)
+                        Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_path}) has already been started.");
+
+                    exe.started = true;
+                    if (exe.background)
+                        exe.LogBackgroundStart();
+
                     exe.command.action(exe);
                     exe.Dispose();
                 }
 
             if (exe.routine != null)
                 if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
+                {
+                    if (!exe.started && exe.background)
+                        exe.LogBackgroundStart();
+                    exe.started = true;
+
                     if (!exe.routine.MoveNext())
                         exe.Dispose();
+                }
 
             exe.line = null;
 
             if (exe.disposed)
                 goto before_execution;
 
-            return true;
-        }
-
-        //--------------------------------------------------------------------------------------------------------------
-
-        internal bool AreAllDisposed()
-        {
-            for (int i = 0; i < _executors.Count; i++)
-                if (!_executors[i].disposed)
-                    return false;
             return true;
         }
 

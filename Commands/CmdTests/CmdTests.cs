@@ -59,7 +59,7 @@ namespace _COBRA_
                 }
                 finally
                 {
-                    Debug.Log($"'{exe.command.name}' ({exe.cmd_path}) disposed".ToSubLog());
+                    Debug.Log($"{exe} disposed".ToSubLog());
                 }
             }
         }

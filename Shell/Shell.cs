@@ -13,7 +13,7 @@ namespace _COBRA_
         readonly List<ExecutorPipeline> background_executors_pipelines = new();
 
         static byte id_counter = 0;
-        public readonly byte id = ++id_counter;
+        public readonly byte shell_ID = ++id_counter;
 
         internal CMD_STATUS status;
         public bool IsIdle => active_executor_pipelines_stack.Count == 0;

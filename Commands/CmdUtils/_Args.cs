@@ -16,7 +16,7 @@ namespace _COBRA_
                 {
                     if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd_path))
                     {
-                        Command.Executor exe2 = new(exe.shell, exe.line, cmd_path, parse_arguments: false);
+                        Command.Executor exe2 = new(exe.shell, exe, exe.line, cmd_path, parse_arguments: false);
                         exe.args.Add(exe2);
                     }
                     else

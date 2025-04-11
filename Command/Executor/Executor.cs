@@ -1,5 +1,4 @@
 ﻿using _ARK_;
-using _UTIL_;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +11,7 @@ namespace _COBRA_
         public partial class Executor : IDisposable
         {
             public readonly Shell shell;
+            public readonly Executor parent;
             public readonly Command command;
             public readonly string cmd_path;
 
@@ -23,22 +23,27 @@ namespace _COBRA_
             public readonly Dictionary<string, object> opts;
             public IEnumerator<CMD_STATUS> routine;
 
-            internal bool disposed;
+            internal bool started, disposed;
 
             public int executions = -1;
             static ushort PID_counter;
-            public ushort PID = ++PID_counter;
+            public readonly ushort executor_ID;
 
             public string error;
+            public override string ToString() => $"[{parent?.executor_ID ?? 0}.{executor_ID}|{cmd_path}]";
 
             //--------------------------------------------------------------------------------------------------------------
 
-            internal Executor(in Shell shell, in Line line, in List<Command> path, in bool parse_options = true, in bool parse_arguments = true)
+            internal Executor(in Shell shell, in Executor parent, in Line line, in List<Command> path, in bool parse_options = true, in bool parse_arguments = true)
             {
                 instances.Add(this);
 
                 this.shell = shell;
+                this.parent = parent;
                 command = path[^1];
+
+                if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                    executor_ID = ++PID_counter;
 
                 switch (path.Count)
                 {
@@ -104,20 +109,23 @@ namespace _COBRA_
                             if (is_pipe || is_chain)
                                 if (Shell.static_domain.TryReadCommand_path(line, out var path2, pipe_only: is_pipe))
                                 {
-                                    Executor exe = new(shell, line, path2);
+                                    Executor exe = new(shell, this, line, path2);
                                     if (exe.error != null)
-                                        error = $"'{command.name}' ({cmd_path}) -> {exe.error}";
+                                        error = this + exe.error;
                                     else if (is_pipe && exe.command.on_pipe == null)
-                                        error = $"'{command.name}' ({cmd_path}) -> '{exe.command.name}' ({exe.cmd_path}) has no '{nameof(exe.command.on_pipe)}' callback, it can not be piped into.";
+                                        error = $"{this} -> {exe} has no '{nameof(exe.command.on_pipe)}' callback, it can not be piped into.";
                                     else if (is_pipe)
-                                        stdout_exe = exe;
+                                        if (command.output_type.IsAssignableFrom(exe.command.input_type))
+                                            stdout_exe = exe;
+                                        else
+                                            error = $"{this}.{nameof(command.output_type)} can not be piped into {exe}.{nameof(exe.command.input_type)} {exe.command.input_type}";
                                     else
                                         next_exe = exe;
                                 }
                                 else if (is_pipe)
-                                    error = $"'{command.name}' ({cmd_path}) failed to pipe into unknown command '{line.arg_last}'";
+                                    error = $"{this} failed to pipe into unknown command '{line.arg_last}'";
                                 else if (is_chain)
-                                    error = $"'{command.name}' ({cmd_path}) failed to chain into unknown command '{line.arg_last}'";
+                                    error = $"{this} failed to chain into unknown command '{line.arg_last}'";
                     }
 
                 if (error == null)
@@ -152,14 +160,14 @@ namespace _COBRA_
                 if (error == null)
                     if (args.Count < command.min_args || args.Count > command.max_args)
                         if (command.min_args == command.max_args)
-                            error = $"'{command.name}' ({cmd_path}) expects {command.min_args} arguments, {args.Count} were given.";
+                            error = $"{this} expects {command.min_args} arguments, {args.Count} were given.";
                         else
-                            error = $"'{command.name}' ({cmd_path}) accepts from {command.min_args} to {command.max_args} arguments, {args.Count} were given.";
+                            error = $"{this} accepts from {command.min_args} to {command.max_args} arguments, {args.Count} were given.";
             }
 
             //--------------------------------------------------------------------------------------------------------------
 
-            internal void LogBackgroundStart() => Debug.Log($"[{PID}] '{command.name}'({cmd_path}) started running in background".ToSubLog());
+            internal void LogBackgroundStart() => Debug.Log($"{this} started running in background".ToSubLog());
 
             internal void PropagateBackground()
             {
@@ -214,7 +222,7 @@ namespace _COBRA_
 
 #if UNITY_EDITOR
                 if (shell != null)
-                    shell.Janitize($"[{PID}] {cmd_path} (already janitized: {disposed})");
+                    shell.Janitize($"[{executor_ID}] {cmd_path} (already janitized: {disposed})");
 #endif
 
                 if (disposed)

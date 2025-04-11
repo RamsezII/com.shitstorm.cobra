@@ -27,6 +27,7 @@ namespace _COBRA_
 
                 exe_log = new(
                     shell: null,
+                    parent: null,
                     line: new Line(string.Empty, SIGNAL_FLAGS._none_, null),
                     path: new()
                     {

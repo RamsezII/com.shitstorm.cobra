@@ -11,7 +11,7 @@ namespace _COBRA_
 
             if (line.signal.HasFlag(SIGNAL_FLAGS.KILL))
             {
-                Debug.LogWarning($"'{GetType().FullName}[{id}] {nameof(line.signal)}: '{line.signal}' to be repaired");
+                Debug.LogWarning($"'{GetType().FullName}[{shell_ID}] {nameof(line.signal)}: '{line.signal}' to be repaired");
                 error = $"[SHELL_WARNING] {nameof(SIGNAL_FLAGS.KILL)} signal received";
             }
 
@@ -60,7 +60,7 @@ namespace _COBRA_
             if (error == null && line.HasNext(true))
                 if (static_domain.TryReadCommand_path(line, out var path))
                 {
-                    Command.Executor exe = new(this, line, path);
+                    Command.Executor exe = new(this, null, line, path);
                     if (exe.error != null)
                     {
                         error = exe.error;
@@ -69,7 +69,6 @@ namespace _COBRA_
                     else if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
                         if (exe.background)
                         {
-                            exe.LogBackgroundStart();
                             exe.PropagateBackground();
                             background_executors_pipelines.Add(new ExecutorPipeline(exe));
                         }
@@ -89,9 +88,9 @@ namespace _COBRA_
 
             if (error != null)
                 if (line.signal.HasFlag(SIGNAL_FLAGS.CHECK))
-                    Debug.LogWarning($"[WARN]{GetType().FullName}[{id}] -> {error}");
+                    Debug.LogWarning($"[WARN]{GetType().FullName}[{shell_ID}] -> {error}");
                 else if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                    Debug.LogError($"[ERROR]{GetType().FullName}[{id}] -> {error}");
+                    Debug.LogError($"[ERROR]{GetType().FullName}[{shell_ID}] -> {error}");
 
             return error;
         }

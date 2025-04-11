@@ -45,7 +45,7 @@ namespace _COBRA_
                     if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd1_path))
                     {
                         Command cmd = cmd1_path[^1];
-                        Command.Executor exe1 = new(exe.shell, exe.line, cmd1_path);
+                        Command.Executor exe1 = new(exe.shell, exe, exe.line, cmd1_path);
 
                         if (exe1.error != null)
                             exe.error = exe1.error;
@@ -63,7 +63,7 @@ namespace _COBRA_
                             if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd2_path))
                             {
                                 Command cmd = cmd2_path[^1];
-                                Command.Executor exe2 = new(exe.shell, exe.line, cmd2_path);
+                                Command.Executor exe2 = new(exe.shell, exe, exe.line, cmd2_path);
 
                                 if (exe2.error != null)
                                     exe.error = exe2.error;
