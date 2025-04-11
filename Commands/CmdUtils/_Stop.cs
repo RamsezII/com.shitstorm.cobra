@@ -16,14 +16,12 @@ namespace _COBRA_
                             exe.args.Add(count);
                         else
                             exe.error = $"could not parse into int value: '{arg}'";
-                    else
-                        exe.args.Add(0);
-                    exe.args.Add(0);
+                    exe.opts["i"] = 0;
                 },
                 on_pipe: static (exe, args, data) =>
                 {
                     int skips = (int)exe.args[0];
-                    int iterations = (int)exe.args[1];
+                    int iterations = (int)exe.opts["i"];
 
                     bool Check() => iterations++ < skips;
 
@@ -47,7 +45,7 @@ namespace _COBRA_
                             break;
                     }
 
-                    exe.args[1] = iterations;
+                    exe.opts["i"] = iterations;
                 },
                 aliases: "head"
                 );

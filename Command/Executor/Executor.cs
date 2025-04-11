@@ -14,8 +14,8 @@ namespace _COBRA_
             internal static readonly Executor exe_log = new(
                 shell: null,
                 line: new Line(string.Empty, SIGNAL_FLAGS._none_, null),
-                path: new() 
-                { 
+                path: new()
+                {
                     new Command("_log", on_pipe: (exe, args, data) =>
                     {
                         switch (data)
@@ -33,7 +33,7 @@ namespace _COBRA_
                                 Debug.Log(data);
                                 break;
                         }
-                    }), 
+                    }),
                 }
                 );
 
@@ -119,8 +119,8 @@ namespace _COBRA_
                             else
                                 stdout_exe = exe;
                         }
-                        else if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC) && line.start_i != line.cpl_start_i)
-                            error = $"'{command.name}' ({cmd_path}) failed to parse pipe.";
+                        else
+                            error = $"'{command.name}' ({cmd_path}) failed to pipe into unknown command '{line.arg_last}'";
 
                 if (error == null)
                     if (command.routine != null)

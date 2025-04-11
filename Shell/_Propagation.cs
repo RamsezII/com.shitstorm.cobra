@@ -112,7 +112,7 @@ namespace _COBRA_
                     if (!static_domain.TryReadCommand_path(line, out var path))
                     {
                         if (!string.IsNullOrWhiteSpace(line.arg_last))
-                            error = $"[USER_ERROR] command '{line.arg_last}' not found in '{static_domain.name}'";
+                            error = $"'{line.arg_last}' not found in '{static_domain.name}'";
                     }
                     else
                     {
@@ -169,18 +169,19 @@ namespace _COBRA_
                         }
                     }
 
-                if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                {
-                    if (add_to_background.Count > 0)
-                        background_executors.AddRange(add_to_background);
-
-                    if (add_to_chain.Count > 0)
+                if (error == null)
+                    if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
                     {
-                        foreach (var exe in add_to_chain)
-                            pending_executors_queue.Enqueue(exe);
-                        goto before_pending_queue;
+                        if (add_to_background.Count > 0)
+                            background_executors.AddRange(add_to_background);
+
+                        if (add_to_chain.Count > 0)
+                        {
+                            foreach (var exe in add_to_chain)
+                                pending_executors_queue.Enqueue(exe);
+                            goto before_pending_queue;
+                        }
                     }
-                }
             }
             else
                 line.ReadBack();
