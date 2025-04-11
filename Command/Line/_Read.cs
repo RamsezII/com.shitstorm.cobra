@@ -35,7 +35,7 @@ namespace _COBRA_
                 {
                     case Util_cobra.char_BACKGROUND:
                         ++read_i;
-                        if (read_i < text.Length && text[read_i + 1] == Util_cobra.char_BACKGROUND)
+                        if (read_i < text.Length && text[read_i] == Util_cobra.char_BACKGROUND)
                         {
                             ++read_i;
                             LintToThisPosition(linter.chain);
