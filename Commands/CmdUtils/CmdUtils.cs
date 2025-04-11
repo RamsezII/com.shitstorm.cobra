@@ -18,7 +18,6 @@ namespace _COBRA_
             Init_Skip();
             Init_Stop();
             Init_Logs();
-            Init_Execs();
 
             const string
                 flag_remove_empties = "--remove-empties",

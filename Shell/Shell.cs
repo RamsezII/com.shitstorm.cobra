@@ -1,5 +1,4 @@
 ﻿using _ARK_;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,15 +8,15 @@ namespace _COBRA_
     {
         public static readonly Command static_domain = new("shell_root");
 
-        internal readonly List<ExecutorPipeline> active_exe_pipelines_stack = new();
-        internal readonly Queue<Command.Executor> pending_executors_queue = new();
-        internal readonly List<Command.Executor> background_executors = new();
+        readonly List<ExecutorPipeline> active_executor_pipelines_stack = new();
+        readonly Queue<Command.Executor> pending_executors_queue = new();
+        readonly List<ExecutorPipeline> background_executors_pipelines = new();
 
         static byte id_counter = 0;
         public readonly byte id = ++id_counter;
 
         internal CMD_STATUS status;
-        public bool IsIdle => active_exe_pipelines_stack.Count == 0;
+        public bool IsIdle => active_executor_pipelines_stack.Count == 0;
         public CMD_STATUS CurrentStatus => status;
         public ITerminal terminal;
 
@@ -44,23 +43,18 @@ namespace _COBRA_
         {
             NUCLEOR.delegates.update_shells -= TickExecutors;
 
-            for (int i = 0; i < active_exe_pipelines_stack.Count; i++)
-            {
-                ExecutorPipeline pipeline = active_exe_pipelines_stack[i];
-                for (int j = 0; j < pipeline.executors.Count; j++)
-                    pipeline.executors[j].Dispose();
-            }
-
-            active_exe_pipelines_stack.Clear();
-
-            foreach (var executor in pending_executors_queue)
+            foreach (Command.Executor executor in pending_executors_queue)
                 executor.Dispose();
             pending_executors_queue.Clear();
 
-            for (int i1 = 0; i1 < background_executors.Count; i1++)
-                background_executors[i1].Dispose();
+            for (int i = 0; i < active_executor_pipelines_stack.Count; i++)
+                active_executor_pipelines_stack[i].Dispose();
+            active_executor_pipelines_stack.Clear();
 
-            background_executors.Clear();
+            for (int i1 = 0; i1 < background_executors_pipelines.Count; i1++)
+                background_executors_pipelines[i1].Dispose();
+
+            background_executors_pipelines.Clear();
         }
     }
 }

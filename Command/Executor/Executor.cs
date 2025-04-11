@@ -9,7 +9,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        public class Executor : IDisposable
+        public partial class Executor : IDisposable
         {
             internal static readonly Executor exe_log = new(
                 shell: null,
@@ -42,6 +42,8 @@ namespace _COBRA_
             public readonly string cmd_path;
 
             public Line line;
+            internal ExecutorPipeline pipeline;
+            public bool background;
             public Executor stdout_exe = exe_log;
             public readonly List<object> args;
             public readonly Dictionary<string, object> opts = new(StringComparer.OrdinalIgnoreCase);
@@ -61,6 +63,14 @@ namespace _COBRA_
             static void OnBeforeSceneLoad()
             {
                 id_counter = 0;
+            }
+
+            //--------------------------------------------------------------------------------------------------------------
+
+            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+            static void OnAfterSceneLoad()
+            {
+                Init_Execs();
             }
 
             //--------------------------------------------------------------------------------------------------------------
@@ -130,6 +140,13 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
+            public void PropagateBackground()
+            {
+                background = true;
+                if (stdout_exe != exe_log)
+                    stdout_exe.background = true;
+            }
+
             public static string GetPrefixe() => $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{"~".SetColor("#73B2D9")}$";
             public string GetPrefixe(string user_name = null, string cmd_path = null)
             {
@@ -141,6 +158,8 @@ namespace _COBRA_
             public void Stdout(in object data)
             {
                 stdout_exe.line = line;
+                if (stdout_exe != exe_log)
+                    stdout_exe.pipeline = pipeline;
                 stdout_exe.command.on_pipe(stdout_exe, stdout_exe.args, data);
                 stdout_exe.line = null;
             }

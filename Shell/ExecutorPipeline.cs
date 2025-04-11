@@ -1,20 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _COBRA_
 {
     internal class ExecutorPipeline : IDisposable
     {
-        public readonly List<Command.Executor> executors = new();
+        readonly List<Command.Executor> _executors = new();
+        bool disposed;
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public bool TryGetCurrent(out Command.Executor executor)
+        internal ExecutorPipeline(in Command.Executor executor) => AddExecutor(executor);
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        internal void AddExecutor(in Command.Executor executor)
         {
-            for (int i = 0; i < executors.Count; i++)
-                if (!executors[i].disposed.Value)
+            if (disposed)
+                Debug.LogError($"adding {executor.GetType().FullName} '{executor.command.name}' ({executor.cmd_path}) to a disposed {GetType().FullName}.");
+            executor.pipeline = this;
+            _executors.Remove(executor);
+            _executors.Add(executor);
+        }
+
+        internal bool TryExecuteCurrent(in Command.Line line, out Command.Executor executor)
+        {
+            if (!TryGetCurrent(out executor))
+            {
+                Dispose();
+                return false;
+            }
+
+            executor.line = line;
+
+            if (executor.command.action != null)
+                if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
                 {
-                    executor = executors[i];
+                    executor.command.action(executor);
+                    executor.Dispose();
+                }
+
+            if (executor.routine != null)
+                if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
+                    if (!executor.routine.MoveNext())
+                        executor.Dispose();
+
+            executor.line = null;
+
+            return true;
+        }
+
+        internal bool TryGetCurrent(out Command.Executor executor)
+        {
+            for (int i = 0; i < _executors.Count; i++)
+                if (!_executors[i].disposed.Value)
+                {
+                    executor = _executors[i];
                     return true;
                 }
             executor = null;
@@ -23,10 +65,10 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public bool AreAllDisposed()
+        internal bool AreAllDisposed()
         {
-            for (int i = 0; i < executors.Count; i++)
-                if (!executors[i].disposed.Value)
+            for (int i = 0; i < _executors.Count; i++)
+                if (!_executors[i].disposed.Value)
                     return false;
             return true;
         }
@@ -35,9 +77,10 @@ namespace _COBRA_
 
         public void Dispose()
         {
-            for (int i = 0; i < executors.Count; i++)
-                executors[i].PropagateDispose();
-            executors.Clear();
+            disposed = true;
+            for (int i = 0; i < _executors.Count; i++)
+                _executors[i].PropagateDispose();
+            _executors.Clear();
         }
     }
 }
