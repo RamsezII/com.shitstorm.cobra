@@ -10,17 +10,23 @@ namespace _COBRA_
         {
             public bool TryRead_one_flag(in Executor executor, out string output, params string[] flags)
             {
-                SkipLintToThisPosition();
-
+                output = string.Empty;
                 HashSet<string> flags_remaining = new(flags, StringComparer.OrdinalIgnoreCase);
+
+                SkipLintToThisPosition();
 
                 if (TryReadArgument(out string split, flags_remaining, complete_if_is_option: true, accept_only_candidate: false, lint: false))
                     if (!split.StartsWith('-'))
+                    {
                         ReadBack();
+                        return false;
+                    }
                     else if (!flags_remaining.Contains(split))
                     {
+                        ReadBack();
                         LintToThisPosition(linter.error);
                         executor.error = $"wrong or already used option '{split}'";
+                        return false;
                     }
                     else
                     {
@@ -28,9 +34,7 @@ namespace _COBRA_
                         output = split;
                         return true;
                     }
-
-                output = string.Empty;
-                return true;
+                return false;
             }
 
             public bool TryRead_flags(in Executor executor, out HashSet<string> output, params string[] flags)

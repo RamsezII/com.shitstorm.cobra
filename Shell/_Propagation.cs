@@ -47,7 +47,7 @@ namespace _COBRA_
                     if (exe == null)
                         error = $"[SHELL_WARNING] presence of NULL {exe.GetType().FullName} in {nameof(pending_executors)}";
                     else if (exe.disposed)
-                        error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} in {nameof(pending_executors)}";
+                        error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} ({exe}) in {nameof(pending_executors)}";
                     else if (exe.background)
                         background_janitors.Add(new Command.Executor.Janitor(exe));
                     else
@@ -81,16 +81,18 @@ namespace _COBRA_
                 else if (!string.IsNullOrWhiteSpace(line.arg_last))
                     error = $"'{line.arg_last}' not found in '{static_domain.name}'";
 
+            previous_state = status.state;
             if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe))
                 status = active_exe.routine.Current;
             else
                 status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: Command.Executor.GetPrefixe(), immortal: true);
+            state_changed = previous_state != status.state;
 
             if (error != null)
                 if (line.signal.HasFlag(SIGNAL_FLAGS.CHECK))
-                    Debug.LogWarning($"[WARN]{GetType().FullName}[{shell_ID}] -> {error}");
+                    Debug.LogWarning($"[WARN {this}] -> {error}");
                 else if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                    Debug.LogError($"[ERROR]{GetType().FullName}[{shell_ID}] -> {error}");
+                    Debug.LogError($"[ERROR {this}] -> {error}");
 
             return error;
         }

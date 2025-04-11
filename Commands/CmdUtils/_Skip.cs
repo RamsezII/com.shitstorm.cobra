@@ -10,6 +10,7 @@ namespace _COBRA_
                 "skip",
                 manual: new("skip <int> first entries from pipe"),
                 max_args: 1,
+                opts: static exe => exe.opts.Add("i", 0),
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
@@ -17,7 +18,6 @@ namespace _COBRA_
                             exe.args.Add(count);
                         else
                             exe.error = $"could not parse into int value: '{arg}'";
-                    exe.opts["i"] = 0;
                 },
                 on_pipe: static (exe, args, data) =>
                 {
