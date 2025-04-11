@@ -71,7 +71,7 @@ namespace _COBRA_
 ,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadFlags(exe, out var flags, flag_remove_empties))
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_remove_empties))
                         foreach (string flag in flags)
                             exe.args.Add(flag);
                 });
@@ -83,7 +83,7 @@ namespace _COBRA_
                 {
                     if (exe.line.TryReadArgument(out string prefixe))
                         exe.args.Add(prefixe);
-                    if (exe.line.TryReadFlags(exe, out var flags, flag_no_white_space))
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_no_white_space))
                         foreach (string flag in flags)
                             exe.args.Add(flag);
                 },

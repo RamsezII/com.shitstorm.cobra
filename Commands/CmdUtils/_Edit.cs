@@ -14,7 +14,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadFlags(exe, out var opts, flag_force_file))
+                    if (exe.line.TryRead_flags(exe, out var opts, flag_force_file))
                         if (opts.Contains(flag_force_file))
                             exe.opts.Add(flag_force_file, null);
 

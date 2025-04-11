@@ -58,7 +58,7 @@ namespace _COBRA_
                     if (exe.error != null)
                         return;
 
-                    if (exe.line.TryReadFlags(exe, out var flags, flag_else))
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_else))
                         if (flags.Contains(flag_else))
                             if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd2_path))
                             {

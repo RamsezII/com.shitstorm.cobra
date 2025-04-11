@@ -14,7 +14,7 @@ namespace _COBRA_
 ,
                 opts: exe =>
                 {
-                    if (exe.line.TryReadFlags(exe, out var flags, "-m", "--meaning", "--enhance"))
+                    if (exe.line.TryRead_flags(exe, out var flags, "-m", "--meaning", "--enhance"))
                         foreach (var flag in flags)
                             exe.opts.Add(flag, null);
                 },
