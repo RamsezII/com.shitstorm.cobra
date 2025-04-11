@@ -64,7 +64,50 @@ namespace _COBRA_
                 return true;
             }
 
-            public bool TryReadOptions(in Executor executor, in Dictionary<string, Action<string>> onOption)
+            public bool TryReadOptions_with_automatic_values(in Executor exe, out Dictionary<string, string> output, params string[] options)
+            {
+                SkipLintToThisPosition();
+
+                HashSet<string> options_remaining = new(options, StringComparer.OrdinalIgnoreCase);
+                output = new(options_remaining.Count, StringComparer.OrdinalIgnoreCase);
+
+                while (TryReadArgument(out string split, options_remaining, complete_if_is_option: true, accept_only_candidate: false, lint: false))
+                {
+                    if (!split.StartsWith('-'))
+                    {
+                        ReadBack();
+                        break;
+                    }
+                    cpl_stop = true;
+
+                    if (!options.Contains(split))
+                    {
+                        LintToThisPosition(linter.error);
+                        exe.error = $"wrong option '{split}'";
+                        return false;
+                    }
+                    else if (!options_remaining.Contains(split))
+                    {
+                        LintToThisPosition(linter.error);
+                        exe.error = $"option '{split}' already added";
+                        return false;
+                    }
+
+                    LintToThisPosition(linter.option);
+                    options_remaining.Remove(split);
+
+                    if (TryReadArgument(out string opt_value))
+                        output.Add(split, opt_value);
+                    else
+                    {
+                        exe.error = $"option '{split}' requires a value";
+                        LintToThisPosition(linter.error);
+                    }
+                }
+                return true;
+            }
+
+            public bool TryReadOptions_with_custom_reading(in Executor executor, in Dictionary<string, Action<string>> onOption)
             {
                 SkipLintToThisPosition();
 
@@ -99,7 +142,7 @@ namespace _COBRA_
                 return true;
             }
 
-            public bool TryReadOptions(in Executor executor, in Dictionary<string, IEnumerable<string>> options, out Dictionary<string, string> output)
+            public bool TryReadOptions_with_possible_values(in Executor executor, in Dictionary<string, IEnumerable<string>> options, out Dictionary<string, string> output)
             {
                 SkipLintToThisPosition();
 

@@ -9,6 +9,7 @@ namespace _COBRA_
     {
         public readonly string name;
         public readonly Traductions manual;
+        public readonly bool background;
         public readonly int min_args, max_args;
         public readonly Action<Executor> opts, args;
 
@@ -23,6 +24,7 @@ namespace _COBRA_
         internal Command(
             in string name,
             in Traductions manual = default,
+            in bool background = default,
             in int min_args = default,
             in int max_args = default,
             in Action<Executor> opts = default,
@@ -34,6 +36,7 @@ namespace _COBRA_
         {
             this.name = name;
             this.manual = manual;
+            this.background = background;
             this.min_args = min_args;
             this.max_args = Mathf.Max(min_args, max_args);
             this.opts = opts;
@@ -65,11 +68,13 @@ namespace _COBRA_
             in Action<Executor> opts = null,
             in Action<Executor> args = null,
             in Traductions manual = default,
+            in bool background = default,
             in int min_args = default,
             in int max_args = default,
             params string[] aliases
             ) => AddCommand(new(name,
                                 manual: manual,
+                                background: background,
                                 min_args: min_args,
                                 max_args: max_args,
                                 opts: opts,
@@ -82,11 +87,13 @@ namespace _COBRA_
             in Action<Executor> opts = null,
             in Action<Executor> args = null,
             in Traductions manual = default,
+            in bool background = default,
             in int min_args = default,
             in int max_args = default,
             params string[] aliases
             ) => AddCommand(new(name,
                                 manual: manual,
+                                background: background,
                                 min_args: min_args,
                                 max_args: max_args,
                                 opts: opts,
@@ -99,11 +106,13 @@ namespace _COBRA_
             in Action<Executor> opts = null,
             in Action<Executor> args = null,
             in Traductions manual = default,
+            in bool background = default,
             in int min_args = default,
             in int max_args = default,
             params string[] aliases
             ) => AddCommand(new(name,
                                 manual: manual,
+                                background: background,
                                 min_args: min_args,
                                 max_args: max_args,
                                 opts: opts,

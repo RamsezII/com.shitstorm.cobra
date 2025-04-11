@@ -14,7 +14,7 @@ namespace _COBRA_
                 args: exe =>
                 {
                     var dict = exe.line.linter.GetColorProperties();
-                    if (exe.line.TryReadOptions(exe, new(StringComparer.OrdinalIgnoreCase) { { "--option", new[] { "yes", "no", "maybe", } } }, out var output))
+                    if (exe.line.TryReadOptions_with_possible_values(exe, new(StringComparer.OrdinalIgnoreCase) { { "--option", new[] { "yes", "no", "maybe", } } }, out var output))
                         ;
 
                     while (exe.line.TryReadArgument(out string arg, dict.Keys, lint: false))
