@@ -18,30 +18,43 @@ namespace _COBRA_
                 }
             }
 
-            public bool TryReadChainSeparator(out string argument)
+            public bool TryReadCommandSeparator(out string argument)
             {
-                text.SkipSpaces(ref read_i);
+                if (!HasNext(true))
+                {
+                    argument = string.Empty;
+                    return false;
+                }
+
                 LintToThisPosition(linter._default_);
 
-                if (read_i < text.Length)
+                int start_i = read_i;
+                char c = text[read_i];
+
+                switch (c)
                 {
-                    int start_i = read_i;
-
-                    while (read_i < text.Length && text[read_i] switch
-                    {
-                        Util_cobra.char_SPACE => true,
-                        Util_cobra.char_TAB => true,
-                        _ => false,
-                    })
+                    case Util_cobra.char_BACKGROUND:
                         ++read_i;
+                        if (read_i < text.Length && text[read_i + 1] == Util_cobra.char_BACKGROUND)
+                        {
+                            ++read_i;
+                            LintToThisPosition(linter.chain);
+                        }
+                        else
+                            LintToThisPosition(linter.background);
+                        argument = text[start_i..read_i];
+                        return true;
 
-                    LintToThisPosition(linter.argument);
-                    argument = text[start_i..read_i];
+                    case Util_cobra.char_PIPE:
+                        ++read_i;
+                        LintToThisPosition(linter.pipe);
+                        argument = text[start_i..read_i];
+                        return true;
 
-                    return true;
+                    default:
+                        argument = string.Empty;
+                        return false;
                 }
-                argument = string.Empty;
-                return false;
             }
 
             public bool TryReadPipe()

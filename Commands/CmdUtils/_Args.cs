@@ -34,7 +34,7 @@ namespace _COBRA_
                     if (exe2.error != null)
                         exe.error = exe2.error;
                     else
-                        exe.shell.pending_executors_queue.Enqueue(exe2);
+                        exe.shell.SpontaneizeExecutor(exe2);
                 },
                 aliases: "xargs");
         }

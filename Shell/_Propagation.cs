@@ -5,6 +5,19 @@ namespace _COBRA_
 {
     partial class Shell
     {
+        internal void SpontaneizeExecutor(in Command.Executor executor)
+        {
+            if (active_exe_pipelines_stack.Count == 0)
+            {
+                ExecutorPipeline pipeline = new();
+                pipeline.executors.Add(executor);
+                active_exe_pipelines_stack.Add(pipeline);
+            }
+            else
+                active_exe_pipelines_stack[^1].executors.Add(executor);
+        }
+
+        void TickExecutors() => PropagateLine(new Command.Line(string.Empty, SIGNAL_FLAGS.TICK, terminal));
         public string PropagateLine(in Command.Line line)
         {
             string error = null;
@@ -15,67 +28,66 @@ namespace _COBRA_
                 error = $"[SHELL_WARNING] {nameof(SIGNAL_FLAGS.KILL)} signal received";
             }
 
-            if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
-                if (background_executors.Count > 0)
+            if (background_executors.Count > 0)
+                if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
                     for (int i = 0; i < background_executors.Count; ++i)
                     {
-                        var executor = background_executors[i];
-                        var routine = executor.routine;
+                        var exe = background_executors[i];
+                        var routine = exe.routine;
 
+                        exe.line = line;
                         if (routine == null || !routine.MoveNext())
                         {
-                            executor.Dispose();
+                            exe.Dispose();
                             background_executors.RemoveAt(i);
                             --i;
                         }
+                        exe.line = null;
                     }
 
                 before_active_executors:
 
-            if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                if (active_executors_stack.Count > 0)
+            if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
+                if (active_exe_pipelines_stack.Count > 0)
                 {
-                    var exe = active_executors_stack[^1];
-                    if (exe.routine == null)
+                    ExecutorPipeline exe_pipeline = active_exe_pipelines_stack[^1];
+                    if (!exe_pipeline.TryGetCurrent(out Command.Executor exe))
                     {
-                        active_executors_stack.RemoveAt(active_executors_stack.Count - 1);
-                        exe.line = line;
-                        exe.command.action(exe);
-                        exe.line = null;
-                        //exe.Dispose();
+                        active_exe_pipelines_stack.RemoveAt(active_exe_pipelines_stack.Count - 1);
                         goto before_active_executors;
                     }
                     else
                     {
-                        var routine = exe.routine;
-                        switch (routine.Current.state)
-                        {
-                            case CMD_STATES.BLOCKING or CMD_STATES.FULLSCREEN_readonly when line.signal.HasFlag(SIGNAL_FLAGS.TICK):
-                                if (!routine.MoveNext())
-                                {
-                                    exe.Dispose();
-                                    active_executors_stack.RemoveAt(active_executors_stack.Count - 1);
-                                }
-                                break;
+                        exe.line = line;
 
-                            case CMD_STATES.WAIT_FOR_STDIN:
-                            case CMD_STATES.FULLSCREEN_write:
-                                exe.line = line;
-                                if (!routine.MoveNext())
-                                {
-                                    exe.Dispose();
-                                    active_executors_stack.RemoveAt(active_executors_stack.Count - 1);
-                                }
-                                exe.line = null;
-                                break;
+                        if (exe.routine == null)
+                        {
+                            if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                                exe.command.action(exe);
+                            exe.Dispose();
+                        }
+                        else if (line.signal.HasFlag(SIGNAL_FLAGS.TICK) && !exe.routine.MoveNext())
+                            exe.Dispose();
+
+                        exe.line = null;
+
+                        if (exe.disposed.Value)
+                        {
+                            if (exe_pipeline.AreAllDisposed())
+                            {
+                                active_exe_pipelines_stack.RemoveAt(active_exe_pipelines_stack.Count - 1);
+                                exe_pipeline.Dispose();
+                            }
+
+                            goto before_active_executors;
                         }
                     }
                 }
 
             before_pending_queue:
 
-            if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
-                if (active_executors_stack.Count == 0 && pending_executors_queue.Count > 0)
+            if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
+                if (active_exe_pipelines_stack.Count == 0 && pending_executors_queue.Count > 0)
                 {
                     var exe = pending_executors_queue.Dequeue();
                     if (exe == null)
@@ -84,7 +96,7 @@ namespace _COBRA_
                         error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} in {nameof(pending_executors_queue)}";
                     else
                     {
-                        active_executors_stack.Add(exe);
+                        SpontaneizeExecutor(exe);
                         goto before_active_executors;
                     }
                 }
@@ -113,7 +125,7 @@ namespace _COBRA_
                         else
                         {
                         before_separator:
-                            if (line.TryReadChainSeparator(out string separator))
+                            if (line.TryReadCommandSeparator(out string separator))
                                 switch (separator)
                                 {
                                     case Util_cobra.str_CHAIN:
@@ -125,15 +137,24 @@ namespace _COBRA_
                                         break;
 
                                     case Util_cobra.str_BACKGROUND:
-                                        add_to_background.Add(exe);
-                                        Debug.Log($"{exe.id} {nameof(exe.background)}: {exe.id}".ToLog());
-                                        exe.Stdout(exe.id);
-                                        exe.PropagateBackground();
-
-                                        if (line.HasNext(true))
-                                            goto before_separator;
+                                        if (exe.command.routine == null)
+                                            error = $"'{exe.command.name}' ({exe.cmd_path}) can not run in background because it has no {nameof(exe.command.routine)}";
                                         else
-                                            break;
+                                        {
+                                            add_to_background.Add(exe);
+
+                                            if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
+                                            {
+                                                Debug.Log($"[{exe.id}] '{exe.command.name}' ({exe.cmd_path}) started running in background".ToSubLog());
+                                                exe.Stdout(exe.id);
+                                            }
+
+                                            if (line.HasNext(true))
+                                                goto before_separator;
+                                            else
+                                                break;
+                                        }
+                                        break;
 
                                     default:
                                         if (line.TryReadAny(out string any))
@@ -164,10 +185,10 @@ namespace _COBRA_
             else
                 line.ReadBack();
 
-            if (active_executors_stack.Count == 0)
-                status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: Command.Executor.GetPrefixe(), immortal: true);
+            if (active_exe_pipelines_stack.Count > 0 && active_exe_pipelines_stack[^1].TryGetCurrent(out Command.Executor active_exe))
+                status = active_exe.routine.Current;
             else
-                status = active_executors_stack[^1].routine.Current;
+                status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: Command.Executor.GetPrefixe(), immortal: true);
 
             if (error != null)
                 if (line.signal.HasFlag(SIGNAL_FLAGS.CHECK))

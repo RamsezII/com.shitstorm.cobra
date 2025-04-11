@@ -23,6 +23,7 @@ namespace _COBRA_
 
             Shell.static_domain.AddRoutine(
                 "routine-test",
+                min_args: 1,
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
@@ -41,7 +42,9 @@ namespace _COBRA_
                         float timer = 0;
                         while (timer < 1)
                         {
-                            timer += 3 * Time.deltaTime;
+                            if (exe.line.signal.HasFlag(SIGNAL_FLAGS.TICK))
+                                timer += 3 * Time.deltaTime;
+
                             yield return new CMD_STATUS()
                             {
                                 state = CMD_STATES.BLOCKING,

@@ -84,11 +84,11 @@ namespace _COBRA_
                     Command.Executor exe1 = (Command.Executor)exe.args[0];
 
                     if (isTrue)
-                        exe.shell.active_executors_stack.Add(exe1);
+                        exe.shell.SpontaneizeExecutor(exe1);
                     else if (exe.args.Count > 1)
                     {
                         Command.Executor exe2 = (Command.Executor)exe.args[1];
-                        exe.shell.active_executors_stack.Add(exe2);
+                        exe.shell.SpontaneizeExecutor(exe2);
                     }
                 }
                 );

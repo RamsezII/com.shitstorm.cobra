@@ -14,18 +14,37 @@ namespace _COBRA_
             internal static readonly Executor exe_log = new(
                 shell: null,
                 line: new Line(string.Empty, SIGNAL_FLAGS._none_, null),
-                path: new() { new Command("_log", on_pipe: (exe, args, data) => Debug.Log(data)), }
+                path: new() 
+                { 
+                    new Command("_log", on_pipe: (exe, args, data) =>
+                    {
+                        switch (data)
+                        {
+                            case IEnumerable<string> lines:
+                                foreach (string line in lines)
+                                    Debug.Log(line);
+                                break;
+
+                            case string str:
+                                Debug.Log(str);
+                                break;
+
+                            default:
+                                Debug.Log(data);
+                                break;
+                        }
+                    }), 
+                }
                 );
 
             public readonly Shell shell;
             public readonly Command command;
             public readonly string cmd_path;
 
-            public bool background;
             public Line line;
-            public Executor stdout_exe = exe_log, stderr_exe = exe_log;
+            public Executor stdout_exe = exe_log;
             public readonly List<object> args;
-            public readonly HashSet<string> opts = new(StringComparer.OrdinalIgnoreCase);
+            public readonly Dictionary<string, object> opts = new(StringComparer.OrdinalIgnoreCase);
             public IEnumerator<CMD_STATUS> routine;
 
             public readonly ThreadSafe_struct<bool> disposed = new();
@@ -35,8 +54,6 @@ namespace _COBRA_
             public byte id = ++id_counter;
 
             public string error;
-            public void Stdout(in object data) => stdout_exe.command.on_pipe(stdout_exe, stdout_exe.args, data);
-            public void Stderr(in object data) => stderr_exe.command.on_pipe(stderr_exe, stderr_exe.args, data);
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -121,17 +138,37 @@ namespace _COBRA_
                 return $"{user_name.SetColor("#73CC26")}:{cmd_path.SetColor("#73B2D9")}$";
             }
 
-            public void PropagateBackground()
+            public void Stdout(in object data)
             {
-                background = true;
-                stdout_exe?.PropagateBackground();
+                stdout_exe.line = line;
+                stdout_exe.command.on_pipe(stdout_exe, stdout_exe.args, data);
+                stdout_exe.line = null;
             }
 
             //--------------------------------------------------------------------------------------------------------------
 
+            public void PropagateDispose()
+            {
+                if (!disposed.Value)
+                    if (stdout_exe != exe_log)
+                        stdout_exe.Dispose();
+                Dispose();
+            }
+
             public void Dispose()
             {
-                line = null;
+                lock (disposed)
+                {
+#if UNITY_EDITOR
+                    if (shell != null)
+                        shell.Janitize($"[{id}] {cmd_path} (already janitized: {disposed._value})");
+#endif
+
+                    if (disposed._value)
+                        return;
+                    disposed.Value = true;
+                }
+
                 routine?.Dispose();
                 routine = null;
 
@@ -143,24 +180,7 @@ namespace _COBRA_
                     args.Clear();
                 }
 
-                if (!disposed.Value)
-                {
-                    if (stdout_exe != exe_log)
-                        stdout_exe.Dispose();
-                    if (stderr_exe != exe_log)
-                        stderr_exe.Dispose();
-                }
-
-                lock (disposed)
-                {
-                    if (disposed._value)
-                    {
-                        if (false)
-                            Debug.LogWarning($"[{nameof(Dispose)}] '{command.name}' ({cmd_path}) was already disposed.");
-                        return;
-                    }
-                    disposed._value = true;
-                }
+                line = null;
             }
         }
     }

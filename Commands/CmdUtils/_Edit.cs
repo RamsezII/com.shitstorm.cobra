@@ -16,7 +16,7 @@ namespace _COBRA_
                 {
                     if (exe.line.TryReadFlags(exe, out var opts, flag_force_file))
                         if (opts.Contains(flag_force_file))
-                            exe.opts.Add(flag_force_file);
+                            exe.opts.Add(flag_force_file, null);
 
                     // read file path
                     // (reparer tab avant)
