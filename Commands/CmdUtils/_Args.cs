@@ -15,7 +15,10 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd_path))
-                        exe.args.Add(cmd_path);
+                    {
+                        Command.Executor exe2 = new(exe.shell, exe.line, cmd_path, parse_arguments: false);
+                        exe.args.Add(exe2);
+                    }
                     else
                         exe.error = $"command '{exe.command.name}' could not find command '{exe.line.arg_last}'";
                 },
@@ -29,7 +32,8 @@ namespace _COBRA_
                     };
 
                     Command.Line line = new(cmd_line, exe.line.signal, exe.line.terminal);
-                    Command.Executor exe2 = new(exe.shell, line, (List<Command>)exe.args[0]);
+                    Command.Executor exe2 = (Command.Executor)exe.args[0];
+                    exe2.ParseArguments(line);
 
                     if (exe2.error != null)
                         exe.error = exe2.error;

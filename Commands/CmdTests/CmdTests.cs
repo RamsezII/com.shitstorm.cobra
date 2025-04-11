@@ -10,20 +10,24 @@ namespace _COBRA_
         {
             Shell.static_domain.AddAction(
                 "test-options",
-                args: exe =>
+                action: exe => exe.Stdout(exe.args.LinesToText())
+,
+                opts: exe =>
                 {
                     if (exe.line.TryReadFlags(exe, out var flags, "-m", "--meaning", "--enhance"))
                         foreach (var flag in flags)
-                            exe.args.Add(flag);
+                            exe.opts.Add(flag, null);
+                },
+                args: exe =>
+                {
                     if (exe.line.TryReadArgument(out string arg, new[] { "bush", "fire", "word", }))
                         exe.args.Add(arg);
-                },
-                action: exe => exe.Stdout(exe.args.LinesToText())
-                );
+                });
 
             Shell.static_domain.AddRoutine(
                 "routine-test",
                 min_args: 1,
+                opts: null,
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))

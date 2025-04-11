@@ -11,25 +11,27 @@ namespace _COBRA_
                 flag_error = "--error",
                 flag_background = "--background";
 
-            Shell.static_domain.AddPipe(
+            Shell.static_domain.AddAction(
                 "log",
+                min_args: 1,
                 args: exe =>
                 {
-                    if (exe.line.TryReadOneOfFlags(exe, out string flag))
-                        exe.args.Add(flag);
+                    if (exe.line.TryReadOneOfFlags(exe, out string flag, new[] { flag_warning, flag_error, flag_background, }))
+                        exe.opts[flag] = null;
+                    if (exe.line.TryReadArgument(out string message))
+                        exe.args.Add(message);
                 },
-                on_pipe: static (exe, args, data) =>
+                action: static exe =>
                 {
-                    if (exe.args.Count == 0)
-                        Debug.Log(data);
-                    else if (args.Contains(flag_warning))
-                        Debug.LogWarning(data);
-                    else if (args.Contains(flag_error))
-                        Debug.LogError(data);
-                    else if (args.Contains(flag_background))
-                        Debug.Log(data.ToString().ToSubLog());
+                    string message = (string)exe.args[0];
+                    if (exe.opts.ContainsKey(flag_warning))
+                        Debug.LogWarning(message);
+                    else if (exe.opts.ContainsKey(flag_error))
+                        Debug.LogError(message);
+                    else if (exe.opts.ContainsKey(flag_background))
+                        Debug.Log(message.ToString().ToSubLog());
                     else
-                        Debug.Log(data);
+                        Debug.Log(message);
                 });
         }
     }

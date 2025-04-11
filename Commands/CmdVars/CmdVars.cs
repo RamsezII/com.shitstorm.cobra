@@ -43,6 +43,7 @@ namespace _COBRA_
                 "get-var",
                 manual: new("<variable name>"),
                 min_args: 1,
+                opts: null,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
@@ -61,6 +62,7 @@ namespace _COBRA_
                 "set-var",
                 manual: new("<variable name> <value>"),
                 min_args: 2,
+                opts: null,
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))

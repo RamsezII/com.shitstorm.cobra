@@ -46,14 +46,14 @@ namespace _COBRA_
             public bool background;
             public Executor stdout_exe = exe_log;
             public readonly List<object> args;
-            public readonly Dictionary<string, object> opts = new(StringComparer.OrdinalIgnoreCase);
+            public readonly Dictionary<string, object> opts;
             public IEnumerator<CMD_STATUS> routine;
 
             public readonly ThreadSafe_struct<bool> disposed = new();
 
             public int executions = -1;
-            static byte id_counter;
-            public byte id = ++id_counter;
+            static ushort PID_counter;
+            public ushort PID = ++PID_counter;
 
             public string error;
 
@@ -62,7 +62,7 @@ namespace _COBRA_
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
             static void OnBeforeSceneLoad()
             {
-                id_counter = 0;
+                PID_counter = 0;
             }
 
             //--------------------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            internal Executor(in Shell shell, in Line line, in List<Command> path)
+            internal Executor(in Shell shell, in Line line, in List<Command> path, in bool parse_options = true, in bool parse_arguments = true)
             {
                 this.shell = shell;
                 command = path[^1];
@@ -102,20 +102,21 @@ namespace _COBRA_
                         break;
                 }
 
-                if (command.args != null)
-                {
-                    args = new(command.min_args);
-                    this.line = line;
-                    command.args(this);
-                    this.line = null;
+                if (error == null)
+                    if (command.opts != null)
+                    {
+                        opts = new(StringComparer.OrdinalIgnoreCase);
+                        if (parse_options)
+                            ParseOptions(line);
+                    }
 
-                    if (error == null)
-                        if (args.Count < command.min_args || args.Count > command.max_args)
-                            if (command.min_args == command.max_args)
-                                error = $"'{command.name}' ({cmd_path}) expects {command.min_args} arguments, {args.Count} were given.";
-                            else
-                                error = $"'{command.name}' ({cmd_path}) accepts from {command.min_args} to {command.max_args} arguments, {args.Count} were given.";
-                }
+                if (error == null)
+                    if (command.args != null)
+                    {
+                        args = new(command.min_args);
+                        if (parse_arguments)
+                            ParseArguments(line);
+                    }
 
                 if (error == null)
                     if (line.TryReadPipe())
@@ -136,6 +137,33 @@ namespace _COBRA_
                     if (command.routine != null)
                         if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
                             routine = command.routine(this);
+            }
+
+            internal void ParseOptions(in Line line)
+            {
+                if (command.opts == null)
+                    return;
+
+                this.line = line;
+                command.opts(this);
+                this.line = null;
+            }
+
+            internal void ParseArguments(in Line line)
+            {
+                if (command.args == null)
+                    return;
+
+                this.line = line;
+                command.args(this);
+                this.line = null;
+
+                if (error == null)
+                    if (args.Count < command.min_args || args.Count > command.max_args)
+                        if (command.min_args == command.max_args)
+                            error = $"'{command.name}' ({cmd_path}) expects {command.min_args} arguments, {args.Count} were given.";
+                        else
+                            error = $"'{command.name}' ({cmd_path}) accepts from {command.min_args} to {command.max_args} arguments, {args.Count} were given.";
             }
 
             //--------------------------------------------------------------------------------------------------------------
@@ -180,7 +208,7 @@ namespace _COBRA_
                 {
 #if UNITY_EDITOR
                     if (shell != null)
-                        shell.Janitize($"[{id}] {cmd_path} (already janitized: {disposed._value})");
+                        shell.Janitize($"[{PID}] {cmd_path} (already janitized: {disposed._value})");
 #endif
 
                     if (disposed._value)

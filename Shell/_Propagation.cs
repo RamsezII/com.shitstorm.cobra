@@ -63,7 +63,10 @@ namespace _COBRA_
                         error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} in {nameof(pending_executors_queue)}";
                     else
                     {
-                        active_executor_pipelines_stack.Add(new ExecutorPipeline(exe));
+                        if (exe.background)
+                            background_executors_pipelines.Add(new ExecutorPipeline(exe));
+                        else
+                            active_executor_pipelines_stack.Add(new ExecutorPipeline(exe));
                         goto before_active_executors;
                     }
                 }
@@ -114,10 +117,8 @@ namespace _COBRA_
                                     case Util_cobra.str_BACKGROUND:
                                         if (line.signal.HasFlag(SIGNAL_FLAGS.EXEC))
                                         {
-                                            Debug.Log($"[{exe.id}] '{exe.command.name}' ({exe.cmd_path}) started running in background".ToSubLog());
                                             exe.PropagateBackground();
-                                            add_to_background.Add(exe);
-                                            exe.Stdout(exe.id);
+                                            add_to_chain.Add(exe);
                                         }
 
                                         if (line.HasNext(true))

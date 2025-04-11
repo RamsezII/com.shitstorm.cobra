@@ -11,7 +11,6 @@ namespace _COBRA_
 
             Shell.static_domain.AddPipe(
                 "not",
-                args: null,
                 on_pipe: static (exe, args, data) =>
                 {
                     switch (data)
@@ -33,7 +32,8 @@ namespace _COBRA_
                             exe.error = $"wrong argument '{data}'";
                             break;
                     }
-                });
+                },
+                args: null);
 
             Shell.static_domain.AddPipe(
                 "if",

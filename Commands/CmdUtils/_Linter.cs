@@ -9,6 +9,8 @@ namespace _COBRA_
         {
             Shell.static_domain.AddAction(
                 "linter-test",
+                action: null
+,
                 args: exe =>
                 {
                     var dict = exe.line.linter.GetColorProperties();
@@ -20,9 +22,7 @@ namespace _COBRA_
                             exe.line.LintToThisPosition(color);
                         else
                             exe.line.LintToThisPosition(exe.line.linter.error);
-                },
-                action: null
-                );
+                });
         }
     }
 }

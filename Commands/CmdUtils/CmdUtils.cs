@@ -37,32 +37,23 @@ namespace _COBRA_
             Shell.static_domain.AddAction(
                 "shutdown",
                 manual: new("closes the application"),
-                args: null,
                 action: exe => Application.Quit()
                 );
 
             Shell.static_domain.AddAction(
                 "clear",
                 manual: new("clear all previous logs"),
-                args: null,
                 action: exe => Application.Quit()
                 );
 
             Shell.static_domain.AddAction(
                 "clear-history",
                 manual: new("clear all previous entries"),
-                args: null,
                 action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
                 );
 
             Shell.static_domain.AddPipe(
                 "split",
-                args: static exe =>
-                {
-                    if (exe.line.TryReadFlags(exe, out var flags, flag_remove_empties))
-                        foreach (string flag in flags)
-                            exe.args.Add(flag);
-                },
                 on_pipe: static (exe, args, data) =>
                 {
                     if (data is string str)
@@ -77,7 +68,13 @@ namespace _COBRA_
                     else
                         exe.Stdout(data);
                 }
-                );
+,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadFlags(exe, out var flags, flag_remove_empties))
+                        foreach (string flag in flags)
+                            exe.args.Add(flag);
+                });
 
             Shell.static_domain.AddPipe(
                 "prefixe",

@@ -10,10 +10,6 @@ namespace _COBRA_
             {
                 Shell.static_domain.AddAction(
                     "current-executors",
-                    args: exe =>
-                    {
-
-                    },
                     action: exe =>
                     {
                         List<string> lines = new();
@@ -49,6 +45,10 @@ namespace _COBRA_
                         //}
 
                         exe.Stdout(lines);
+                    },
+                    args: exe =>
+                    {
+
                     },
                     aliases: "ps");
             }

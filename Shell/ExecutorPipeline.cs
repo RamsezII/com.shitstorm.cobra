@@ -24,29 +24,35 @@ namespace _COBRA_
             _executors.Add(executor);
         }
 
-        internal bool TryExecuteCurrent(in Command.Line line, out Command.Executor executor)
+        internal bool TryExecuteCurrent(in Command.Line line, out Command.Executor exe)
         {
-            if (!TryGetCurrent(out executor))
+            if (!TryGetCurrent(out exe))
             {
                 Dispose();
                 return false;
             }
 
-            executor.line = line;
+            if (exe.command.action == null && exe.routine == null)
+            {
+                Debug.LogError($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_path}) has no {nameof(exe.command.action)} or {nameof(exe.routine)} to execute.");
+                return false;
+            }
 
-            if (executor.command.action != null)
+            exe.line = line;
+
+            if (exe.command.action != null)
                 if (line.HasFlags_any(SIGNAL_FLAGS.EXEC | SIGNAL_FLAGS.TICK))
                 {
-                    executor.command.action(executor);
-                    executor.Dispose();
+                    exe.command.action(exe);
+                    exe.Dispose();
                 }
 
-            if (executor.routine != null)
+            if (exe.routine != null)
                 if (line.signal.HasFlag(SIGNAL_FLAGS.TICK))
-                    if (!executor.routine.MoveNext())
-                        executor.Dispose();
+                    if (!exe.routine.MoveNext())
+                        exe.Dispose();
 
-            executor.line = null;
+            exe.line = null;
 
             return true;
         }

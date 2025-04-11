@@ -10,7 +10,7 @@ namespace _COBRA_
         public readonly string name;
         public readonly Traductions manual;
         public readonly int min_args, max_args;
-        public readonly Action<Executor> args;
+        public readonly Action<Executor> opts, args;
 
         public readonly Action<Executor, List<object>, object> on_pipe;
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
@@ -25,6 +25,7 @@ namespace _COBRA_
             in Traductions manual = default,
             in int min_args = default,
             in int max_args = default,
+            in Action<Executor> opts = default,
             in Action<Executor> args = default,
             in Action<Executor> action = default,
             in Action<Executor, List<object>, object> on_pipe = default,
@@ -35,6 +36,7 @@ namespace _COBRA_
             this.manual = manual;
             this.min_args = min_args;
             this.max_args = Mathf.Max(min_args, max_args);
+            this.opts = opts;
             this.args = args;
             this.action = action;
             this.on_pipe = on_pipe;
@@ -59,32 +61,53 @@ namespace _COBRA_
 
         public Command AddAction(
             in string name,
-            in Action<Executor> args,
             in Action<Executor> action,
+            in Action<Executor> opts = null,
+            in Action<Executor> args = null,
             in Traductions manual = default,
             in int min_args = default,
             in int max_args = default,
             params string[] aliases
-            ) => AddCommand(new(name, manual, min_args, max_args, args, action: action), aliases);
+            ) => AddCommand(new(name,
+                                manual: manual,
+                                min_args: min_args,
+                                max_args: max_args,
+                                opts: opts,
+                                args: args,
+                                action: action), aliases);
 
         public Command AddPipe(
             in string name,
-            in Action<Executor> args,
             in Action<Executor, List<object>, object> on_pipe,
+            in Action<Executor> opts = null,
+            in Action<Executor> args = null,
             in Traductions manual = default,
             in int min_args = default,
             in int max_args = default,
             params string[] aliases
-            ) => AddCommand(new(name, manual, min_args, max_args, args, on_pipe: on_pipe), aliases);
+            ) => AddCommand(new(name,
+                                manual: manual,
+                                min_args: min_args,
+                                max_args: max_args,
+                                opts: opts,
+                                args: args,
+                                on_pipe: on_pipe), aliases);
 
         public Command AddRoutine(
             in string name,
-            in Action<Executor> args,
             in Func<Executor, IEnumerator<CMD_STATUS>> routine,
+            in Action<Executor> opts = null,
+            in Action<Executor> args = null,
             in Traductions manual = default,
             in int min_args = default,
             in int max_args = default,
             params string[] aliases
-            ) => AddCommand(new(name, manual, min_args, max_args, args, routine: routine), aliases);
+            ) => AddCommand(new(name,
+                                manual: manual,
+                                min_args: min_args,
+                                max_args: max_args,
+                                opts: opts,
+                                args: args,
+                                routine: routine), aliases);
     }
 }
