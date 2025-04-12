@@ -1,20 +1,18 @@
-using _COBRA_;
+﻿using _COBRA_;
 using _UTIL_e;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace _COBRA_e
 {
-    internal static class EditorCmd
+    partial class GitCmd
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void OnAfterSceneLoad()
+        static void Init_PushAll()
         {
             const string
                 flag_blocking = "--blocking";
 
-            Shell.static_domain.AddRoutine(
-                "push-all-git-repos",
+            domain_git.AddRoutine("push-all-repos",
+                manual: new("<commit message>"),
                 min_args: 1,
                 opts: static exe =>
                 {
