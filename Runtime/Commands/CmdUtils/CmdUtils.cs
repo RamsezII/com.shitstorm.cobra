@@ -56,6 +56,13 @@ namespace _COBRA_
 
             Shell.static_domain.AddPipe(
                 "split",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_remove_empties))
+                        foreach (string flag in flags)
+                            exe.args.Add(flag);
+                },
                 on_pipe: static (exe, args, data) =>
                 {
                     if (data is string str)
@@ -69,26 +76,11 @@ namespace _COBRA_
                     }
                     else
                         exe.Stdout(data);
-                }
-,
-                args: static exe =>
-                {
-                    if (exe.line.TryRead_flags(exe, out var flags, flag_remove_empties))
-                        foreach (string flag in flags)
-                            exe.args.Add(flag);
                 });
 
             Shell.static_domain.AddPipe(
                 "prefixe",
                 min_args: 1,
-                args: static exe =>
-                {
-                    if (exe.line.TryReadArgument(out string prefixe))
-                        exe.args.Add(prefixe);
-                    if (exe.line.TryRead_flags(exe, out var flags, flag_no_white_space))
-                        foreach (string flag in flags)
-                            exe.args.Add(flag);
-                },
                 on_pipe: static (exe, args, data) =>
                 {
                     string prefixe = (string)args[0];
@@ -98,6 +90,14 @@ namespace _COBRA_
                         exe.Stdout($"{prefixe} {data}");
                     else
                         exe.Stdout($"{prefixe}{data}");
+                },
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string prefixe))
+                        exe.args.Add(prefixe);
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_no_white_space))
+                        foreach (string flag in flags)
+                            exe.args.Add(flag);
                 }
                 );
         }

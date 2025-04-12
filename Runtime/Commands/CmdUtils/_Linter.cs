@@ -9,8 +9,8 @@ namespace _COBRA_
         {
             Shell.static_domain.AddAction(
                 "linter-test",
-                action: null
-,
+                action: null,
+                max_args: 20,
                 args: exe =>
                 {
                     var dict = exe.line.linter.GetColorProperties();

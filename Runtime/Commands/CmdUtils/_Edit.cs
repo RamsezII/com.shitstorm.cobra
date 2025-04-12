@@ -19,11 +19,11 @@ namespace _COBRA_
                         if (opts.Contains(flag_force_file))
                             exe.opts.Add(flag_force_file, null);
                 },
-                args: static exe =>
-                {
-                    // read file path
-                    // (reparer tab avant)
-                },
+                //args: static exe =>
+                //{
+                //    // read file path
+                //    // (reparer tab avant)
+                //},
                 routine: ERoutine
                 );
 

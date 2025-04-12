@@ -50,6 +50,9 @@ namespace _COBRA_
             this.max_args = Mathf.Max(min_args, max_args);
             this.opts = opts;
             this.args = args;
+
+            if (this.max_args == 0 && args != null)
+                throw new Exception($"'{name}' assigned {nameof(this.args)} callback but {nameof(this.max_args)} is 0");
         }
 
         Command AddCommand(in Command command, params string[] aliases)

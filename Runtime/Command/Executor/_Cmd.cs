@@ -9,7 +9,7 @@ namespace _COBRA_
             static void Init_Cmd()
             {
                 Shell.static_domain.AddAction(
-                    "current-executors",
+                    "monitor-executors",
                     action: exe =>
                     {
                         List<string> lines = new();
@@ -45,10 +45,6 @@ namespace _COBRA_
                         //}
 
                         exe.Stdout(lines);
-                    },
-                    args: exe =>
-                    {
-
                     },
                     aliases: "ps");
             }
