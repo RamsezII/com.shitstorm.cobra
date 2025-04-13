@@ -9,7 +9,8 @@ namespace _COBRA_
         public static readonly Command static_domain;
 
         readonly Queue<Command.Executor> pending_executors = new();
-        readonly List<Command.Executor.Janitor> front_janitors = new(), background_janitors = new();
+        readonly List<Command.Executor.Janitor> front_janitors = new();
+        internal static readonly List<Command.Executor.Janitor> background_janitors = new();
 
         static byte id_counter = 0;
         public readonly byte shell_ID = ++id_counter;
@@ -36,6 +37,18 @@ namespace _COBRA_
         {
             id_counter = 0;
             static_domain.PropagateOblivion();
+            OnNucleorQuit();
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void OnAfterSceneLoad()
+        {
+            NUCLEOR.delegates.onApplicationQuit -= OnNucleorQuit;
+            NUCLEOR.delegates.onApplicationQuit += OnNucleorQuit;
+            NUCLEOR.delegates.shell_tick -= UpdateBackgroundJanitors;
+            NUCLEOR.delegates.shell_tick += UpdateBackgroundJanitors;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -43,14 +56,14 @@ namespace _COBRA_
         private void Awake()
         {
             terminal = GetComponentInParent<ITerminal>();
-            NUCLEOR.delegates.update_shells += TickExecutors;
+            NUCLEOR.delegates.shell_tick += UpdateUpdateJanitors;
         }
 
         //--------------------------------------------------------------------------------------------------------------
 
         private void OnDestroy()
         {
-            NUCLEOR.delegates.update_shells -= TickExecutors;
+            NUCLEOR.delegates.shell_tick -= UpdateUpdateJanitors;
 
             foreach (Command.Executor executor in pending_executors)
                 executor.Dispose();
@@ -59,9 +72,13 @@ namespace _COBRA_
             for (int i = 0; i < front_janitors.Count; i++)
                 front_janitors[i].Dispose();
             front_janitors.Clear();
+        }
 
-            for (int i1 = 0; i1 < background_janitors.Count; i1++)
-                background_janitors[i1].Dispose();
+        static void OnNucleorQuit()
+        {
+            NUCLEOR.delegates.shell_tick -= UpdateBackgroundJanitors;
+            for (int i = 0; i < background_janitors.Count; i++)
+                background_janitors[i].Dispose();
             background_janitors.Clear();
         }
     }

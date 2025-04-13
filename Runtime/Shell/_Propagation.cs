@@ -4,7 +4,19 @@ namespace _COBRA_
 {
     partial class Shell
     {
-        void TickExecutors() => PropagateLine(new Command.Line(string.Empty, SIGNALS.TICK, terminal));
+        static void UpdateBackgroundJanitors()
+        {
+            Command.Line line = new(string.Empty, SIGNALS.TICK, null);
+            if (background_janitors.Count > 0)
+                for (int i = 0; i < background_janitors.Count; ++i)
+                {
+                    var janitor = background_janitors[i];
+                    if (!janitor.TryExecuteCurrent(line, out _))
+                        background_janitors.RemoveAt(i--);
+                }
+        }
+
+        void UpdateUpdateJanitors() => PropagateLine(new Command.Line(string.Empty, SIGNALS.TICK, terminal));
         public string PropagateLine(in Command.Line line)
         {
             string error = null;
@@ -31,23 +43,13 @@ namespace _COBRA_
                                 }
                     }
 
-            if (error == null)
-                if (line.signal.HasFlag(SIGNALS.TICK))
-                    if (background_janitors.Count > 0)
-                        for (int i = 0; i < background_janitors.Count; ++i)
-                        {
-                            var janitor = background_janitors[i];
-                            if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
-                                background_janitors.RemoveAt(i--);
-                        }
-
-                    before_active_executors:
+                before_active_executors:
 
             if (error == null)
                 if (front_janitors.Count > 0)
                 {
                     var janitor = front_janitors[^1];
-                    if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
+                    if (!janitor.TryExecuteCurrent(line, out _))
                     {
                         front_janitors.RemoveAt(front_janitors.Count - 1);
                         janitor.Dispose();

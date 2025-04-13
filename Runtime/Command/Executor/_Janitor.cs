@@ -52,7 +52,7 @@ namespace _COBRA_
                     return false;
                 }
 
-                internal bool TryExecuteCurrent(in Line line, in List<Janitor> background_janitors, out Executor exe)
+                internal bool TryExecuteCurrent(in Line line, out Executor exe)
                 {
                 before_execution:
                     exe = null;
@@ -70,7 +70,10 @@ namespace _COBRA_
                             break;
                         else if (exe.TryPullNext(out exe))
                         {
-                            background_janitors.Add(new Janitor(exe));
+                            if (exe.background)
+                                Shell.background_janitors.Add(new Janitor(exe));
+                            else
+                                _executors.Add(exe);
                             return true;
                         }
                     }

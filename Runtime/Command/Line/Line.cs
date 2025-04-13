@@ -44,9 +44,6 @@ namespace _COBRA_
                 this.cursor_i = cursor_i;
                 this.cpl_index = cpl_index;
 
-                if (terminal == null)
-                    Debug.LogWarning("null terminal");
-
                 linter = terminal?.GetLinter;
                 linter?.Clear();
             }

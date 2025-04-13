@@ -55,7 +55,7 @@ namespace _COBRA_
                 throw new Exception($"'{name}' assigned {nameof(this.args)} callback but {nameof(this.max_args)} is 0");
         }
 
-        Command AddCommand(in Command command, params string[] aliases)
+        public Command AddCommand(in Command command, params string[] aliases)
         {
             _commands.Add(command.name, command);
             for (int i = 0; i < aliases.Length; ++i)

@@ -1,11 +1,11 @@
 ﻿namespace _COBRA_
 {
-    partial class CmdUtils
+    partial class CmdExecutors
     {
-        static void Init_Executors()
+        static void Init_Find()
         {
-            Shell.static_domain.AddAction(
-                "find-executor",
+            domain_exe.AddAction(
+                "find",
                 opts: static exe =>
                 {
 
