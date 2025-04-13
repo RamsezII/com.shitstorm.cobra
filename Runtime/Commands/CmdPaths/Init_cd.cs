@@ -11,7 +11,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, is_path: true))
+                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.DIRECTORY))
                         if (Directory.Exists(path))
                             exe.args.Add(path);
                         else

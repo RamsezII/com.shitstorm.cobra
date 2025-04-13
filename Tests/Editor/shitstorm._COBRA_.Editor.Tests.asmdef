@@ -1,0 +1,23 @@
+{
+    "name": "shitstorm._COBRA_.Editor.Tests",
+    "rootNamespace": "_COBRA_et",
+    "references": [
+        "GUID:ec96f6dc48fee4244bcebc247464e471",
+        "GUID:ebba8d578b54b88469e4b861112fd4be",
+        "GUID:2a84e452762c9634994f1da664544658",
+        "GUID:85d8eb001661017439ab39a2d69b3cd4",
+        "GUID:a27b72c9e716ff84a99a10d1220cf413",
+        "GUID:e2cc50623f5d9c74daf8ba069d0e2d39"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

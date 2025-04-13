@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace _COBRA_
@@ -109,10 +110,10 @@ namespace _COBRA_
 
             public bool TryReadArgument(
                 out string argument,
-                in IEnumerable<string> completions_candidates = null,
-                in bool complete_if_is_option = false,
-                in bool accept_only_candidate = false,
-                in bool is_path = false,
+                IEnumerable<string> completions = null,
+                in bool complete_if_option = false,
+                in bool strict = false,
+                in PATH_FLAGS path_mode = 0,
                 in bool lint = true)
             {
                 if (lint)
@@ -127,7 +128,7 @@ namespace _COBRA_
                     ++arg_i;
 
                     if (lint)
-                        if (is_path)
+                        if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
                         {
                             is_cursor_on_path = IsOnCursor;
                             if (is_cursor_on_path)
@@ -144,22 +145,30 @@ namespace _COBRA_
                 if (!cpl_done)
                     if (signal.HasFlag(SIGNALS.CPL))
                         if (IsOnCursor)
-                            if (is_path || completions_candidates != null)
-                                if (!complete_if_is_option || argument.StartsWith('-'))
+                            if (path_mode.HasFlags_any(PATH_FLAGS.BOTH) || completions != null)
+                                if (!complete_if_option || argument.StartsWith('-'))
                                 {
                                     cpl_done = true;
                                     cpl_start_i = read_i;
                                     if (signal.HasFlag(SIGNALS.CPL_TAB))
-                                        if (is_path)
-                                            PathCompletion_tab(argument);
+                                        if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
+                                            PathCompletion_tab(argument, path_mode, out completions);
                                         else
-                                            ComputeCompletion_tab(argument, completions_candidates);
+                                            ComputeCompletion_tab(argument, completions);
                                     else if (signal.HasFlag(SIGNALS.CPL_ALT))
-                                        if (is_path)
-                                            PathCompletion_alt(argument);
+                                        if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
+                                            PathCompletion_alt(argument, path_mode, out completions);
                                         else
-                                            ComputeCompletion_alt(argument, completions_candidates);
+                                            ComputeCompletion_alt(argument, completions);
                                 }
+
+                if (strict)
+                    if (completions != null)
+                        if (!completions.Contains(argument))
+                        {
+                            ReadBack();
+                            return false;
+                        }
 
                 return isNotEmpty;
             }

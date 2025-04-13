@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -31,33 +32,43 @@ namespace _COBRA_
                     LintToThisPosition(linter.path);
             }
 
-            void PathCompletion_tab(in string arg)
+            void PathCompletion_tab(in string arg, in PATH_FLAGS flags, out IEnumerable<string> candidates)
             {
                 string full_path = arg.SafeRootedPath(shell.work_dir);
                 string parent_dir = Path.GetDirectoryName(full_path);
 
-                string[] dirs =
-                    Directory.EnumerateDirectories(parent_dir)
-                    .Select(path => path.SafeRootedPath(shell.work_dir))
-                    .ToArray();
+                candidates = flags switch
+                {
+                    PATH_FLAGS.FILE => Directory.EnumerateFiles(parent_dir),
+                    PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(parent_dir),
+                    _ => Directory.EnumerateDirectories(parent_dir),
+                };
 
-                string[] array = ECompletionCandidates_tab(arg, dirs).ToArray();
+                candidates = candidates.Select(path => path.SafeRootedPath(shell.work_dir));
+
+                string[] array = ECompletionCandidates_tab(arg, candidates).ToArray();
                 if (array.Length == 0)
                     return;
                 InsertCompletionCandidate(array[cpl_index % array.Length]);
             }
 
-            void PathCompletion_alt(in string arg)
+            void PathCompletion_alt(in string arg, in PATH_FLAGS flags, out IEnumerable<string> candidates)
             {
                 string full_path = arg.SafeRootedPath(shell.work_dir);
                 string parent_dir = Path.GetDirectoryName(full_path);
 
                 if (HasFlags_any(SIGNALS.UP | SIGNALS.DOWN))
                 {
-                    string[] dirs =
-                        Directory.EnumerateDirectories(parent_dir)
-                        .Select(path => path.SafeRootedPath(shell.work_dir))
-                        .ToArray();
+                    candidates = flags switch
+                    {
+                        PATH_FLAGS.FILE => Directory.EnumerateFiles(parent_dir),
+                        PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(parent_dir),
+                        _ => Directory.EnumerateDirectories(parent_dir),
+                    };
+
+                    candidates = candidates.Select(path => path.SafeRootedPath(shell.work_dir));
+
+                    string[] dirs = candidates.ToArray();
 
                     int indexOf = Array.IndexOf(dirs, full_path);
                     if (indexOf >= 0)
@@ -81,11 +92,15 @@ namespace _COBRA_
                 else if (signal.HasFlag(SIGNALS.LEFT))
                     InsertCompletionCandidate(parent_dir);
                 else if (signal.HasFlag(SIGNALS.RIGHT))
-                    foreach (string fs in Directory.EnumerateFileSystemEntries(full_path))
+                {
+                    candidates = Directory.EnumerateFileSystemEntries(full_path);
+                    foreach (string fs in candidates)
                     {
                         InsertCompletionCandidate(fs.SafeRootedPath(shell.work_dir));
                         break;
                     }
+                }
+                candidates = null;
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using _ARK_;
+using System.IO;
 using UnityEngine;
 
 namespace _COBRA_
@@ -21,11 +22,16 @@ namespace _COBRA_
                 aliases: "wdir");
 
             Command.static_domain.AddAction(
+                "reset-working-dir",
+                action: static exe => exe.shell.work_dir = NUCLEOR.home_path
+                );
+
+            Command.static_domain.AddAction(
                 "path-test",
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, is_path: true))
+                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.BOTH))
                         ;
                 },
                 action: static exe =>
@@ -69,7 +75,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, is_path: true))
+                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.DIRECTORY))
                         if (Directory.Exists(path))
                             exe.error = $"path already exists: '{path}'";
                         else if (!Path.IsPathFullyQualified(path))
