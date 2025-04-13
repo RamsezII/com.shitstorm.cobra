@@ -14,11 +14,12 @@ namespace _COBRA_
             public bool notEmpty;
             public int cpl_index;
             public SIGNALS signal;
-            public bool cpl_stop, cpl_done;
-            public int cursor_i, read_i, start_i, end_i, arg_i = -1, cpl_start_i;
-            public string arg_last;
+            public bool cpl_stop, cpl_done, is_cursor_on_path;
+            public int cursor_i, read_i, start_i, path_i, end_i, arg_i = -1, cpl_start_i;
+            public string arg_last, path_last;
             public CMDLINE_DATA data;
             public bool HasFlags_any(in SIGNALS flags) => (signal & flags) != 0;
+            bool IsOnCursor => cursor_i >= start_i && cursor_i <= read_i;
 
             //--------------------------------------------------------------------------------------------------------------
 

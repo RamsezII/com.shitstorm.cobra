@@ -93,10 +93,16 @@ namespace _COBRA_
             public void ReadBack()
             {
                 --arg_i;
+
                 if (cpl_start_i == read_i)
+                {
                     cpl_done = false;
+                    is_cursor_on_path = false;
+                }
+
                 end_i = read_i = start_i;
                 text.GroupedErase(ref start_i);
+
                 if (!cpl_done)
                     cpl_start_i = start_i;
             }
@@ -122,14 +128,22 @@ namespace _COBRA_
 
                     if (lint)
                         if (is_path)
+                        {
+                            is_cursor_on_path = IsOnCursor;
+                            if (is_cursor_on_path)
+                            {
+                                path_i = start_i;
+                                path_last = arg_last;
+                            }
                             LintPath();
+                        }
                         else
                             LintToThisPosition(linter.argument);
                 }
 
                 if (!cpl_done)
                     if (signal.HasFlag(SIGNALS.CPL))
-                        if (cursor_i >= start_i && cursor_i <= read_i)
+                        if (IsOnCursor)
                             if (is_path || completions_candidates != null)
                                 if (!complete_if_is_option || argument.StartsWith('-'))
                                 {
