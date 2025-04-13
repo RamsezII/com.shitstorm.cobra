@@ -98,7 +98,7 @@ namespace _COBRA_
                         }
 
                     if (exe.routine != null)
-                        if (line.signal.HasFlag(SIGNALS.TICK))
+                        if (exe.started || line.signal.HasFlag(SIGNALS.TICK))
                         {
                             if (!exe.started && exe.background)
                                 exe.LogBackgroundStart();

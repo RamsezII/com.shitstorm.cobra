@@ -18,6 +18,7 @@ namespace _COBRA_
         public CMD_STATES previous_state;
         public bool state_changed;
         public bool IsIdle => front_janitors.Count == 0;
+        public bool IsBusy => front_janitors.Count > 0;
         public ITerminal terminal;
         public override string ToString() => $"{GetType().FullName}[{shell_ID}]";
 

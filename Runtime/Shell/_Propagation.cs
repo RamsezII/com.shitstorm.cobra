@@ -44,19 +44,18 @@ namespace _COBRA_
                     before_active_executors:
 
             if (error == null)
-                if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
-                    if (front_janitors.Count > 0)
+                if (front_janitors.Count > 0)
+                {
+                    var janitor = front_janitors[^1];
+                    if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
                     {
-                        var janitor = front_janitors[^1];
-                        if (!janitor.TryExecuteCurrent(line, background_janitors, out _))
-                        {
-                            front_janitors.RemoveAt(front_janitors.Count - 1);
-                            janitor.Dispose();
-                            goto before_active_executors;
-                        }
+                        front_janitors.RemoveAt(front_janitors.Count - 1);
+                        janitor.Dispose();
+                        goto before_active_executors;
                     }
+                }
 
-                before_pending_queue:
+            before_pending_queue:
 
             if (error == null)
                 if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
