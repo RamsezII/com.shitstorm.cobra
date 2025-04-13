@@ -69,19 +69,19 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg, is_path: true))
-                        exe.args.Add(arg);
+                    if (exe.line.TryReadArgument(out string path, is_path: true))
+                        if (Directory.Exists(path))
+                            exe.error = $"path already exists: '{path}'";
+                        else if (!Path.IsPathFullyQualified(path))
+                            exe.error = $"path not fully qualified: '{path}'";
+                        else
+                            exe.args.Add(path);
                 },
                 action: static exe =>
                 {
                     string path = (string)exe.args[0];
-                    if (!Path.IsPathRooted(path))
-                        path = Path.Combine(exe.shell.work_dir, path);
-
-                    if (Directory.Exists(path))
-                        exe.error = $"path already exists: '{path}'";
-                    else
-                        Directory.CreateDirectory(path);
+                    path = path.SafeRootedPath(exe.shell.work_dir);
+                    Directory.CreateDirectory(path);
                 },
                 aliases: "mkdir");
         }

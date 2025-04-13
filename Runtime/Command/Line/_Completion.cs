@@ -39,7 +39,7 @@ namespace _COBRA_
                             ++matches;
                         }
                     }
-                    if (matches == argument.Length)
+                    if (matches >= argument.Length)
                         yield return candidate;
                 }
             }

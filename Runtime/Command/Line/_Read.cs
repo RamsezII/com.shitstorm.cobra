@@ -136,7 +136,10 @@ namespace _COBRA_
                                     cpl_done = true;
                                     cpl_start_i = read_i;
                                     if (signal.HasFlag(SIGNALS.CPL_TAB))
-                                        ComputeCompletion_tab(argument, completions_candidates);
+                                        if (is_path)
+                                            PathCompletion_tab(argument);
+                                        else
+                                            ComputeCompletion_tab(argument, completions_candidates);
                                     else if (signal.HasFlag(SIGNALS.CPL_ALT))
                                         if (is_path)
                                             PathCompletion_alt(argument);

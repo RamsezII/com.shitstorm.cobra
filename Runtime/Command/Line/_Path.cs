@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -30,6 +31,22 @@ namespace _COBRA_
                     LintToThisPosition(linter.file);
                 else
                     LintToThisPosition(linter.path);
+            }
+
+            void PathCompletion_tab(in string arg)
+            {
+                string full_path = arg.SafeRootedPath(shell.work_dir);
+                string parent_dir = Path.GetDirectoryName(full_path);
+
+                string[] dirs =
+                    Directory.EnumerateDirectories(parent_dir)
+                    .Select(path => path.SafeRootedPath(shell.work_dir))
+                    .ToArray();
+
+                string[] array = ECompletionCandidates_tab(arg, dirs).ToArray();
+                if (array.Length == 0)
+                    return;
+                InsertCompletionCandidate(array[cpl_index % array.Length]);
             }
 
             void PathCompletion_alt(in string arg)
