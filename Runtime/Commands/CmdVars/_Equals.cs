@@ -6,7 +6,7 @@ namespace _COBRA_
     {
         static void InitEquals()
         {
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "equals-literal",
                 manual: new("[pipe output] <value>"),
                 max_args: 1,
@@ -23,7 +23,7 @@ namespace _COBRA_
                 }
                 );
 
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "equals-var",
                 manual: new("[pipe output] <variable>"),
                 max_args: 1,

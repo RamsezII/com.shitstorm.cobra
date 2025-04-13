@@ -35,7 +35,7 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            domain_eve = Shell.static_domain.AddRoutine(
+            domain_eve = Command.static_domain.AddRoutine(
                 "satellite",
                 routine: EMain,
                 aliases: "eve"

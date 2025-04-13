@@ -6,7 +6,9 @@ namespace _COBRA_
     {
         static void Init_Nucleor()
         {
-            Shell.static_domain.AddRoutine("monitor-nucleor", routine: ERoutine);
+            Command domain_nucleor = Command.static_domain.AddDomain("nucleor");
+
+            domain_nucleor.AddRoutine("monitor", routine: ERoutine);
 
             static IEnumerator<CMD_STATUS> ERoutine(Command.Executor exe)
             {

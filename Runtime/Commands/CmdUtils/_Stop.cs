@@ -6,7 +6,7 @@ namespace _COBRA_
     {
         static void Init_Stop()
         {
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "stop",
                 max_args: 1,
                 opts: static exe => exe.opts.Add("i", 0),

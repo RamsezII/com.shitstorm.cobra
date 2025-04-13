@@ -7,7 +7,7 @@ namespace _COBRA_
     {
         static void InitGrep()
         {
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "grep",
                 manual: new("regex filter"),
                 min_args: 1,

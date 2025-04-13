@@ -7,14 +7,14 @@ namespace _COBRA_
     {
         static void Init_Args()
         {
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "args",
                 manual: new("pipes data as arguments to a command"),
                 min_args: 1,
                 max_args: 1,
                 args: static exe =>
                 {
-                    if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd_path))
+                    if (Command.static_domain.TryReadCommand_path(exe.line, out var cmd_path))
                     {
                         Command.Executor exe2 = new(exe.shell, exe, exe.line, cmd_path, parse_arguments: false);
                         exe.args.Add(exe2);

@@ -6,8 +6,6 @@ namespace _COBRA_
 {
     public sealed partial class Shell : MonoBehaviour
     {
-        public static readonly Command static_domain;
-
         readonly Queue<Command.Executor> pending_executors = new();
         readonly List<Command.Executor.Janitor> front_janitors = new();
         internal static readonly List<Command.Executor.Janitor> background_janitors = new();
@@ -25,18 +23,10 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        static Shell()
-        {
-            static_domain = new Command(nameof(static_domain));
-        }
-
-        //--------------------------------------------------------------------------------------------------------------
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoad()
         {
             id_counter = 0;
-            static_domain.PropagateOblivion();
             OnNucleorQuit();
         }
 

@@ -9,13 +9,13 @@ namespace _COBRA_
     {
         static void InitManual()
         {
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "manual",
                 manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
                 max_args: 1,
                 args: exe =>
                 {
-                    if (Shell.static_domain.TryReadCommand_path(exe.line, out var path))
+                    if (Command.static_domain.TryReadCommand_path(exe.line, out var path))
                         exe.args.Add(path);
                 },
                 action: exe =>
@@ -36,7 +36,7 @@ command arguments work as this :
 
                         sb.AppendLine("Commands :");
 
-                        foreach (var group in Shell.static_domain._commands.GroupBy(pair => pair.Value))
+                        foreach (var group in Command.static_domain._commands.GroupBy(pair => pair.Value))
                         {
                             foreach (var pair in group)
                                 sb.Append($"{pair.Key}, ");

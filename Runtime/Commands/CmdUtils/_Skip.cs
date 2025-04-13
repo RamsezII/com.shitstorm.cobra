@@ -6,7 +6,7 @@ namespace _COBRA_
     {
         static void Init_Skip()
         {
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "skip",
                 manual: new("skip <int> first entries from pipe"),
                 max_args: 1,

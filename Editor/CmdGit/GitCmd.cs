@@ -12,7 +12,8 @@ namespace _COBRA_e
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            domain_git = Shell.static_domain.AddDomain("git");
+            domain_git = Command.static_domain.AddDomain("git");
+
             Init_PushAll();
         }
     }

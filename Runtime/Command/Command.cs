@@ -7,6 +7,8 @@ namespace _COBRA_
 {
     public sealed partial class Command
     {
+        public static readonly Command static_domain = new(nameof(static_domain));
+
         public readonly string name;
         public readonly Action<Executor> action;
         public readonly Action<Executor, List<object>, object> on_pipe;
@@ -19,6 +21,14 @@ namespace _COBRA_
         public readonly Type input_type, output_type;
 
         public bool IsDomain => _commands.Count >= 0 || action == null && on_pipe == null && routine == null;
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void OnBeforeSceneLoad()
+        {
+            static_domain.PropagateOblivion();
+        }
 
         //--------------------------------------------------------------------------------------------------------------
 

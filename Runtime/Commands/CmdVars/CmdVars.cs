@@ -39,7 +39,7 @@ namespace _COBRA_
 
         static void InitVars()
         {
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "get-var",
                 manual: new("<variable name>"),
                 min_args: 1,
@@ -58,7 +58,7 @@ namespace _COBRA_
                 action: exe => exe.Stdout(exe.args[0])
                 );
 
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "set-var",
                 manual: new("<variable name> <value>"),
                 min_args: 2,

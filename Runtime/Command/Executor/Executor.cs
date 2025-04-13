@@ -50,7 +50,7 @@ namespace _COBRA_
                     case 0:
                         throw new ArgumentException($"Command path is empty.", nameof(path));
 
-                    case 1 when path[0] == Shell.static_domain:
+                    case 1 when path[0] == static_domain:
                         cmd_path = "~";
                         break;
 
@@ -107,7 +107,7 @@ namespace _COBRA_
 
                         if (error == null)
                             if (is_pipe || is_chain)
-                                if (Shell.static_domain.TryReadCommand_path(line, out var path2, pipe_only: is_pipe))
+                                if (static_domain.TryReadCommand_path(line, out var path2, pipe_only: is_pipe))
                                 {
                                     Executor exe = new(shell, this, line, path2);
                                     if (exe.error != null)

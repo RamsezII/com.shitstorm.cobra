@@ -27,7 +27,7 @@ namespace _COBRA_
                 flag_remove_empties = "--remove-empties",
                 flag_no_white_space = "--no-white-space";
 
-            Shell.static_domain.AddAction("echo",
+            Command.static_domain.AddAction("echo",
                 manual: new("echo!"),
                 min_args: 1,
                 args: exe =>
@@ -38,25 +38,25 @@ namespace _COBRA_
                 action: exe => exe.Stdout(exe.args[0])
                 );
 
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "shutdown",
                 manual: new("closes the application"),
                 action: exe => Application.Quit()
                 );
 
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "clear",
                 manual: new("clear all previous logs"),
                 action: exe => Application.Quit()
                 );
 
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "clear-history",
                 manual: new("clear all previous entries"),
                 action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
                 );
 
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "split",
                 min_args: 1,
                 args: static exe =>
@@ -80,7 +80,7 @@ namespace _COBRA_
                         exe.Stdout(data);
                 });
 
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "prefixe",
                 min_args: 1,
                 on_pipe: static (exe, args, data) =>

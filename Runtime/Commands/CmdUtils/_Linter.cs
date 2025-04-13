@@ -7,7 +7,7 @@ namespace _COBRA_
     {
         static void InitLinter()
         {
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "linter-test",
                 action: null,
                 max_args: 20,

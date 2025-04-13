@@ -9,7 +9,7 @@ namespace _COBRA_
             const string
                 flag_else = "--else";
 
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "not",
                 on_pipe: static (exe, args, data) =>
                 {
@@ -35,14 +35,14 @@ namespace _COBRA_
                 },
                 args: null);
 
-            Shell.static_domain.AddPipe(
+            Command.static_domain.AddPipe(
                 "if",
                 manual: new("<command> {--else <command>}"),
                 min_args: 1,
                 max_args: 2,
                 args: static exe =>
                 {
-                    if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd1_path))
+                    if (Command.static_domain.TryReadCommand_path(exe.line, out var cmd1_path))
                     {
                         Command cmd = cmd1_path[^1];
                         Command.Executor exe1 = new(exe.shell, exe, exe.line, cmd1_path);
@@ -60,7 +60,7 @@ namespace _COBRA_
 
                     if (exe.line.TryRead_flags(exe, out var flags, flag_else))
                         if (flags.Contains(flag_else))
-                            if (Shell.static_domain.TryReadCommand_path(exe.line, out var cmd2_path))
+                            if (Command.static_domain.TryReadCommand_path(exe.line, out var cmd2_path))
                             {
                                 Command cmd = cmd2_path[^1];
                                 Command.Executor exe2 = new(exe.shell, exe, exe.line, cmd2_path);

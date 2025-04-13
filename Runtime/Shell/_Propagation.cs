@@ -78,7 +78,7 @@ namespace _COBRA_
                     }
 
             if (error == null && line.HasNext(true))
-                if (static_domain.TryReadCommand_path(line, out var path))
+                if (Command.static_domain.TryReadCommand_path(line, out var path))
                 {
                     Command.Executor exe = new(this, null, line, path);
                     if (exe.error != null)
@@ -99,7 +99,7 @@ namespace _COBRA_
                         }
                 }
                 else if (!string.IsNullOrWhiteSpace(line.arg_last))
-                    error = $"'{line.arg_last}' not found in '{static_domain.name}'";
+                    error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
 
             previous_state = current_status.state;
             if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe))

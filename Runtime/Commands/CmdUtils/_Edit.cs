@@ -8,7 +8,7 @@ namespace _COBRA_
         {
             const string flag_force_file = "--create-if-not-found";
 
-            Shell.static_domain.AddRoutine(
+            Command.static_domain.AddRoutine(
                 "edit-file",
                 manual: new("create and edit a file"),
                 min_args: 0,

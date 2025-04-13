@@ -8,9 +8,18 @@
 
         public static void Init()
         {
-            domain_exe = Shell.static_domain.AddDomain("executor");
+            domain_exe = Command.static_domain.AddDomain("executor");
+
             Init_Find();
             Init_Monitor();
+
+            domain_exe.AddAction(
+                "list-all",
+                manual: new("returns all active executors"),
+                action: static exe =>
+                {
+
+                });
         }
     }
 }

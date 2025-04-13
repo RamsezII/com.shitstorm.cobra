@@ -8,7 +8,7 @@ namespace _COBRA_
         {
             static void Init_Cmd()
             {
-                Shell.static_domain.AddAction(
+                static_domain.AddAction(
                     "monitor-executors",
                     action: exe =>
                     {

@@ -11,7 +11,7 @@ namespace _COBRA_
                 flag_error = "--error",
                 flag_background = "--background";
 
-            Shell.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "log",
                 min_args: 1,
                 args: exe =>

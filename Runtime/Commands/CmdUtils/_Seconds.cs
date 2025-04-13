@@ -10,7 +10,7 @@ namespace _COBRA_
             const string
                 flag_count_down = "--count-down";
 
-            Shell.static_domain.AddRoutine(
+            Command.static_domain.AddRoutine(
                 "count-seconds",
                 min_args: 1,
                 opts: static exe =>
