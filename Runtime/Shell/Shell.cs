@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ namespace _COBRA_
         public bool IsBusy => front_janitors.Count > 0;
         public ITerminal terminal;
         public override string ToString() => $"{GetType().FullName}[{SID}]";
+        public DirectoryInfo work_dir;
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -48,6 +50,7 @@ namespace _COBRA_
 
         private void Awake()
         {
+            work_dir = new(Directory.GetCurrentDirectory());
             terminal = GetComponentInParent<ITerminal>();
             NUCLEOR.delegates.shell_tick += UpdateUpdateJanitors;
             instances.Add(this);

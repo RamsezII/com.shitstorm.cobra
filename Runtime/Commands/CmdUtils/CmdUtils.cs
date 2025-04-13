@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using System;
+using System.IO;
 using UnityEngine;
 
 namespace _COBRA_
@@ -54,6 +55,11 @@ namespace _COBRA_
                 "clear-history",
                 manual: new("clear all previous entries"),
                 action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
+                );
+
+            Command.static_domain.AddAction(
+                "working-directory",
+                action: static exe => exe.Stdout(Directory.GetCurrentDirectory())
                 );
 
             Command.static_domain.AddPipe(
