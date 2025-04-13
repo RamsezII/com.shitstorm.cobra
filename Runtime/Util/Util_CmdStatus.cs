@@ -9,6 +9,7 @@ namespace _COBRA_
         WAIT_FOR_STDIN,
         FULLSCREEN_readonly,
         FULLSCREEN_write,
+        DONE,
     }
 
     public struct CMD_STATUS

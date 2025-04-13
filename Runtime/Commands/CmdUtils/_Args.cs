@@ -20,7 +20,7 @@ namespace _COBRA_
                         exe.args.Add(exe2);
                     }
                     else
-                        exe.error = $"command '{exe.command.name}' could not find command '{exe.line.arg_last}'";
+                        exe.error = $"command '{exe.command.name}' could not find command ({nameof(Command.Line.arg_last)}: '{exe.line.arg_last}')";
                 },
                 on_pipe: static (exe, args, data) =>
                 {

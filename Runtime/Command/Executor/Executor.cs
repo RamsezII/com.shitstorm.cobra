@@ -27,10 +27,11 @@ namespace _COBRA_
 
             public int executions = -1;
             static ushort PID_counter;
-            public readonly ushort executor_ID;
+            public readonly ushort EID;
+            public ushort PEID => parent?.EID ?? 0;
 
             public string error;
-            public override string ToString() => $"[{parent?.executor_ID ?? 0}-{executor_ID} {cmd_path}]";
+            public override string ToString() => $"[{parent?.EID ?? 0}-{EID} {cmd_path}]";
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +44,7 @@ namespace _COBRA_
                 command = path[^1];
 
                 if (line.signal.HasFlag(SIGNALS.EXEC))
-                    executor_ID = ++PID_counter;
+                    EID = ++PID_counter;
 
                 switch (path.Count)
                 {

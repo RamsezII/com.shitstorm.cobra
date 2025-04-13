@@ -58,22 +58,21 @@ namespace _COBRA_
 
             Command.static_domain.AddPipe(
                 "split",
-                min_args: 1,
-                args: static exe =>
+                opts: static exe =>
                 {
                     if (exe.line.TryRead_flags(exe, out var flags, flag_remove_empties))
                         foreach (string flag in flags)
-                            exe.args.Add(flag);
+                            exe.opts.Add(flag, null);
                 },
                 on_pipe: static (exe, args, data) =>
                 {
                     if (data is string str)
                     {
                         StringSplitOptions options = 0;
-                        if (exe.args.Contains(flag_remove_empties))
+                        if (exe.opts.ContainsKey(flag_remove_empties))
                             options |= StringSplitOptions.RemoveEmptyEntries;
 
-                        foreach (string line in str.Split(new[] { '\n' }, options))
+                        foreach (string line in str.Split(new[] { ' ', '\n' }, options))
                             exe.Stdout(line);
                     }
                     else

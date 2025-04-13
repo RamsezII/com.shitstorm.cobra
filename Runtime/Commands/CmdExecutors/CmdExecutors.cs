@@ -18,7 +18,7 @@
                 manual: new("returns all active executors"),
                 action: static exe =>
                 {
-
+                    exe.Stdout(Shell.Monitor());
                 });
         }
     }

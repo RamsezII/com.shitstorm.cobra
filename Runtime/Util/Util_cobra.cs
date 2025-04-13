@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public static class Util_cobra
+public static partial class Util_cobra
 {
     public static int SkipSpaces(this string text, ref int read_i)
     {

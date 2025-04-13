@@ -10,7 +10,7 @@ namespace _COBRA_
         {
             internal class Janitor : IDisposable
             {
-                readonly List<Executor> _executors = new();
+                internal readonly List<Executor> _executors = new();
                 bool disposed;
 
                 static ushort id_counter;
