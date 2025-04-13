@@ -64,10 +64,10 @@ namespace _COBRA_
 
             static IEnumerator<CMD_STATUS> EMain(Command.Executor exe)
             {
-                yield return new(CMD_STATES.BLOCKING, prefixe: exe.GetPrefixe());
+                yield return new(CMD_STATES.BLOCKING, prefixe: exe.shell.GetPrefixe());
 
                 string request_url = $"https://shitstorm.ovh/texts";
-                string EvePrefixe() => exe.GetPrefixe(cmd_path: "[EVE]" + request_url);
+                string EvePrefixe() => exe.shell.GetPrefixe(cmd_path: "[EVE]" + request_url);
 
                 while (true)
                 {

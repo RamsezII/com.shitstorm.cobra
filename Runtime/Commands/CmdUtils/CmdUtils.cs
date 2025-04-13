@@ -22,6 +22,7 @@ namespace _COBRA_
             Init_Seconds();
             Init_Nucleor();
             Init_Signal();
+
             CmdExecutors.Init();
 
             const string
@@ -55,11 +56,6 @@ namespace _COBRA_
                 "clear-history",
                 manual: new("clear all previous entries"),
                 action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
-                );
-
-            Command.static_domain.AddAction(
-                "working-directory",
-                action: static exe => exe.Stdout(Directory.GetCurrentDirectory())
                 );
 
             Command.static_domain.AddPipe(

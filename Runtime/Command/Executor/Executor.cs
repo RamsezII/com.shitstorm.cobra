@@ -190,14 +190,6 @@ namespace _COBRA_
                 return true;
             }
 
-            public static string GetPrefixe() => $"{MachineSettings.machine_name.Value.SetColor("#73CC26")}:{"~".SetColor("#73B2D9")}$";
-            public string GetPrefixe(string user_name = null, string cmd_path = null)
-            {
-                user_name ??= MachineSettings.machine_name.Value;
-                cmd_path ??= this.cmd_path;
-                return $"{user_name.SetColor("#73CC26")}:{cmd_path.SetColor("#73B2D9")}$";
-            }
-
             public void Stdout(in object data)
             {
                 stdout_exe.line = line;

@@ -105,7 +105,7 @@ namespace _COBRA_
             if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe))
                 current_status = active_exe.routine.Current;
             else
-                current_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: Command.Executor.GetPrefixe(), immortal: true);
+                current_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: GetPrefixe(), immortal: true);
             state_changed = previous_state != current_status.state;
 
             if (error != null)
