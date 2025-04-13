@@ -106,6 +106,7 @@ namespace _COBRA_
                 in IEnumerable<string> completions_candidates = null,
                 in bool complete_if_is_option = false,
                 in bool accept_only_candidate = false,
+                in bool is_path = false,
                 in bool lint = true)
             {
                 if (lint)
@@ -120,13 +121,16 @@ namespace _COBRA_
                     ++arg_i;
 
                     if (lint)
-                        LintToThisPosition(linter.argument);
+                        if (is_path)
+                            LintPath();
+                        else
+                            LintToThisPosition(linter.argument);
                 }
 
                 if (!cpl_done)
                     if (signal.HasFlag(SIGNALS.CPL))
                         if (cursor_i >= start_i && cursor_i <= read_i)
-                            if (completions_candidates != null)
+                            if (is_path || completions_candidates != null)
                                 if (!complete_if_is_option || argument.StartsWith('-'))
                                 {
                                     cpl_done = true;
@@ -134,7 +138,10 @@ namespace _COBRA_
                                     if (signal.HasFlag(SIGNALS.CPL_TAB))
                                         ComputeCompletion_tab(argument, completions_candidates);
                                     else if (signal.HasFlag(SIGNALS.CPL_ALT))
-                                        ComputeCompletion_alt(argument, completions_candidates);
+                                        if (is_path)
+                                            PathCompletion_alt(argument);
+                                        else
+                                            ComputeCompletion_alt(argument, completions_candidates);
                                 }
 
                 return isNotEmpty;

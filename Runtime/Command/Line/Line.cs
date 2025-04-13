@@ -7,6 +7,7 @@ namespace _COBRA_
     {
         public sealed partial class Line
         {
+            public readonly Shell shell;
             public readonly ITerminal terminal;
             public readonly Linter linter = new();
             public string text;
@@ -44,6 +45,7 @@ namespace _COBRA_
                 this.cursor_i = cursor_i;
                 this.cpl_index = cpl_index;
 
+                shell = terminal?.GetShell;
                 linter = terminal?.GetLinter;
                 linter?.Clear();
             }

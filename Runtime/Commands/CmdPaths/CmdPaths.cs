@@ -18,8 +18,20 @@ namespace _COBRA_
             Command.static_domain.AddAction(
                 "working-directory",
                 action: static exe => exe.Stdout(exe.shell.work_dir),
-                aliases: "wdir"
-                );
+                aliases: "wdir");
+
+            Command.static_domain.AddAction(
+                "path-test",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string path, is_path: true))
+                        ;
+                },
+                action: static exe =>
+                {
+
+                });
 
             Command.static_domain.AddAction(
                 "ls",
@@ -50,32 +62,26 @@ namespace _COBRA_
                 {
 
                 },
-                aliases: "cat"
-                );
+                aliases: "cat");
 
             Command.static_domain.AddAction(
                 "make-directory",
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg))
-                    {
-                        string path = Path.Combine(exe.shell.work_dir, arg);
-                        if (Directory.Exists(path))
-                            exe.error = $"path already exists: '{path}'";
-                        else
-                            exe.args.Add(arg);
-                    }
+                    if (exe.line.TryReadArgument(out string arg, is_path: true))
+                        exe.args.Add(arg);
                 },
                 action: static exe =>
                 {
-                    string path_local = (string)exe.args[0];
-                    string path_absolute = Path.Combine(exe.shell.work_dir, path_local);
+                    string path = (string)exe.args[0];
+                    if (!Path.IsPathRooted(path))
+                        path = Path.Combine(exe.shell.work_dir, path);
 
-                    if (Directory.Exists(path_absolute))
-                        exe.error = $"path already exists: '{path_absolute}'";
+                    if (Directory.Exists(path))
+                        exe.error = $"path already exists: '{path}'";
                     else
-                        Directory.CreateDirectory(path_absolute);
+                        Directory.CreateDirectory(path);
                 },
                 aliases: "mkdir");
         }

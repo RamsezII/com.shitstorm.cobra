@@ -29,6 +29,7 @@ namespace _COBRA_
                 public Color type = Color.gray;
                 public Color directory = Color.gray;
                 public Color file = Color.gray;
+                public Color path = Color.gray;
                 public Color bundle = Color.gray;
                 public Color asset = Color.gray;
                 public Color error = Color.gray;
