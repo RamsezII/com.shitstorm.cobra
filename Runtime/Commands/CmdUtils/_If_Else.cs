@@ -11,7 +11,7 @@ namespace _COBRA_
 
             Command.static_domain.AddPipe(
                 "not",
-                on_pipe: static (exe, args, data) =>
+                on_pipe: static (exe, data) =>
                 {
                     switch (data)
                     {
@@ -71,7 +71,7 @@ namespace _COBRA_
                                     exe.args.Add(exe2);
                             }
                 },
-                on_pipe: static (exe, args, data) =>
+                on_pipe: static (exe, data) =>
                 {
                     bool isTrue = data switch
                     {

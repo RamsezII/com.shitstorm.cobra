@@ -9,7 +9,8 @@ namespace _COBRA_
         const string
             opt_search_pattern = "--search-pattern",
             flag_recursive = "--recursive",
-            flag_create_if_empty = "--create-if-empty";
+            flag_create_if_empty = "--create-if-empty",
+            flag_overwrite = "--overwrite";
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -18,6 +19,7 @@ namespace _COBRA_
         {
             Init_cd();
             Init_edit();
+            Init_ToFile();
 
             Command.static_domain.AddAction(
                 "working-directory",

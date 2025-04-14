@@ -18,7 +18,7 @@ namespace _COBRA_
                         else
                             exe.error = $"could not parse into int value: '{arg}'";
                 },
-                on_pipe: static (exe, args, data) =>
+                on_pipe: static (exe, data) =>
                 {
                     int skips = (int)exe.args[0];
                     int iterations = (int)exe.opts["i"];

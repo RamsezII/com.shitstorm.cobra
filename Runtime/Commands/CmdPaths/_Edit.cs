@@ -10,8 +10,8 @@ namespace _COBRA_
         {
             const string flag_force_file = "--create-if-absent";
 
-            Command.static_domain.AddRoutine(
-                "edit-file",
+            Command.static_domain.AddAction(
+                "open",
                 manual: new("create and edit a file"),
                 min_args: 1,
                 no_background: true,
@@ -26,33 +26,18 @@ namespace _COBRA_
                     if (exe.line.TryReadArgument(out string path, strict: !force, path_mode: PATH_FLAGS.FILE))
                         exe.args.Add(path);
                 },
-                routine: ERoutine
-                );
-
-            static IEnumerator<CMD_STATUS> ERoutine(Command.Executor exe)
-            {
-                bool force = exe.opts.ContainsKey(flag_force_file);
-                string path = (string)exe.args[0];
-                path = exe.shell.PathCheck(path, PathModes.ForceFull);
-
-                string text = string.Empty;
-                if (!force && !File.Exists(path))
+                action: static exe =>
                 {
-                    Debug.LogWarning($"[ERROR] {exe} trying to edit none existing file at: '{path}'\nuse {flag_force_file} if this was intended.");
-                    yield break;
-                }
+                    bool force = exe.opts.ContainsKey(flag_force_file);
+                    string path = (string)exe.args[0];
+                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
 
-                text = File.ReadAllText(path);
-                exe.shell.terminal.SetStdin(text);
+                    string text = string.Empty;
+                    if (!force && !File.Exists(path))
+                        Debug.LogWarning($"[ERROR] {exe} trying to edit none existing file at: '{path}'\nuse {flag_force_file} if this was intended.");
 
-                while (true)
-                {
-                    if (exe.line.signal.HasFlag(SIGNALS.SAVE))
-                        exe.Stdout("Saving file...");
-                    exe.line.NoLintNoRead();
-                    yield return new(CMD_STATES.FULLSCREEN_write);
-                }
-            }
+                    Application.OpenURL(path);
+                });
         }
     }
 }

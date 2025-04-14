@@ -5,11 +5,9 @@ namespace _COBRA_
 {
     public enum CMD_STATES : byte
     {
+        _unknown_,
         BLOCKING,
         WAIT_FOR_STDIN,
-        FULLSCREEN_readonly,
-        FULLSCREEN_write,
-        DONE,
     }
 
     public struct CMD_STATUS

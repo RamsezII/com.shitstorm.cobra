@@ -195,7 +195,7 @@ namespace _COBRA_
                 stdout_exe.line = line;
                 if (stdout_exe != exe_log)
                     stdout_exe.janitor = janitor;
-                stdout_exe.command.on_pipe(stdout_exe, stdout_exe.args, data);
+                stdout_exe.command.on_pipe(stdout_exe, data);
                 stdout_exe.line = null;
             }
 

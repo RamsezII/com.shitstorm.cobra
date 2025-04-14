@@ -18,7 +18,6 @@ namespace _COBRA_
             Init_Stop();
             Init_Logs();
             Init_Seconds();
-            Init_Nucleor();
             Init_Signal();
 
             CmdExecutors.Init();
@@ -64,7 +63,7 @@ namespace _COBRA_
                         foreach (string flag in flags)
                             exe.opts.Add(flag, null);
                 },
-                on_pipe: static (exe, args, data) =>
+                on_pipe: static (exe, data) =>
                 {
                     if (data is string str)
                     {
@@ -82,10 +81,10 @@ namespace _COBRA_
             Command.static_domain.AddPipe(
                 "prefixe",
                 min_args: 1,
-                on_pipe: static (exe, args, data) =>
+                on_pipe: static (exe, data) =>
                 {
-                    string prefixe = (string)args[0];
-                    bool no_space = args.Count > 1 && args[1].ToString().Equals(flag_no_white_space, StringComparison.InvariantCultureIgnoreCase);
+                    string prefixe = (string)exe.args[0];
+                    bool no_space = exe.args.Count > 1 && exe.args[1].ToString().Equals(flag_no_white_space, StringComparison.InvariantCultureIgnoreCase);
 
                     if (!no_space && !prefixe.EndsWith(' '))
                         exe.Stdout($"{prefixe} {data}");

@@ -16,7 +16,7 @@ namespace _COBRA_
                     if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(arg);
                 },
-                on_pipe: static (exe, args, data) =>
+                on_pipe: static (exe, data) =>
                 {
                     Regex regex = new((string)exe.args[0], RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                     switch (data)

@@ -11,7 +11,7 @@ namespace _COBRA_
 
         public readonly string name;
         public readonly Action<Executor> action;
-        public readonly Action<Executor, List<object>, object> on_pipe;
+        public readonly Action<Executor, object> on_pipe;
         public readonly Func<Executor, IEnumerator<CMD_STATUS>> routine;
 
         public readonly Traductions manual;
@@ -35,7 +35,7 @@ namespace _COBRA_
         internal Command(
             in string name,
             in Action<Executor> action = default,
-            in Action<Executor, List<object>, object> on_pipe = default,
+            in Action<Executor, object> on_pipe = default,
             in Func<Executor, IEnumerator<CMD_STATUS>> routine = default,
             in Traductions manual = default,
             in bool immortal = default,
@@ -103,7 +103,7 @@ namespace _COBRA_
 
         public Command AddPipe(
             in string name,
-            in Action<Executor, List<object>, object> on_pipe,
+            in Action<Executor, object> on_pipe,
             in Action<Executor> opts = null,
             in Action<Executor> args = null,
             in Type input_type = null,

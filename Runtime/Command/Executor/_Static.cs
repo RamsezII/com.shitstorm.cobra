@@ -31,7 +31,7 @@ namespace _COBRA_
                     line: new Line(string.Empty, SIGNALS._none_, null),
                     path: new()
                     {
-                        new Command("_log", on_pipe: (exe, args, data) =>
+                        new Command("_log", on_pipe: (exe, data) =>
                         {
                             switch (data)
                             {

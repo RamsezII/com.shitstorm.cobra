@@ -22,7 +22,7 @@ namespace _COBRA_
                     else
                         exe.error = $"command '{exe.command.name}' could not find command ({nameof(Command.Line.arg_last)}: '{exe.line.arg_last}')";
                 },
-                on_pipe: static (exe, args, data) =>
+                on_pipe: static (exe, data) =>
                 {
                     string cmd_line = data switch
                     {
