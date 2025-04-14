@@ -43,7 +43,7 @@ namespace _COBRA_
                 }
 
                 text = File.ReadAllText(path);
-                exe.shell.terminal.ForceStdin(text);
+                exe.shell.terminal.SetStdin(text);
 
                 while (true)
                 {

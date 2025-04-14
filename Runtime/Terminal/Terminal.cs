@@ -6,6 +6,6 @@
         public Shell GetShell { get; }
         void ToggleWindow(bool toggle);
         void ForceSelectStdin();
-        void ForceStdin(in string text);
+        void SetStdin(string text);
     }
 }
