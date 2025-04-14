@@ -33,8 +33,6 @@ namespace _COBRA_
             {
                 bool force = exe.opts.ContainsKey(flag_force_file);
                 string path = (string)exe.args[0];
-                string parent_dir = Path.GetDirectoryName(path);
-                Debug.Log(parent_dir);
                 path = exe.shell.PathCheck(path, PathModes.ForceFull);
 
                 string text = string.Empty;
