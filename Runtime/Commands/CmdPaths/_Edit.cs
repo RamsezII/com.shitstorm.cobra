@@ -42,7 +42,6 @@ namespace _COBRA_
                     yield break;
                 }
 
-                yield return new(CMD_STATES.FULLSCREEN_write);
                 text = File.ReadAllText(path);
                 exe.shell.terminal.ForceStdin(text);
 
@@ -50,6 +49,7 @@ namespace _COBRA_
                 {
                     if (exe.line.signal.HasFlag(SIGNALS.SAVE))
                         exe.Stdout("Saving file...");
+                    exe.line.NoLintNoRead();
                     yield return new(CMD_STATES.FULLSCREEN_write);
                 }
             }

@@ -56,6 +56,13 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
+            public void NoLintNoRead()
+            {
+                linter.last_i = read_i = text.Length;
+                linter.sb.Clear();
+                linter.sb.Append(text);
+            }
+
             public void EndLint(in Color color)
             {
                 if (!signal.HasFlag(SIGNALS.LINT))

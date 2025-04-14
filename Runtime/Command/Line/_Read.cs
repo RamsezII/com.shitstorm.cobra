@@ -8,17 +8,6 @@ namespace _COBRA_
     {
         partial class Line
         {
-            public bool TryReadAny(out string any)
-            {
-                if (HasNext(true))
-                    return Util_cobra.TryReadArgument(text, out start_i, ref read_i, out any, false);
-                else
-                {
-                    any = string.Empty;
-                    return false;
-                }
-            }
-
             public bool TryReadCommandSeparator(out string argument)
             {
                 if (!HasNext(true))
@@ -56,23 +45,6 @@ namespace _COBRA_
                         argument = string.Empty;
                         return false;
                 }
-            }
-
-            public bool TryReadPipe()
-            {
-                text.SkipSpaces(ref this.read_i);
-                LintToThisPosition(Color.white);
-
-                int read_i = this.read_i;
-                bool res = Util_cobra.TryReadPipe(text, ref read_i);
-
-                if (res)
-                {
-                    this.read_i = read_i + 1;
-                    LintToThisPosition(linter.pipe);
-                }
-
-                return res;
             }
 
             public bool HasNext(in bool save_move)
