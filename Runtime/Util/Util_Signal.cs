@@ -15,6 +15,7 @@ namespace _COBRA_
         _cpl,
         _tab,
         _alt,
+        _hist,
         _up,
         _down,
         _left,
@@ -37,6 +38,7 @@ namespace _COBRA_
         CPL = 1 << SIGNALS_enum._cpl,
         TAB = 1 << SIGNALS_enum._tab,
         ALT = 1 << SIGNALS_enum._alt,
+        HIST = 1 << SIGNALS_enum._hist,
         UP = 1 << SIGNALS_enum._up,
         RIGHT = 1 << SIGNALS_enum._right,
         DOWN = 1 << SIGNALS_enum._down,
@@ -49,6 +51,9 @@ namespace _COBRA_
         ALT_RIGHT = CPL_ALT | RIGHT,
         ALT_DOWN = CPL_ALT | DOWN,
         ALT_LEFT = CPL_ALT | LEFT,
+
+        HIST_UP = HIST | UP,
+        HIST_DOWN = HIST | DOWN,
 
         STDIN_CHANGE = LINT | VALIDATE,
     }
