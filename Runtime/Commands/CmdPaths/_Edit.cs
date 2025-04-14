@@ -38,12 +38,15 @@ namespace _COBRA_
                 path = exe.shell.PathCheck(path, PathModes.ForceFull);
 
                 string text = string.Empty;
-                if (File.Exists(path))
+                if (!force && !File.Exists(path))
                 {
-                    yield return new(CMD_STATES.FULLSCREEN_write);
-                    text = File.ReadAllText(path);
-                    exe.shell.terminal.ForceStdin(text);
+                    Debug.LogWarning($"[ERROR] {exe} trying to edit none existing file at: '{path}'\nuse {flag_force_file} if this was intended.");
+                    yield break;
                 }
+
+                yield return new(CMD_STATES.FULLSCREEN_write);
+                text = File.ReadAllText(path);
+                exe.shell.terminal.ForceStdin(text);
 
                 while (true)
                 {

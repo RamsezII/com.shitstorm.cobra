@@ -39,7 +39,7 @@ namespace _COBRA_
                 if (arg.StartsWith("./", StringComparison.OrdinalIgnoreCase) || arg.StartsWith("..", StringComparison.OrdinalIgnoreCase))
                     arg = shell.PathCheck(arg, PathModes.TryLocal);
 
-                string parent_dir = Path.GetDirectoryName(full_path);
+                string parent_dir = string.IsNullOrWhiteSpace(arg) ? shell.working_dir : Path.GetDirectoryName(full_path);
                 if (!Directory.Exists(parent_dir))
                     parent_dir = shell.working_dir;
 
@@ -61,7 +61,7 @@ namespace _COBRA_
             {
                 string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool arg_rooted, out bool arg_in_workdir);
 
-                string parent_dir = Path.GetDirectoryName(full_path);
+                string parent_dir = string.IsNullOrWhiteSpace(arg) ? shell.working_dir : Path.GetDirectoryName(full_path);
                 if (!Directory.Exists(parent_dir))
                     parent_dir = shell.working_dir;
 
