@@ -22,6 +22,19 @@ namespace _COBRA_et
                 {
                     exe.Stdout(exe.args[0]);
                 });
+
+            Command.static_domain.AddAction(
+                "path-test",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.BOTH))
+                        ;
+                },
+                action: static exe =>
+                {
+
+                });
         }
     }
 }

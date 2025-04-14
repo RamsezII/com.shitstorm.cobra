@@ -15,7 +15,7 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.line.TryRead_one_flag(exe, out string flag, flag_count_down))
+                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, flag_count_down))
                         exe.opts.Add(flag_count_down, true);
                 },
                 args: static exe =>

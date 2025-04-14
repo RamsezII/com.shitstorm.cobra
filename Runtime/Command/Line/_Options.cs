@@ -8,7 +8,32 @@ namespace _COBRA_
     {
         partial class Line
         {
-            public bool TryRead_one_flag(in Executor executor, out string output, params string[] flags)
+            public bool TryRead_one_flag(in Executor executor, params string[] flags)
+            {
+                SkipLintToThisPosition();
+
+                if (TryReadArgument(out string split, completions: flags, complete_if_option: true, strict: false, lint: false))
+                    if (!split.StartsWith('-'))
+                    {
+                        ReadBack();
+                        return false;
+                    }
+                    else if (flags.Contains(split, StringComparer.OrdinalIgnoreCase))
+                    {
+                        LintToThisPosition(linter.option);
+                        return true;
+                    }
+                    else
+                    {
+                        ReadBack();
+                        LintToThisPosition(linter.error);
+                        executor.error = $"wrong flag '{split}'";
+                        return false;
+                    }
+                return false;
+            }
+
+            public bool TryRead_one_of_the_flags(in Executor executor, out string output, params string[] flags)
             {
                 output = string.Empty;
                 HashSet<string> flags_remaining = new(flags, StringComparer.OrdinalIgnoreCase);

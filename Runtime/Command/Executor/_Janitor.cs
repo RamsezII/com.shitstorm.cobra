@@ -96,7 +96,15 @@ namespace _COBRA_
                             if (exe.background)
                                 exe.LogBackgroundStart();
 
-                            exe.command.action(exe);
+                            try
+                            {
+                                exe.command.action(exe);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogException(e);
+                            }
+
                             exe.Dispose();
                         }
 
@@ -107,8 +115,16 @@ namespace _COBRA_
                                 exe.LogBackgroundStart();
                             exe.started = true;
 
-                            if (!exe.routine.MoveNext())
+                            try
+                            {
+                                if (!exe.routine.MoveNext())
+                                    exe.Dispose();
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogException(e);
                                 exe.Dispose();
+                            }
                         }
 
                     exe.line = null;

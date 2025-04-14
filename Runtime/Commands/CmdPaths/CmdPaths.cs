@@ -7,7 +7,8 @@ namespace _COBRA_
     internal static partial class CmdPaths
     {
         const string
-            opt_search_pattern = "--search-pattern";
+            opt_search_pattern = "--search-pattern",
+            flag_recursive = "--recursive";
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -25,19 +26,6 @@ namespace _COBRA_
                 "reset-working-dir",
                 action: static exe => exe.shell.work_dir = NUCLEOR.home_path
                 );
-
-            Command.static_domain.AddAction(
-                "path-test",
-                min_args: 1,
-                args: static exe =>
-                {
-                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.BOTH))
-                        ;
-                },
-                action: static exe =>
-                {
-
-                });
 
             Command.static_domain.AddAction(
                 "ls",
@@ -90,6 +78,36 @@ namespace _COBRA_
                     Directory.CreateDirectory(path);
                 },
                 aliases: "mkdir");
+
+            Command.static_domain.AddAction(
+                "remove-directory",
+                min_args: 1,
+                opts: static exe =>
+                {
+                    if (exe.line.TryRead_one_flag(exe, "-r", flag_recursive))
+                        exe.opts.Add(flag_recursive, null);
+                },
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string path, strict: true, path_mode: PATH_FLAGS.DIRECTORY))
+                        exe.args.Add(path);
+                },
+                action: static exe =>
+                {
+                    bool recursive = exe.opts.ContainsKey(flag_recursive);
+                    string path = (string)exe.args[0];
+                    path = path.SafeRootedPath(exe.shell.work_dir);
+
+                    try
+                    {
+                        Directory.Delete(path, recursive);
+                    }
+                    catch (IOException ioe)
+                    {
+                        Debug.LogException(ioe);
+                        Debug.LogWarning($"use the '{flag_recursive}' flag if you want to remove recursively (including inside content)");
+                    }
+                });
         }
     }
 }
