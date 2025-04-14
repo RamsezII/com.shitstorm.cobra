@@ -32,17 +32,24 @@ namespace _COBRA_
                     LintToThisPosition(linter.path);
             }
 
-            void PathCompletion_tab(in string arg, in PATH_FLAGS flags, out IEnumerable<string> candidates)
+            void PathCompletion_tab(string arg, in PATH_FLAGS flags, out IEnumerable<string> candidates)
             {
-                string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool try_local, out bool is_local_to_shell);
+                string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool arg_rooted, out bool arg_in_workdir);
+
+                if (arg.StartsWith("./", StringComparison.OrdinalIgnoreCase) || arg.StartsWith("..", StringComparison.OrdinalIgnoreCase))
+                    arg = shell.PathCheck(arg, PathModes.TryLocal);
+
+                string parent_dir = Path.GetDirectoryName(full_path);
+                if (!Directory.Exists(parent_dir))
+                    parent_dir = shell.working_dir;
 
                 candidates = flags switch
                 {
-                    PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(shell.working_dir),
-                    _ => Directory.EnumerateFileSystemEntries(shell.working_dir),
+                    PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(parent_dir),
+                    _ => Directory.EnumerateFileSystemEntries(parent_dir),
                 };
 
-                candidates = candidates.Select(path => shell.PathCheck(path, is_local_to_shell ? PathModes.TryLocal : PathModes.ForceFull));
+                candidates = candidates.Select(path => shell.PathCheck(path, arg_rooted ? PathModes.ForceFull : PathModes.TryLocal));
 
                 string[] array = ECompletionCandidates_tab(arg, candidates).ToArray();
                 if (array.Length == 0)
@@ -52,7 +59,7 @@ namespace _COBRA_
 
             void PathCompletion_alt(in string arg, in PATH_FLAGS flags, out IEnumerable<string> candidates)
             {
-                string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool arg_rooted, out bool is_local);
+                string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool arg_rooted, out bool arg_in_workdir);
 
                 string parent_dir = Path.GetDirectoryName(full_path);
                 if (!Directory.Exists(parent_dir))
@@ -66,7 +73,7 @@ namespace _COBRA_
                         _ => Directory.EnumerateFileSystemEntries(parent_dir),
                     };
 
-                    candidates = candidates.Select(path => shell.PathCheck(path, is_local ? PathModes.TryLocal : PathModes.ForceFull));
+                    candidates = candidates.Select(path => shell.PathCheck(path, arg_rooted ? PathModes.ForceFull : PathModes.TryLocal));
 
                     string[] dirs = candidates.ToArray();
 
@@ -88,7 +95,7 @@ namespace _COBRA_
                     InsertCompletionCandidate(dirs[cpl_index]);
                 }
                 else if (signal.HasFlag(SIGNALS.LEFT))
-                    InsertCompletionCandidate(shell.PathCheck(parent_dir, is_local ? PathModes.TryLocal : PathModes.ForceFull));
+                    InsertCompletionCandidate(shell.PathCheck(parent_dir, arg_rooted ? PathModes.ForceFull : PathModes.TryLocal));
                 else if (signal.HasFlag(SIGNALS.RIGHT))
                 {
                     candidates = flags switch
@@ -99,7 +106,7 @@ namespace _COBRA_
 
                     foreach (string fs in candidates)
                     {
-                        InsertCompletionCandidate(shell.PathCheck(fs, is_local ? PathModes.TryLocal : PathModes.ForceFull));
+                        InsertCompletionCandidate(shell.PathCheck(fs, arg_rooted ? PathModes.ForceFull : PathModes.TryLocal));
                         break;
                     }
                 }

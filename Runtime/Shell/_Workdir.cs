@@ -44,7 +44,11 @@ namespace _COBRA_
         {
             try
             {
-                was_rooted = Path.IsPathRooted(path);
+                if (string.IsNullOrWhiteSpace(path))
+                    was_rooted = false;
+                else
+                    was_rooted = Path.IsPathRooted(path);
+
                 string result_path = path;
 
                 if (!was_rooted)
