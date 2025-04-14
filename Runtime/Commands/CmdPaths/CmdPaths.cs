@@ -8,7 +8,8 @@ namespace _COBRA_
     {
         const string
             opt_search_pattern = "--search-pattern",
-            flag_recursive = "--recursive";
+            flag_recursive = "--recursive",
+            flag_create_if_empty = "--create-if-empty";
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -20,12 +21,12 @@ namespace _COBRA_
 
             Command.static_domain.AddAction(
                 "working-directory",
-                action: static exe => exe.Stdout(exe.shell.work_dir),
+                action: static exe => exe.Stdout(exe.shell.working_dir),
                 aliases: "wdir");
 
             Command.static_domain.AddAction(
                 "reset-working-dir",
-                action: static exe => exe.shell.work_dir = NUCLEOR.home_path
+                action: static exe => exe.shell.working_dir = NUCLEOR.home_path
                 );
 
             Command.static_domain.AddAction(
@@ -42,8 +43,8 @@ namespace _COBRA_
                     if (exe.opts.TryGetValue(opt_search_pattern, out object value))
                         search_pattern = (string)value;
 
-                    foreach (string dir in Directory.EnumerateFileSystemEntries(exe.shell.work_dir, search_pattern))
-                        exe.Stdout(Path.GetRelativePath(exe.shell.work_dir, dir));
+                    foreach (string dir in Directory.EnumerateFileSystemEntries(exe.shell.working_dir, search_pattern))
+                        exe.Stdout(Path.GetRelativePath(exe.shell.working_dir, dir));
                 });
 
             Command.static_domain.AddAction(
@@ -57,7 +58,7 @@ namespace _COBRA_
                 action: static exe =>
                 {
                     string path = (string)exe.args[0];
-                    path = path.SafeRootedPath(exe.shell.work_dir);
+                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
 
                     string text = File.ReadAllText(path);
                     exe.Stdout(text);
@@ -80,7 +81,7 @@ namespace _COBRA_
                 action: static exe =>
                 {
                     string path = (string)exe.args[0];
-                    path = path.SafeRootedPath(exe.shell.work_dir);
+                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
                     Directory.CreateDirectory(path);
                 },
                 aliases: "mkdir");
@@ -102,7 +103,7 @@ namespace _COBRA_
                 {
                     bool recursive = exe.opts.ContainsKey(flag_recursive);
                     string path = (string)exe.args[0];
-                    path = path.SafeRootedPath(exe.shell.work_dir);
+                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
 
                     try
                     {
@@ -135,7 +136,7 @@ namespace _COBRA_
                 {
                     bool recursive = exe.opts.ContainsKey(flag_recursive);
                     string path = (string)exe.args[0];
-                    path = path.SafeRootedPath(exe.shell.work_dir);
+                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
 
                     try
                     {

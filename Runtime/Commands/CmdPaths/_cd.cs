@@ -9,19 +9,36 @@ namespace _COBRA_
             Command.static_domain.AddAction(
                 "change-directory",
                 min_args: 1,
+                opts: static exe =>
+                {
+                    if (exe.line.TryRead_one_flag(exe, flag_create_if_empty))
+                        exe.opts.Add(flag_create_if_empty, null);
+                },
                 args: static exe =>
                 {
+                    bool flag_create = exe.opts.ContainsKey(flag_create_if_empty);
                     if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.DIRECTORY))
-                        if (Directory.Exists(path))
+                    {
+                        path = exe.shell.PathCheck(path, PathModes.ForceFull);
+                        if (flag_create || Directory.Exists(path))
                             exe.args.Add(path);
                         else
                             exe.error = $"unexistant directory: '{path}'";
+                    }
                 },
                 action: static exe =>
                 {
-                    string path = ((string)exe.args[0]).SafeRootedPath(exe.shell.work_dir);
+                    bool flag_create = exe.opts.ContainsKey(flag_create_if_empty);
+                    string path = (string)exe.args[0];
+                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
+
                     if (Directory.Exists(path))
-                        exe.shell.work_dir = path;
+                        exe.shell.working_dir = path;
+                    else if (flag_create)
+                    {
+                        Directory.CreateDirectory(path);
+                        exe.shell.working_dir = path;
+                    }
                     else
                         exe.error = $"unexistant directory: '{path}'";
                 },

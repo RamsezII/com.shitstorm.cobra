@@ -14,7 +14,7 @@ namespace _COBRA_
                 string full_path = arg_last;
                 try
                 {
-                    full_path = full_path.SafeRootedPath(shell.work_dir);
+                    full_path = shell.PathCheck(full_path, PathModes.ForceFull);
                 }
                 catch (Exception e)
                 {
@@ -34,16 +34,15 @@ namespace _COBRA_
 
             void PathCompletion_tab(in string arg, in PATH_FLAGS flags, out IEnumerable<string> candidates)
             {
-                string full_path = arg.SafeRootedPath(shell.work_dir);
-                string parent_dir = Path.GetDirectoryName(full_path);
+                string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool try_local, out bool is_local_to_shell);
 
                 candidates = flags switch
                 {
-                    PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(parent_dir),
-                    _ => Directory.EnumerateFileSystemEntries(parent_dir),
+                    PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(shell.working_dir),
+                    _ => Directory.EnumerateFileSystemEntries(shell.working_dir),
                 };
 
-                candidates = candidates.Select(path => path.SafeRootedPath(shell.work_dir));
+                candidates = candidates.Select(path => shell.PathCheck(path, is_local_to_shell ? PathModes.TryLocal : PathModes.ForceFull));
 
                 string[] array = ECompletionCandidates_tab(arg, candidates).ToArray();
                 if (array.Length == 0)
@@ -53,8 +52,11 @@ namespace _COBRA_
 
             void PathCompletion_alt(in string arg, in PATH_FLAGS flags, out IEnumerable<string> candidates)
             {
-                string full_path = arg.SafeRootedPath(shell.work_dir);
+                string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool arg_rooted, out bool is_local);
+
                 string parent_dir = Path.GetDirectoryName(full_path);
+                if (!Directory.Exists(parent_dir))
+                    parent_dir = shell.working_dir;
 
                 if (HasFlags_any(SIGNALS.UP | SIGNALS.DOWN))
                 {
@@ -64,13 +66,14 @@ namespace _COBRA_
                         _ => Directory.EnumerateFileSystemEntries(parent_dir),
                     };
 
-                    candidates = candidates.Select(path => path.SafeRootedPath(shell.work_dir));
+                    candidates = candidates.Select(path => shell.PathCheck(path, is_local ? PathModes.TryLocal : PathModes.ForceFull));
 
                     string[] dirs = candidates.ToArray();
 
-                    int indexOf = Array.IndexOf(dirs, full_path);
-                    if (indexOf >= 0)
-                    {
+                    int indexOf = Array.IndexOf(dirs, arg);
+                    if (indexOf == -1)
+                        cpl_index = 0;
+                    else
                         cpl_index = indexOf + signal switch
                         {
                             SIGNALS s when s.HasFlag(SIGNALS.UP) => -1,
@@ -78,23 +81,25 @@ namespace _COBRA_
                             _ => 0,
                         };
 
-                        cpl_index %= dirs.Length;
-                        if (cpl_index < 0)
-                            cpl_index += dirs.Length;
-                    }
-                    else
-                        cpl_index = 0;
+                    while (cpl_index < 0)
+                        cpl_index += dirs.Length;
+                    cpl_index %= dirs.Length;
 
                     InsertCompletionCandidate(dirs[cpl_index]);
                 }
                 else if (signal.HasFlag(SIGNALS.LEFT))
-                    InsertCompletionCandidate(parent_dir);
+                    InsertCompletionCandidate(shell.PathCheck(parent_dir, is_local ? PathModes.TryLocal : PathModes.ForceFull));
                 else if (signal.HasFlag(SIGNALS.RIGHT))
                 {
-                    candidates = Directory.EnumerateFileSystemEntries(full_path);
+                    candidates = flags switch
+                    {
+                        PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(full_path),
+                        _ => Directory.EnumerateFileSystemEntries(full_path),
+                    };
+
                     foreach (string fs in candidates)
                     {
-                        InsertCompletionCandidate(fs.SafeRootedPath(shell.work_dir));
+                        InsertCompletionCandidate(shell.PathCheck(fs, is_local ? PathModes.TryLocal : PathModes.ForceFull));
                         break;
                     }
                 }
