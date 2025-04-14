@@ -39,9 +39,8 @@ namespace _COBRA_
 
                 candidates = flags switch
                 {
-                    PATH_FLAGS.FILE => Directory.EnumerateFiles(parent_dir),
                     PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(parent_dir),
-                    _ => Directory.EnumerateDirectories(parent_dir),
+                    _ => Directory.EnumerateFileSystemEntries(parent_dir),
                 };
 
                 candidates = candidates.Select(path => path.SafeRootedPath(shell.work_dir));
@@ -61,9 +60,8 @@ namespace _COBRA_
                 {
                     candidates = flags switch
                     {
-                        PATH_FLAGS.FILE => Directory.EnumerateFiles(parent_dir),
                         PATH_FLAGS.DIRECTORY => Directory.EnumerateDirectories(parent_dir),
-                        _ => Directory.EnumerateDirectories(parent_dir),
+                        _ => Directory.EnumerateFileSystemEntries(parent_dir),
                     };
 
                     candidates = candidates.Select(path => path.SafeRootedPath(shell.work_dir));

@@ -51,8 +51,8 @@ namespace _COBRA_
                     var janitor = front_janitors[^1];
                     if (!janitor.TryExecuteCurrent(line, out _))
                     {
-                        front_janitors.RemoveAt(front_janitors.Count - 1);
                         janitor.Dispose();
+                        front_janitors.Remove(janitor);
                         goto before_active_executors;
                     }
                 }

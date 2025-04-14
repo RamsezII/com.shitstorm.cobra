@@ -16,6 +16,7 @@ namespace _COBRA_
         static void OnAfterSceneLoad()
         {
             Init_cd();
+            Init_edit();
 
             Command.static_domain.AddAction(
                 "working-directory",
@@ -50,11 +51,16 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-
+                    if (exe.line.TryReadArgument(out string path, strict: true, path_mode: PATH_FLAGS.FILE))
+                        exe.args.Add(path);
                 },
                 action: static exe =>
                 {
+                    string path = (string)exe.args[0];
+                    path = path.SafeRootedPath(exe.shell.work_dir);
 
+                    string text = File.ReadAllText(path);
+                    exe.Stdout(text);
                 },
                 aliases: "cat");
 
@@ -78,6 +84,39 @@ namespace _COBRA_
                     Directory.CreateDirectory(path);
                 },
                 aliases: "mkdir");
+
+            Command.static_domain.AddAction(
+                "rm",
+                min_args: 1,
+                opts: static exe =>
+                {
+                    if (exe.line.TryRead_one_flag(exe, "-r", flag_recursive))
+                        exe.opts.Add(flag_recursive, null);
+                },
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string path, strict: true, path_mode: PATH_FLAGS.DIRECTORY))
+                        exe.args.Add(path);
+                },
+                action: static exe =>
+                {
+                    bool recursive = exe.opts.ContainsKey(flag_recursive);
+                    string path = (string)exe.args[0];
+                    path = path.SafeRootedPath(exe.shell.work_dir);
+
+                    try
+                    {
+                        if (Directory.Exists(path))
+                            Directory.Delete(path, recursive);
+                        if (File.Exists(path))
+                            File.Delete(path);
+                    }
+                    catch (IOException ioe)
+                    {
+                        Debug.LogException(ioe);
+                        Debug.LogWarning($"use the '{flag_recursive}' flag if you want to remove recursively (including inside content)");
+                    }
+                });
 
             Command.static_domain.AddAction(
                 "remove-directory",

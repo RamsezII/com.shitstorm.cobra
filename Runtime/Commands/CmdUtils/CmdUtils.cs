@@ -1,6 +1,5 @@
 ﻿using _ARK_;
 using System;
-using System.IO;
 using UnityEngine;
 
 namespace _COBRA_
@@ -13,7 +12,6 @@ namespace _COBRA_
             Init_Args();
             InitManual();
             InitGrep();
-            InitEdit();
             InitLinter();
             Init_If_Else();
             Init_Skip();
