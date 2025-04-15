@@ -8,7 +8,6 @@ namespace _COBRA_
         public sealed partial class Line
         {
             public readonly Shell shell;
-            public readonly ITerminal terminal;
             public readonly Linter linter = new();
             public string text;
             public bool notEmpty;
@@ -37,18 +36,20 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            public Line(in string text, in SIGNALS signal, in ITerminal terminal, in int cursor_i = default, in int cpl_index = default)
+            public Line(in string text, in SIGNALS signal, in Shell shell, in int cursor_i = default, in int cpl_index = default)
             {
                 notEmpty = !string.IsNullOrWhiteSpace(text);
                 this.text = notEmpty ? text : string.Empty;
                 this.signal = signal;
-                this.terminal = terminal;
+                this.shell = shell;
                 this.cursor_i = cursor_i;
                 this.cpl_index = cpl_index;
 
-                shell = terminal?.GetShell;
-                linter = terminal?.GetLinter;
-                linter?.Clear();
+                if (shell != null)
+                {
+                    linter = shell.terminal?.GetLinter;
+                    linter?.Clear();
+                }
             }
         }
     }

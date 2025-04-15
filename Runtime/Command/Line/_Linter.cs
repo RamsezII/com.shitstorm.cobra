@@ -36,10 +36,10 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                public string GetLint(in ITerminal terminal, in string input, out Line line)
+                public string GetLint(in Shell shell, in string input, out Line line)
                 {
-                    line = new(input, SIGNALS.LINT, terminal);
-                    terminal.GetShell.PropagateLine(line);
+                    line = new(input, SIGNALS.LINT, shell);
+                    shell.PropagateLine(line);
                     line.EndLint(error);
                     string res = sb.PullValue();
                     Clear();

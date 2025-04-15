@@ -7,5 +7,6 @@
         void ToggleWindow(bool toggle);
         void ForceSelectStdin();
         void SetStdin(string text);
+        void AddLine(in object line, in string lint);
     }
 }

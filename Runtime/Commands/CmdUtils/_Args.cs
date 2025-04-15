@@ -31,7 +31,7 @@ namespace _COBRA_
                         _ => data.ToString(),
                     };
 
-                    Command.Line line = new(cmd_line, exe.line.signal, exe.line.terminal);
+                    Command.Line line = new(cmd_line, exe.line.signal, exe.shell);
                     Command.Executor exe2 = (Command.Executor)exe.args[0];
                     exe2.ParseArguments(line);
 

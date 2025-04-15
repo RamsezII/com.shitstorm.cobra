@@ -24,7 +24,7 @@ namespace _COBRA_
                 }
         }
 
-        void UpdateUpdateJanitors() => PropagateLine(new Command.Line(string.Empty, SIGNALS.TICK, terminal));
+        void UpdateUpdateJanitors() => PropagateLine(new Command.Line(string.Empty, SIGNALS.TICK, this));
         public string PropagateLine(in Command.Line line)
         {
             string error = null;

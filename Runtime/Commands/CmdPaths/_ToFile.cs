@@ -5,9 +5,13 @@ namespace _COBRA_
 {
     partial class CmdPaths
     {
+        internal static Command cmd_tofile;
+
+        //--------------------------------------------------------------------------------------------------------------
+
         static void Init_ToFile()
         {
-            Command.static_domain.AddPipe(
+            cmd_tofile = Command.static_domain.AddPipe(
                 "to-file",
                 min_args: 1,
                 opts: static exe =>

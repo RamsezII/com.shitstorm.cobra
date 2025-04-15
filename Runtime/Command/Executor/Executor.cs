@@ -1,5 +1,4 @@
-﻿using _ARK_;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -190,11 +189,18 @@ namespace _COBRA_
                 return true;
             }
 
-            public void Stdout(in object data)
+            public void Stdout(in object data, string lint = null)
             {
+                if (string.IsNullOrEmpty(lint))
+                    lint = data.ToString();
+
                 stdout_exe.line = line;
-                if (stdout_exe != exe_log)
+
+                if (stdout_exe == exe_log)
+                    ;
+                else
                     stdout_exe.janitor = janitor;
+
                 stdout_exe.command.on_pipe(stdout_exe, data);
                 stdout_exe.line = null;
             }
