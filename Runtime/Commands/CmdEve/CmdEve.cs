@@ -64,10 +64,10 @@ namespace _COBRA_
 
             static IEnumerator<CMD_STATUS> EMain(Command.Executor exe)
             {
-                yield return new(CMD_STATES.BLOCKING, prefixe: exe.shell.GetPrefixe());
-
                 string request_url = $"https://shitstorm.ovh/texts";
                 string EvePrefixe() => exe.shell.GetPrefixe(cmd_path: "[EVE]" + request_url);
+
+                yield return new(CMD_STATES.WAIT_FOR_STDIN, prefixe: EvePrefixe());
 
                 while (true)
                 {
@@ -80,8 +80,9 @@ namespace _COBRA_
                             exe2.Stdout(exe2.cmd_path);
                         continue;
                     }
+
                     if (false)
-                        if (exe.line.TryReadArgument(out string cmd_name, commands_names, false))
+                        if (exe.line.TryReadArgument(out string cmd_name, out bool is_candidate, commands_names, false))
                             if (!Enum.TryParse(cmd_name, true, out EveCmds code))
                                 exe.error = $"[EVE] Invalid command '{exe.line.arg_last}'";
                             else

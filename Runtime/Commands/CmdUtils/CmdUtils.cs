@@ -31,7 +31,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 action: exe => exe.Stdout(exe.args[0])
@@ -93,7 +93,7 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string prefixe))
+                    if (exe.line.TryReadArgument(out string prefixe, out _))
                         exe.args.Add(prefixe);
                     if (exe.line.TryRead_flags(exe, out var flags, flag_no_white_space))
                         foreach (string flag in flags)

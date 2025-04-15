@@ -11,8 +11,16 @@ namespace _COBRA_
                 for (int i = 0; i < background_janitors.Count; ++i)
                 {
                     var janitor = background_janitors[i];
-                    if (!janitor.TryExecuteCurrent(line, out _))
+                    bool in_activity = janitor.TryExecuteCurrent(line, out _);
+
+                    if (janitor.TryPullError(out string error))
+                        Debug.LogError($"[BACKGROUND_ERROR] janitor[{i}] {error}");
+
+                    if (!in_activity || error != null)
+                    {
+                        janitor.Dispose();
                         background_janitors.RemoveAt(i--);
+                    }
                 }
         }
 
@@ -49,11 +57,17 @@ namespace _COBRA_
                 if (front_janitors.Count > 0)
                 {
                     var janitor = front_janitors[^1];
-                    if (!janitor.TryExecuteCurrent(line, out _))
+                    bool in_activity = janitor.TryExecuteCurrent(line, out _);
+
+                    janitor.TryPullError(out error);
+
+                    if (!in_activity || error != null)
                     {
                         janitor.Dispose();
                         front_janitors.Remove(janitor);
-                        goto before_active_executors;
+
+                        if (error == null)
+                            goto before_active_executors;
                     }
                 }
 
@@ -77,29 +91,30 @@ namespace _COBRA_
                         }
                     }
 
-            if (error == null && line.HasNext(true))
-                if (Command.static_domain.TryReadCommand_path(line, out var path))
-                {
-                    Command.Executor exe = new(this, null, line, path);
-                    if (exe.error != null)
+            if (front_janitors.Count == 0)
+                if (error == null && line.HasNext(true))
+                    if (Command.static_domain.TryReadCommand_path(line, out var path))
                     {
-                        error = exe.error;
-                        exe.Dispose();
+                        Command.Executor exe = new(this, null, line, path);
+                        if (exe.error != null)
+                        {
+                            error = exe.error;
+                            exe.Dispose();
+                        }
+                        else if (line.signal.HasFlag(SIGNALS.EXEC))
+                            if (exe.background)
+                            {
+                                exe.PropagateBackground();
+                                background_janitors.Add(new Command.Executor.Janitor(exe));
+                            }
+                            else
+                            {
+                                pending_executors.Enqueue(exe);
+                                goto before_pending_queue;
+                            }
                     }
-                    else if (line.signal.HasFlag(SIGNALS.EXEC))
-                        if (exe.background)
-                        {
-                            exe.PropagateBackground();
-                            background_janitors.Add(new Command.Executor.Janitor(exe));
-                        }
-                        else
-                        {
-                            pending_executors.Enqueue(exe);
-                            goto before_pending_queue;
-                        }
-                }
-                else if (!string.IsNullOrWhiteSpace(line.arg_last))
-                    error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
+                    else if (!string.IsNullOrWhiteSpace(line.arg_last))
+                        error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
 
             previous_state = current_status.state;
             if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe))

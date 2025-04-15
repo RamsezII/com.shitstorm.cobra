@@ -13,7 +13,7 @@ namespace _COBRA_
                 opts: static exe => exe.opts.Add("i", 0),
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         if (int.TryParse(arg, out int count))
                             exe.args.Add(count);
                         else

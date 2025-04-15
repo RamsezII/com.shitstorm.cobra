@@ -13,7 +13,7 @@ namespace _COBRA_et
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg, new string[] { "tiz", "taz", "toz", }, strict: true))
+                    if (exe.line.TryReadArgument(out string arg, out bool is_candidate, new string[] { "tiz", "taz", "toz", }) && is_candidate)
                         exe.args.Add(arg);
                     else
                         exe.error = $"invalid arg ('{exe.line.arg_last}')";
@@ -21,19 +21,6 @@ namespace _COBRA_et
                 action: static exe =>
                 {
                     exe.Stdout(exe.args[0]);
-                });
-
-            Command.static_domain.AddAction(
-                "path-test",
-                min_args: 1,
-                args: static exe =>
-                {
-                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.BOTH))
-                        ;
-                },
-                action: static exe =>
-                {
-
                 });
         }
     }

@@ -53,13 +53,14 @@ namespace _COBRA_
             line.LintToThisPosition(Color.white);
 
             bool res = TryReadCommand_ref(line, this, pipe_only, path);
-
             if (res)
                 line.LintToThisPosition(line.linter.command);
             else
+            {
+                path = null;
                 line.LintToThisPosition(line.linter.error);
-
-            return res;
+            }
+            return res && path != null && path.Count > 0;
 
             static bool TryReadCommand_ref(in Line line, Command domain, bool pipe_only, in List<Command> path)
             {
@@ -67,7 +68,7 @@ namespace _COBRA_
                 if (pipe_only)
                     keys = keys.Where(keys => domain._commands[keys].on_pipe != null);
 
-                if (line.TryReadArgument(out string cmd_name, keys, strict: false, lint: false) && (!pipe_only || keys.Contains(cmd_name)) && domain._commands.TryGetValue(cmd_name, out Command intermediate))
+                if (line.TryReadArgument(out string cmd_name, out bool is_candidate, keys, lint: false) && (!pipe_only || is_candidate) && domain._commands.TryGetValue(cmd_name, out Command intermediate))
                 {
                     path.Add(intermediate);
                     if (intermediate.IsDomain)
@@ -75,6 +76,7 @@ namespace _COBRA_
                 }
                 else
                     line.ReadBack();
+
                 return path.Count > 0;
             }
         }

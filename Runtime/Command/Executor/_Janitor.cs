@@ -16,11 +16,27 @@ namespace _COBRA_
                 static ushort id_counter;
                 public readonly ushort pipeline_ID = ++id_counter;
 
+                internal string error;
+
                 //--------------------------------------------------------------------------------------------------------------
 
                 internal Janitor(in Executor executor) => AddExecutor(executor);
 
                 //--------------------------------------------------------------------------------------------------------------
+
+                internal bool TryPullError(out string error)
+                {
+                    error = this.error;
+                    this.error = null;
+                    return error != null;
+                }
+
+                internal string PullError()
+                {
+                    string err = error;
+                    error = null;
+                    return err;
+                }
 
                 internal void AddExecutor(in Executor executor)
                 {
@@ -99,6 +115,8 @@ namespace _COBRA_
                             try
                             {
                                 exe.command.action(exe);
+                                if (exe.error != null)
+                                    error = $"{this} {exe} {exe.error}";
                             }
                             catch (Exception e)
                             {
@@ -109,23 +127,29 @@ namespace _COBRA_
                         }
 
                     if (exe.routine != null)
-                        if (exe.started || line.signal.HasFlag(SIGNALS.TICK))
+                    {
+                        if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
                         {
                             if (!exe.started && exe.background)
                                 exe.LogBackgroundStart();
                             exe.started = true;
-
-                            try
-                            {
-                                if (!exe.routine.MoveNext())
-                                    exe.Dispose();
-                            }
-                            catch (Exception e)
-                            {
-                                Debug.LogException(e);
-                                exe.Dispose();
-                            }
                         }
+
+                        try
+                        {
+                            bool has_next = exe.routine.MoveNext();
+                            if (exe.error != null)
+                                error = $"{this} {exe} {exe.error}";
+
+                            if (!has_next || error != null)
+                                exe.Dispose();
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogException(e);
+                            exe.Dispose();
+                        }
+                    }
 
                     exe.line = null;
 

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 
 namespace _COBRA_
@@ -23,7 +22,7 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     bool force = exe.opts.ContainsKey(flag_force_file);
-                    if (exe.line.TryReadArgument(out string path, strict: !force, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.FILE))
                         exe.args.Add(path);
                 },
                 action: static exe =>

@@ -17,7 +17,7 @@ namespace _COBRA_
                     if (exe.line.TryRead_options_with_allowed_values(exe, new(StringComparer.OrdinalIgnoreCase) { { "--option", new[] { "yes", "no", "maybe", } } }, out var output))
                         ;
 
-                    while (exe.line.TryReadArgument(out string arg, dict.Keys, lint: false))
+                    while (exe.line.TryReadArgument(out string arg, out bool is_candidate, dict.Keys, lint: false))
                         if (dict.TryGetValue(arg, out Color color))
                             exe.line.LintToThisPosition(color);
                         else

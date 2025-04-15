@@ -12,7 +12,7 @@ namespace _COBRA_
                 max_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string literal))
+                    if (exe.line.TryReadArgument(out string literal, out _))
                         exe.args.Add(literal);
                 },
                 on_pipe: static (exe, data) =>
@@ -29,8 +29,11 @@ namespace _COBRA_
                 max_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string var_name, variables.Keys))
-                        exe.args.Add(var_name);
+                    if (exe.line.TryReadArgument(out string var_name, out bool is_candidate, variables.Keys))
+                        if (is_candidate)
+                            exe.args.Add(var_name);
+                        else
+                            exe.error = $"unknown var '{var_name}'";
                 },
                 on_pipe: static (exe, data) =>
                 {

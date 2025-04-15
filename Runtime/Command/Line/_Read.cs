@@ -82,9 +82,9 @@ namespace _COBRA_
 
             public bool TryReadArgument(
                 out string argument,
+                out bool is_candidate,
                 IEnumerable<string> completions = null,
                 in bool complete_if_option = false,
-                in bool strict = false,
                 in PATH_FLAGS path_mode = 0,
                 in bool lint = true)
             {
@@ -134,13 +134,7 @@ namespace _COBRA_
                                             ComputeCompletion_alt(argument, completions);
                                 }
 
-                if (strict)
-                    if (completions != null)
-                        if (!completions.Contains(argument))
-                        {
-                            ReadBack();
-                            return false;
-                        }
+                is_candidate = completions != null && completions.Contains(argument);
 
                 return isNotEmpty;
             }

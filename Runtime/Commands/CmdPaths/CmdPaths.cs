@@ -54,8 +54,9 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, strict: true, path_mode: PATH_FLAGS.FILE))
-                        exe.args.Add(path);
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.FILE))
+                        if (is_candidate)
+                            exe.args.Add(path);
                 },
                 action: static exe =>
                 {
@@ -72,7 +73,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.DIRECTORY))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
                         if (Directory.Exists(path))
                             exe.error = $"path already exists: '{path}'";
                         else if (!Path.IsPathFullyQualified(path))
@@ -98,8 +99,9 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, strict: true, path_mode: PATH_FLAGS.DIRECTORY))
-                        exe.args.Add(path);
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
+                        if (is_candidate)
+                            exe.args.Add(path);
                 },
                 action: static exe =>
                 {
@@ -131,8 +133,11 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, strict: true, path_mode: PATH_FLAGS.DIRECTORY))
-                        exe.args.Add(path);
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
+                        if (is_candidate)
+                            exe.args.Add(path);
+                        else
+                            exe.error = $"invalid directory: '{path}'";
                 },
                 action: static exe =>
                 {

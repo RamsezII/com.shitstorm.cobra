@@ -17,7 +17,7 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     bool flag_create = exe.opts.ContainsKey(flag_create_if_empty);
-                    if (exe.line.TryReadArgument(out string path, path_mode: PATH_FLAGS.DIRECTORY))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
                     {
                         path = exe.shell.PathCheck(path, PathModes.ForceFull);
                         if (flag_create || Directory.Exists(path))

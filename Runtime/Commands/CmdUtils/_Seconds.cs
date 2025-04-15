@@ -20,7 +20,7 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(int.Parse(arg));
                 },
                 routine: ERoutineTest);

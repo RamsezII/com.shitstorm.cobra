@@ -46,11 +46,11 @@ namespace _COBRA_
                 opts: null,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
-                        if (variables.TryGetValue(var_name, out object var_value))
+                    if (exe.line.TryReadArgument(out string var_name, out bool is_candidate, variables.Keys, lint: false))
+                        if (is_candidate)
                         {
                             exe.line.LintToThisPosition(exe.line.linter.variable);
-                            exe.args.Add(var_value);
+                            exe.args.Add(variables[var_name]);
                         }
                         else
                             exe.error = $"variable '{var_name}' not found";
@@ -65,12 +65,12 @@ namespace _COBRA_
                 opts: null,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string var_name, variables.Keys, lint: false))
+                    if (exe.line.TryReadArgument(out string var_name, out _, variables.Keys, lint: false))
                     {
                         exe.line.LintToThisPosition(exe.line.linter.variable);
                         exe.args.Add(var_name);
 
-                        if (exe.line.TryReadArgument(out string var_value, lint: false))
+                        if (exe.line.TryReadArgument(out string var_value, out _, lint: false))
                         {
                             exe.line.LintToThisPosition(exe.line.linter.value);
                             exe.args.Add(var_value);

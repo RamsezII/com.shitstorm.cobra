@@ -21,7 +21,7 @@ namespace _COBRA_e
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 routine: ERoutine);

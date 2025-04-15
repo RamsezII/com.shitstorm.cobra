@@ -19,7 +19,7 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     bool create_if_empty = exe.opts.ContainsKey(flag_create_if_empty);
-                    if (exe.line.TryReadArgument(out string path, strict: !create_if_empty, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.FILE))
                         exe.args.Add(path);
                 },
                 on_pipe: static (exe, data) =>
