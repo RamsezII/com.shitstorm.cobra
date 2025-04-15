@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine.Networking;
+using System.Text;
 
 namespace _COBRA_
 {
@@ -15,6 +16,9 @@ namespace _COBRA_
 
             while (!operation.isDone)
                 yield return new(CMD_STATES.BLOCKING, progress: operation.progress);
+
+            while (!eve_exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                yield return new(CMD_STATES.BLOCKING, progress: 1);
 
             if (request.result != UnityWebRequest.Result.Success)
                 cmd_exe.error = $"[EVE] failed to get index: \"{request.result}\"";
@@ -38,13 +42,21 @@ namespace _COBRA_
                                 break;
                         }
 
-                    cmd_exe.Stdout($"{directories.Count} {nameof(directories).SetColor(eve_exe.line.linter.directory)} ; {files.Count} {nameof(files).SetColor(eve_exe.line.linter.file)}");
+                    StringBuilder sb = new(), sb_lint = new();
 
                     for (int i = 0; i < directories.Count; ++i)
-                        cmd_exe.Stdout(directories[i].SetColor(eve_exe.line.linter.directory));
+                    {
+                        sb.Append($"{directories[i]} ");
+                        sb_lint.Append($"{directories[i]} ".SetColor(eve_exe.line.linter.directory));
+                    }
 
                     for (int i = 0; i < files.Count; ++i)
-                        cmd_exe.Stdout(files[i].SetColor(eve_exe.line.linter.file));
+                    {
+                        sb.Append($"{files[i]} ");
+                        sb_lint.Append($"{files[i]} ".SetColor(eve_exe.line.linter.file));
+                    }
+
+                    cmd_exe.Stdout(sb.ToString(), sb_lint.ToString());
                 }
             else
                 cmd_exe.error = $"[EVE] {nginx_error}";

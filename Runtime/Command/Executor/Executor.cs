@@ -17,7 +17,7 @@ namespace _COBRA_
             public Line line;
             internal Janitor janitor;
             public bool background;
-            internal Executor stdout_exe = exe_log, next_exe;
+            internal Executor stdout_exe, next_exe;
             public readonly List<object> args;
             public readonly Dictionary<string, object> opts;
             public IEnumerator<CMD_STATUS> routine;
@@ -172,7 +172,7 @@ namespace _COBRA_
             internal void PropagateBackground()
             {
                 background = true;
-                if (stdout_exe != exe_log)
+                if (stdout_exe != null)
                     stdout_exe.background = true;
                 next_exe?.PropagateBackground();
             }
@@ -194,15 +194,32 @@ namespace _COBRA_
                 if (string.IsNullOrEmpty(lint))
                     lint = data.ToString();
 
-                stdout_exe.line = line;
+                if (stdout_exe == null)
+                    if (line != null && line.shell != null && line.shell.terminal != null)
+                        line.shell.terminal.AddLine(data, lint);
+                    else
+                        switch (data)
+                        {
+                            case IEnumerable<string> lines:
+                                foreach (string line in lines)
+                                    Debug.Log(line);
+                                break;
 
-                if (stdout_exe == exe_log)
-                    ;
+                            case string str:
+                                Debug.Log(str);
+                                break;
+
+                            default:
+                                Debug.Log(data);
+                                break;
+                        }
                 else
+                {
+                    stdout_exe.line = line;
                     stdout_exe.janitor = janitor;
-
-                stdout_exe.command.on_pipe(stdout_exe, data);
-                stdout_exe.line = null;
+                    stdout_exe.command.on_pipe(stdout_exe, data);
+                    stdout_exe.line = null;
+                }
             }
 
             //--------------------------------------------------------------------------------------------------------------
@@ -210,8 +227,7 @@ namespace _COBRA_
             internal void Janitize()
             {
                 if (!disposed)
-                    if (stdout_exe != exe_log)
-                        stdout_exe.Dispose();
+                    stdout_exe?.Dispose();
                 Dispose();
             }
 

@@ -66,8 +66,10 @@ namespace _COBRA_
                             if (cmd_exe.command == cmd_ls)
                                 routine = ELS(eve_exe, cmd_exe, request_url);
 
-                            while (routine.MoveNext())
-                                yield return routine.Current;
+                            do
+                                cmd_exe.line = eve_exe.line;
+                            while (routine.MoveNext());
+                            cmd_exe.line = null;
                         }
                     }
                     yield return new(CMD_STATES.WAIT_FOR_STDIN, prefixe: EvePrefixe());
