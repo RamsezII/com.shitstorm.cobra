@@ -68,14 +68,15 @@ namespace _COBRA_
                 if (pipe_only)
                     keys = keys.Where(keys => domain._commands[keys].on_pipe != null);
 
-                if (line.TryReadArgument(out string cmd_name, out bool is_candidate, keys, lint: false) && (!pipe_only || is_candidate) && domain._commands.TryGetValue(cmd_name, out Command intermediate))
-                {
-                    path.Add(intermediate);
-                    if (intermediate.IsDomain)
-                        return TryReadCommand_ref(line, intermediate, pipe_only, path);
-                }
-                else
-                    line.ReadBack();
+                if (line.TryReadArgument(out string cmd_name, out bool is_candidate, keys, lint: false))
+                    if (is_candidate && domain._commands.TryGetValue(cmd_name, out Command intermediate))
+                    {
+                        path.Add(intermediate);
+                        if (intermediate.IsDomain)
+                            return TryReadCommand_ref(line, intermediate, pipe_only, path);
+                    }
+                    else
+                        line.ReadBack();
 
                 return path.Count > 0;
             }

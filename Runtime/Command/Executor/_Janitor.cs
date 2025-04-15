@@ -115,8 +115,10 @@ namespace _COBRA_
                             try
                             {
                                 exe.command.action(exe);
+
                                 if (exe.error != null)
-                                    error = $"{this} {exe} {exe.error}";
+                                    if (exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                                        error = $"{this} {exe} {exe.error}";
                             }
                             catch (Exception e)
                             {
@@ -138,10 +140,18 @@ namespace _COBRA_
                         try
                         {
                             bool has_next = exe.routine.MoveNext();
-                            if (exe.error != null)
-                                error = $"{this} {exe} {exe.error}";
 
-                            if (!has_next || error != null)
+                            if (exe.error != null)
+                                if (exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                                {
+                                    error = $"{this} {exe} {Util.PullValue(ref exe.error)}";
+                                    Debug.LogError(error);
+                                    exe.Dispose();
+                                }
+                                else
+                                    exe.error = null;
+
+                            if (!has_next)
                                 exe.Dispose();
                         }
                         catch (Exception e)

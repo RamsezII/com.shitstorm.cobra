@@ -124,9 +124,9 @@ namespace _COBRA_
                                         next_exe = exe;
                                 }
                                 else if (is_pipe)
-                                    error = $"{this} failed to pipe into unknown command '{line.arg_last}'";
+                                    error = $"{this} failed to pipe into unknown command ({nameof(line.arg_last)}: '{line.arg_last}')";
                                 else if (is_chain)
-                                    error = $"{this} failed to chain into unknown command '{line.arg_last}'";
+                                    error = $"{this} failed to chain into unknown command ({nameof(line.arg_last)}: '{line.arg_last}')";
                     }
 
                 if (error == null)

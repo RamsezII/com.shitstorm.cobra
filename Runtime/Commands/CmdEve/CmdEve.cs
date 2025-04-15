@@ -78,7 +78,6 @@ namespace _COBRA_
                             exe.error = exe2.error;
                         else if (exe.line.signal.HasFlag(SIGNALS.EXEC))
                             exe2.Stdout(exe2.cmd_path);
-                        continue;
                     }
 
                     if (false)
