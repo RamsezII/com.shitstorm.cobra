@@ -1,6 +1,4 @@
-﻿using _UTIL_;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace _COBRA_
@@ -18,14 +16,7 @@ namespace _COBRA_
                     break;
 
                 default:
-                    if (!eve_tree.TryGetValue(current_path, out NGinxIndex index))
-                        ;
-                    else
-                    {
-                        NGinxIndex.Entry entry = index.entries.FirstOrDefault(entry => entry.name.Equals(arg, StringComparison.OrdinalIgnoreCase));
-                        if (entry != null)
-                            eve_path_list.Add(entry.name);
-                    }
+                    eve_path_list.Add(arg);
                     break;
             }
         }
