@@ -1,26 +1,14 @@
-﻿using _UTIL_;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace _COBRA_
 {
     static internal partial class CmdEve
     {
-        static readonly Dictionary<string, NGinxIndex> eve_tree = new(StringComparer.OrdinalIgnoreCase);
-
         static Command domain_eve, cmd_ls, cmd_cat, cmd_cd;
         const string eve_url = "https://shitstorm.ovh/eve";
 
         static string EvePathToUrl(in string eve_path) => eve_url + "/" + eve_path;
-
-        //--------------------------------------------------------------------------------------------------------------
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void OnBeforeSceneLoad()
-        {
-            eve_tree.Clear();
-        }
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -65,13 +53,6 @@ namespace _COBRA_
                 string EvePrefixe() => eve_exe.shell.GetPrefixe(cmd_path: "[EVE]" + EvePathToUrl(EvePathStr()));
 
                 yield return new(CMD_STATES.WAIT_FOR_STDIN, prefixe: EvePrefixe());
-
-                // init
-                {
-                    var routine = EInitRoot();
-                    while (routine.MoveNext())
-                        yield return new(CMD_STATES.BLOCKING, progress: routine.Current);
-                }
 
                 while (true)
                 {

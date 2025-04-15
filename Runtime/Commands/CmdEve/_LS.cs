@@ -29,27 +29,19 @@ namespace _COBRA_
                 cmd_exe.Stdout(sb.ToString(), sb_lint.ToString());
             }
 
-            if (eve_tree.TryGetValue(eve_path, out NGinxIndex index))
-                Output(eve_exe, cmd_exe, index);
+            string request_url = EvePathToUrl(eve_path);
+            using UnityWebRequest request = UnityWebRequest.Get(request_url);
+            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+
+            while (!operation.isDone)
+                yield return operation.progress;
+
+            if (request.result != UnityWebRequest.Result.Success)
+                Debug.Log($"[EVE] failed to get index: \"{request.result}\" ({nameof(eve_url)}: '{eve_url}')");
+            else if (!request.downloadHandler.text.TryExtractIndex_FromNGinxText(out NGinxIndex index, out string nginx_error))
+                Debug.LogError($"[EVE] {nginx_error}");
             else
-            {
-                string request_url = EvePathToUrl(eve_path);
-                using UnityWebRequest request = UnityWebRequest.Get(request_url);
-                UnityWebRequestAsyncOperation operation = request.SendWebRequest();
-
-                while (!operation.isDone)
-                    yield return operation.progress;
-
-                if (request.result != UnityWebRequest.Result.Success)
-                    Debug.Log($"[EVE] failed to get index: \"{request.result}\" ({nameof(eve_url)}: '{eve_url}')");
-                else if (!request.downloadHandler.text.TryExtractIndex_FromNGinxText(out index, out string nginx_error))
-                    Debug.LogError($"[EVE] {nginx_error}");
-                else
-                {
-                    eve_tree.Add(eve_path, index);
-                    Output(eve_exe, cmd_exe, index);
-                }
-            }
+                Output(eve_exe, cmd_exe, index);
         }
     }
 }
