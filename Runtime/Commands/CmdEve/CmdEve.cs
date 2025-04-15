@@ -1,17 +1,18 @@
 ﻿using _UTIL_;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace _COBRA_
 {
     static internal partial class CmdEve
     {
-        static readonly Dictionary<string, NGinxIndex.Entry> eve_tree = new();
+        static readonly Dictionary<string, NGinxIndex> eve_tree = new(StringComparer.OrdinalIgnoreCase);
 
         static Command domain_eve, cmd_ls, cmd_cat, cmd_cd;
-        const string request_url = "https://shitstorm.ovh/texts";
-        static string CombinedPath(in string eve_path) => Path.Combine(request_url, eve_path).Replace("\\", "/");
+        const string eve_url = "https://shitstorm.ovh/eve";
+
+        static string EvePathToUrl(in string eve_path) => eve_url + "/" + eve_path;
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -38,19 +39,39 @@ namespace _COBRA_
 
             cmd_cat = domain_eve.AddAction(
                 "cat",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string arg, out _))
+                        exe.args.Add(arg);
+                },
                 action: null);
 
             cmd_cd = domain_eve.AddAction(
                 "cd",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string arg, out _))
+                        exe.args.Add(arg);
+                },
                 action: null);
 
             static IEnumerator<CMD_STATUS> EMain(Command.Executor eve_exe)
             {
-                string EvePrefixe() => eve_exe.shell.GetPrefixe(cmd_path: "[EVE]" + request_url);
+                List<string> eve_path_list = new();
 
-                string eve_path = string.Empty;
+                string EvePathStr() => eve_path_list.Join("/").TrimEnd('/');
+                string EvePrefixe() => eve_exe.shell.GetPrefixe(cmd_path: "[EVE]" + EvePathToUrl(EvePathStr()));
 
                 yield return new(CMD_STATES.WAIT_FOR_STDIN, prefixe: EvePrefixe());
+
+                // init
+                {
+                    var routine = EInitRoot();
+                    while (routine.MoveNext())
+                        yield return new(CMD_STATES.BLOCKING, progress: routine.Current);
+                }
 
                 while (true)
                 {
@@ -61,16 +82,31 @@ namespace _COBRA_
                             eve_exe.error = cmd_exe.error;
                         else if (eve_exe.line.signal.HasFlag(SIGNALS.EXEC))
                         {
-                            IEnumerator<CMD_STATUS> routine = null;
+                            IEnumerator<float> routine = null;
 
                             if (cmd_exe.command == cmd_ls)
-                                routine = ELS(eve_exe, cmd_exe, request_url);
+                                routine = E_ls(eve_exe, cmd_exe, EvePathStr());
 
-                            do
-                                cmd_exe.line = eve_exe.line;
-                            while (routine.MoveNext());
-                            cmd_exe.line = null;
+                            if (cmd_exe.command == cmd_cd)
+                                ChangeDirectory(eve_exe, cmd_exe, EvePathStr(), eve_path_list);
+
+                            if (cmd_exe.command == cmd_cat)
+                               routine = EReadFile(eve_exe, cmd_exe, EvePathStr());
+
+                            cmd_exe.line = eve_exe.line;
+                            if (routine != null)
+                                while (routine.MoveNext())
+                                {
+                                    yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: routine.Current);
+                                    cmd_exe.line = eve_exe.line;
+                                }
                         }
+
+                        if (cmd_exe.error != null)
+                            if (eve_exe.line.HasFlags_any(SIGNALS.CHECK | SIGNALS.EXEC | SIGNALS.TICK))
+                                Debug.LogWarning($"[EVE_ERROR] {cmd_exe.error}");
+
+                        cmd_exe.Dispose();
                     }
                     yield return new(CMD_STATES.WAIT_FOR_STDIN, prefixe: EvePrefixe());
                 }

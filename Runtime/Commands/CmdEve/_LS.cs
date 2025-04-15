@@ -1,65 +1,55 @@
 ﻿using _UTIL_;
 using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine.Networking;
 using System.Text;
+using UnityEngine;
+using UnityEngine.Networking;
 
 namespace _COBRA_
 {
     partial class CmdEve
     {
-        static IEnumerator<CMD_STATUS> ELS(Command.Executor eve_exe, Command.Executor cmd_exe, string request_url)
+        static IEnumerator<float> E_ls(Command.Executor eve_exe, Command.Executor cmd_exe, string eve_path)
         {
-            using UnityWebRequest request = UnityWebRequest.Get(request_url);
-            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+            static void Output(in Command.Executor eve_exe, in Command.Executor cmd_exe, in NGinxIndex index)
+            {
+                StringBuilder sb = new(), sb_lint = new();
 
-            while (!operation.isDone)
-                yield return new(CMD_STATES.BLOCKING, progress: operation.progress);
+                for (int i = 0; i < index.entries.Length; ++i)
+                {
+                    NGinxIndex.Entry entry = index.entries[i];
+                    sb.Append(entry.name);
+                    sb_lint.Append($"{entry.name} ".SetColor(entry.GetEntryType switch
+                    {
+                        NGinxIndex.TYPES.DIRECTORY => eve_exe.line.linter.directory,
+                        NGinxIndex.TYPES.FILE => eve_exe.line.linter.file,
+                        _ => eve_exe.line.linter.path,
+                    }));
+                }
 
-            while (!eve_exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
-                yield return new(CMD_STATES.BLOCKING, progress: 1);
+                cmd_exe.Stdout(sb.ToString(), sb_lint.ToString());
+            }
 
-            if (request.result != UnityWebRequest.Result.Success)
-                cmd_exe.error = $"[EVE] failed to get index: \"{request.result}\"";
-            else if (request.downloadHandler.text.TryExtractIndex_FromNGinxText(out var index, out string nginx_error))
-                if (index.entries.Length == 0)
-                    cmd_exe.Stdout("No entries found");
+            if (eve_tree.TryGetValue(eve_path, out NGinxIndex index))
+                Output(eve_exe, cmd_exe, index);
+            else
+            {
+                string request_url = EvePathToUrl(eve_path);
+                using UnityWebRequest request = UnityWebRequest.Get(request_url);
+                UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+
+                while (!operation.isDone)
+                    yield return operation.progress;
+
+                if (request.result != UnityWebRequest.Result.Success)
+                    Debug.Log($"[EVE] failed to get index: \"{request.result}\" ({nameof(eve_url)}: '{eve_url}')");
+                else if (!request.downloadHandler.text.TryExtractIndex_FromNGinxText(out index, out string nginx_error))
+                    Debug.LogError($"[EVE] {nginx_error}");
                 else
                 {
-                    List<string> directories = new();
-                    List<string> files = new();
-
-                    foreach (var entry in index.entries.OrderBy(entry => entry.name, StringComparer.OrdinalIgnoreCase))
-                        switch (entry.GetEntryType)
-                        {
-                            case NGinxIndex.TYPES.DIRECTORY:
-                                directories.Add(entry.name);
-                                break;
-
-                            case NGinxIndex.TYPES.FILE:
-                                files.Add(entry.name);
-                                break;
-                        }
-
-                    StringBuilder sb = new(), sb_lint = new();
-
-                    for (int i = 0; i < directories.Count; ++i)
-                    {
-                        sb.Append($"{directories[i]} ");
-                        sb_lint.Append($"{directories[i]} ".SetColor(eve_exe.line.linter.directory));
-                    }
-
-                    for (int i = 0; i < files.Count; ++i)
-                    {
-                        sb.Append($"{files[i]} ");
-                        sb_lint.Append($"{files[i]} ".SetColor(eve_exe.line.linter.file));
-                    }
-
-                    cmd_exe.Stdout(sb.ToString(), sb_lint.ToString());
+                    eve_tree.Add(eve_path, index);
+                    Output(eve_exe, cmd_exe, index);
                 }
-            else
-                cmd_exe.error = $"[EVE] {nginx_error}";
+            }
         }
     }
 }
