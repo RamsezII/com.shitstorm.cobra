@@ -13,7 +13,7 @@ namespace _COBRA_
                 flag_url = "--is-web-url";
 
             Command.static_domain.AddRoutine(
-                "music-player",
+                "play-music-at-path",
                 min_args: 1,
                 opts: static exe =>
                 {
