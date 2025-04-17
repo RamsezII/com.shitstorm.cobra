@@ -7,6 +7,22 @@ namespace _COBRA_e
 {
     partial class CmdExternal
     {
+        /*
+            git
+            ├── init
+            ├── clone [url]
+            ├── status
+            ├── add [file...]
+            ├── commit [-m "message"]
+            ├── checkout [branch]
+            ├── push
+            ├── pull
+            ├── merge [branch]
+            └── branch
+                ├── -d [branch]
+                └── [new-branch]
+        */
+
         static void Init_CmdExt()
         {
             Command.static_domain.AddAction(
@@ -37,8 +53,12 @@ namespace _COBRA_e
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg, out _))
-                        exe.args.Add(arg);
+                    if (exe.line.TryReadArgument(out string arg0, out bool is_candidate, new[] { "git", }))
+                    {
+                        exe.args.Add(arg0);
+                        // if (is_candidate)
+
+                    }
                 },
                 action: static exe =>
                 {
