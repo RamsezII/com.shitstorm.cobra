@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _COBRA_e
 {
-    partial class GitCmd
+    partial class CmdExternal
     {
         static void Init_Scan()
         {

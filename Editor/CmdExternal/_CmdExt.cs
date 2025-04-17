@@ -1,28 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using _COBRA_;
-using UnityEngine;
 
 namespace _COBRA_e
 {
-    internal static partial class GitCmd
+    partial class CmdExternal
     {
-        static Command domain_git;
-
-        const string
-            opt_workdir = "--working-directory";
-
-        //--------------------------------------------------------------------------------------------------------------
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void OnAfterSceneLoad()
+        static void Init_CmdExt()
         {
-            domain_git = Command.static_domain.AddDomain("git");
-
-            Init_PushAll();
-            Init_Scan();
-
             Command.static_domain.AddAction(
                 "run-external-command",
                 min_args: 1,
@@ -61,7 +47,8 @@ namespace _COBRA_e
                     if (exe.opts.TryGetValue(opt_workdir, out object _val))
                         workdir = (string)_val;
                     Util_e.RunExternalCommand(workdir, command_line);
-                }
+                },
+                aliases: "."
             );
         }
     }

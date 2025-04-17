@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace _COBRA_e
 {
-    partial class GitCmd
+    partial class CmdExternal
     {
         static void Init_PushAll()
         {
