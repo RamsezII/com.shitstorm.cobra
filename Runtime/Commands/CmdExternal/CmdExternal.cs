@@ -29,7 +29,7 @@ namespace _COBRA_
                     string workdir = exe.shell.working_dir;
                     if (exe.opts.TryGetValue(Command.Line.opt_workdir, out object _val))
                         workdir = (string)_val;
-                    Util.RunExternalCommand(workdir, command_line);
+                    Util.RunExternalCommand(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout));
                 },
                 aliases: "."
             );

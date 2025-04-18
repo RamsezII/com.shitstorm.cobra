@@ -22,8 +22,14 @@ namespace _COBRA_
                     switch (data)
                     {
                         case string str:
-                            if (regex.IsMatch(str))
-                                exe.Stdout(str);
+                            {
+                                string[] splits = str.Split('\n', '\r');
+                                List<string> result = new();
+                                for (int i = 0; i < splits.Length; ++i)
+                                    if (regex.IsMatch(splits[i]))
+                                        result.Add(splits[i]);
+                                exe.Stdout(result.Join("\n"));
+                            }
                             break;
 
                         case IEnumerable<object> objects:
