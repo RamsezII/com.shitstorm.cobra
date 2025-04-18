@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -12,16 +11,19 @@ namespace _COBRA_
             Command.static_domain.AddAction(
                 "manual",
                 manual: new("Of the whats to and the hows to... nowamsayn [burp]"),
-                max_args: 1,
+                max_args: 2,
                 args: exe =>
                 {
                     if (Command.static_domain.TryReadCommand_path(exe.line, out var path))
-                        exe.args.Add(path);
+                    {
+                        exe.args.Add(path[^1]);
+                        exe.args.Add(path.Select(cmd => cmd.name).Join("/"));
+                    }
                 },
                 action: exe =>
                 {
                     if (exe.args.Count > 0)
-                        Debug.Log(((List<KeyValuePair<string, Command>>)exe.args[0])[^1].Value.manual);
+                        Debug.Log(((Command)exe.args[0]).manual);
                     else
                     {
                         StringBuilder sb = new(
