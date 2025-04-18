@@ -12,7 +12,8 @@ namespace _COBRA_
             public readonly Shell shell;
             public readonly Executor parent;
             public readonly Command command;
-            public readonly string cmd_path;
+            public readonly string cmd_longname;
+            public readonly List<Command> path;
 
             public Line line;
             internal Janitor janitor;
@@ -30,7 +31,7 @@ namespace _COBRA_
             public ushort PEID => parent?.EID ?? 0;
 
             public string error;
-            public override string ToString() => $"[{parent?.EID ?? 0}-{EID} {cmd_path}]";
+            public override string ToString() => $"[{parent?.EID ?? 0}-{EID} {cmd_longname}]";
 
             //--------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ namespace _COBRA_
 
                 this.shell = shell;
                 this.parent = parent;
+                this.path = path;
                 command = path[^1];
 
                 if (line.signal.HasFlag(SIGNALS.EXEC))
@@ -51,11 +53,11 @@ namespace _COBRA_
                         throw new ArgumentException($"Command path is empty.", nameof(path));
 
                     case 1 when path[0] == static_domain:
-                        cmd_path = "~";
+                        cmd_longname = "~";
                         break;
 
                     case 1:
-                        cmd_path = path[0].name;
+                        cmd_longname = path[0].name;
                         break;
 
                     default:
@@ -63,7 +65,7 @@ namespace _COBRA_
                         for (int i = 0; i < path.Count; i++)
                             path_sb.Append(path[i].name + "/");
                         path_sb.Remove(path_sb.Length - 1, 1);
-                        cmd_path = path_sb.ToString();
+                        cmd_longname = path_sb.ToString();
                         break;
                 }
 

@@ -35,6 +35,7 @@ namespace _COBRA_
         {
             InitEquals();
             InitVars();
+            Init_For();
         }
 
         static void InitVars()

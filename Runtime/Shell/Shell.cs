@@ -63,7 +63,7 @@ namespace _COBRA_
             sb.AppendLine($" {nameof(SID),5} {nameof(Command.Executor.PEID),5} {nameof(Command.Executor.EID),5} {nameof(Command.name),35} {nameof(CMD_STATUS.state),15} {nameof(Command.Executor.background),15} {nameof(Command.Executor.disposed),15}");
 
             void LogExe(in Command.Executor exe) =>
-                sb.AppendLine($" {exe.shell.SID,5} {exe.PEID,5} {exe.EID,5} {exe.cmd_path,35} {exe.routine?.Current.state ?? CMD_STATES._unknown_,15} {exe.background,15} {exe.disposed,15}");
+                sb.AppendLine($" {exe.shell.SID,5} {exe.PEID,5} {exe.EID,5} {exe.cmd_longname,35} {exe.routine?.Current.state ?? CMD_STATES._unknown_,15} {exe.background,15} {exe.disposed,15}");
 
             foreach (Shell shell in instances)
                 for (int i = 0; i < shell.front_janitors.Count; ++i)

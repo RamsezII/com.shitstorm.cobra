@@ -20,6 +20,7 @@ namespace _COBRA_
             Init_cd();
             Init_edit();
             Init_ToFile();
+            Init_Enumerates();
 
             Command.static_domain.AddAction(
                 "working-directory",

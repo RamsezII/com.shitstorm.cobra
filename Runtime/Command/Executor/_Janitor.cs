@@ -41,12 +41,12 @@ namespace _COBRA_
                 internal void AddExecutor(in Executor executor)
                 {
                     if (disposed)
-                        Debug.LogError($"adding {executor.GetType().FullName} '{executor.command.name}' ({executor.cmd_path}) to disposed pipeline[{pipeline_ID}].");
+                        Debug.LogError($"adding {executor.GetType().FullName} '{executor.command.name}' ({executor.cmd_longname}) to disposed pipeline[{pipeline_ID}].");
 
                     executor.janitor = this;
 
                     if (_executors.Remove(executor))
-                        Debug.LogWarning($"'{executor.GetType().FullName}' '{executor.command.name}' ({executor.cmd_path}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
+                        Debug.LogWarning($"'{executor.GetType().FullName}' '{executor.command.name}' ({executor.cmd_longname}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
 
                     _executors.Add(executor);
                 }
@@ -96,7 +96,7 @@ namespace _COBRA_
 
                     if (exe.command.action == null && exe.routine == null)
                     {
-                        Debug.LogError($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_path}) has no {nameof(exe.command.action)} or {nameof(exe.routine)} to execute.");
+                        Debug.LogError($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) has no {nameof(exe.command.action)} or {nameof(exe.routine)} to execute.");
                         return false;
                     }
 
@@ -106,7 +106,7 @@ namespace _COBRA_
                         if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
                         {
                             if (exe.started)
-                                Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_path}) has already been started.");
+                                Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) has already been started.");
 
                             exe.started = true;
                             if (exe.background)
