@@ -16,6 +16,9 @@ namespace _COBRA_
         static byte id_counter = 0;
         public readonly byte SID = ++id_counter;
 
+        public static readonly VarDict global_vars = new();
+        public readonly VarDict shell_vars = new();
+
         public CMD_STATUS current_status;
         public CMD_STATES previous_state;
         public bool state_changed;
@@ -31,6 +34,7 @@ namespace _COBRA_
         {
             id_counter = 0;
             OnNucleorQuit();
+            global_vars.Clear();
         }
 
         //--------------------------------------------------------------------------------------------------------------

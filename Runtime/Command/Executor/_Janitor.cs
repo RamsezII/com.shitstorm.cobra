@@ -18,6 +18,8 @@ namespace _COBRA_
 
                 internal string error;
 
+                public readonly VarDict temp_vars = new();
+
                 //--------------------------------------------------------------------------------------------------------------
 
                 internal Janitor(in Executor executor) => AddExecutor(executor);
@@ -177,6 +179,7 @@ namespace _COBRA_
                     for (int i = 0; i < _executors.Count; i++)
                         _executors[i].Janitize();
                     _executors.Clear();
+                    temp_vars.Dispose();
                 }
             }
         }

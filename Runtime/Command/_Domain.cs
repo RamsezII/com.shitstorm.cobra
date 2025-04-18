@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Linq;
-using UnityEngine;
 
 namespace _COBRA_
 {
@@ -68,7 +67,7 @@ namespace _COBRA_
                 if (pipe_only)
                     keys = keys.Where(keys => domain._commands[keys].on_pipe != null);
 
-                if (line.TryReadArgument(out string cmd_name, out bool is_candidate, keys, strict: true, lint: false))
+                if (line.TryReadArgument(out string cmd_name, out bool is_candidate, keys, strict: true, stop_if_var: true, lint: false))
                     if (is_candidate && domain._commands.TryGetValue(cmd_name, out Command intermediate))
                     {
                         path.Add(intermediate);

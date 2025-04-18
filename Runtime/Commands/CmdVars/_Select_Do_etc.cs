@@ -15,7 +15,7 @@ namespace _COBRA_
                 on_pipe: static (exe, data) =>
                 {
                     string var_name = (string)exe.args[0];
-                    variables[var_name] = data;
+                    exe.janitor.temp_vars[var_name] = data;
                 }
             );
 

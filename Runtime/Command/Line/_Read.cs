@@ -83,6 +83,9 @@ namespace _COBRA_
                     is_cursor_on_path = false;
                 }
 
+                if (start_i > 0 && text[start_i - 1] == '@')
+                    --start_i;
+
                 end_i = read_i = start_i;
                 text.GroupedErase(ref start_i);
 
@@ -97,22 +100,62 @@ namespace _COBRA_
                 in bool complete_if_option = false,
                 in bool strict = false,
                 in PATH_FLAGS path_mode = 0,
+                in bool stop_if_var = false,
                 in bool lint = true)
             {
                 if (lint)
                     LintToThisPosition(linter._default_);
 
                 bool had_next = HasNext(true, lint);
-                bool isNotEmpty = Util_cobra.TryReadArgument(text, out start_i, ref read_i, out argument, true);
+                bool is_var = had_next && text[read_i] == '@';
+
+                if (is_var)
+                {
+                    if (stop_if_var)
+                    {
+                        argument = string.Empty;
+                        seems_valid = false;
+                        return false;
+                    }
+
+                    completions = shell.shell_vars.Keys.Concat(Shell.global_vars.Keys).Select(var_name => $"@{var_name}");
+                }
+
+                seems_valid = false;
+
+                bool isNotEmpty = Util_cobra.TryReadArgument(text, out start_i, ref read_i, out argument, stop_at_separators: true);
                 end_i = read_i;
+
+                string var_name = is_var && argument.Length > 1
+                    ? argument[1..]
+                    : argument;
+
+                string var_value_str = var_name;
+                if (shell.shell_vars.TryGetValue(var_name, out var var_value) || Shell.global_vars.TryGetValue(var_name, out var_value))
+                {
+                    var_value_str = var_value.ToString();
+                    seems_valid = true;
+                }
 
                 if (isNotEmpty)
                 {
-                    arg_last = argument;
+                    arg_last = var_name;
                     ++arg_i;
 
                     if (lint)
-                        if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
+                        if (path_mode == 0)
+                            if (is_var)
+                            {
+                                if (shell.shell_vars.ContainsKey(var_name))
+                                    LintToThisPosition(linter.var_shell);
+                                else if (Shell.global_vars.ContainsKey(var_name))
+                                    LintToThisPosition(linter.var_global);
+                                else
+                                    LintToThisPosition(linter.var_unknown);
+                            }
+                            else
+                                LintToThisPosition(linter.argument);
+                        else
                         {
                             is_cursor_on_path = IsOnCursor;
                             if (is_cursor_on_path)
@@ -122,8 +165,6 @@ namespace _COBRA_
                             }
                             LintPath();
                         }
-                        else
-                            LintToThisPosition(linter.argument);
                 }
 
                 if (!cpl_done)
@@ -136,28 +177,31 @@ namespace _COBRA_
                                     cpl_start_i = read_i;
                                     if (signal.HasFlag(SIGNALS.CPL_TAB))
                                         if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
-                                            PathCompletion_tab(argument, path_mode, out completions);
+                                            PathCompletion_tab(var_value_str, path_mode, out completions);
                                         else
-                                            ComputeCompletion_tab(argument, completions);
+                                            ComputeCompletion_tab(var_value_str, completions);
                                     else if (signal.HasFlag(SIGNALS.CPL_ALT))
                                         if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
-                                            PathCompletion_alt(argument, path_mode, out completions);
+                                            PathCompletion_alt(var_value_str, path_mode, out completions);
                                         else
-                                            ComputeCompletion_alt(argument, completions);
+                                            ComputeCompletion_alt(var_value_str, completions);
                                 }
 
-                if (path_mode == PATH_FLAGS._none_)
-                    seems_valid = completions != null && completions.Contains(argument);
-                else
-                {
-                    string full_path = shell.PathCheck(argument, PathModes.ForceFull);
-                    if (path_mode.HasFlag(PATH_FLAGS.FILE) && File.Exists(full_path))
-                        seems_valid = true;
-                    else if (path_mode.HasFlag(PATH_FLAGS.DIRECTORY) && Directory.Exists(full_path))
-                        seems_valid = true;
+                if (!is_var)
+                    if (path_mode == PATH_FLAGS._none_)
+                        seems_valid = completions != null && completions.Contains(var_value_str);
                     else
-                        seems_valid = false;
-                }
+                    {
+                        string full_path = shell.PathCheck(argument, PathModes.ForceFull);
+                        if (path_mode.HasFlag(PATH_FLAGS.FILE) && File.Exists(full_path))
+                            seems_valid = true;
+                        else if (path_mode.HasFlag(PATH_FLAGS.DIRECTORY) && Directory.Exists(full_path))
+                            seems_valid = true;
+                        else
+                            seems_valid = false;
+                    }
+
+                argument = var_value_str;
 
                 if (strict && !seems_valid)
                 {
