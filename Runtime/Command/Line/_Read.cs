@@ -56,15 +56,16 @@ namespace _COBRA_
                 }
             }
 
-            public bool HasNext(in bool save_move)
+            public bool HasNext(in bool save_move, in bool lint = true)
             {
                 int read_i = this.read_i;
                 text.SkipSpaces(ref read_i);
 
-                if (linter == null)
-                    LintToThisPosition(Color.gray);
-                else
-                    LintToThisPosition(linter._default_);
+                if (lint)
+                    if (linter == null)
+                        LintToThisPosition(Color.gray);
+                    else
+                        LintToThisPosition(linter._default_);
 
                 if (save_move)
                     this.read_i = read_i;
@@ -94,12 +95,14 @@ namespace _COBRA_
                 out bool seems_valid,
                 IEnumerable<string> completions = null,
                 in bool complete_if_option = false,
+                in bool strict = false,
                 in PATH_FLAGS path_mode = 0,
                 in bool lint = true)
             {
                 if (lint)
                     LintToThisPosition(linter._default_);
 
+                bool had_next = HasNext(true, lint);
                 bool isNotEmpty = Util_cobra.TryReadArgument(text, out start_i, ref read_i, out argument, true);
                 end_i = read_i;
 
@@ -154,6 +157,18 @@ namespace _COBRA_
                         seems_valid = true;
                     else
                         seems_valid = false;
+                }
+
+                if (strict && !seems_valid)
+                {
+                    if (had_next)
+                        ReadBack();
+                    else
+                    {
+                        if (cpl_start_i == start_i)
+                            cpl_done = false;
+                    }
+                    return false;
                 }
 
                 return isNotEmpty;

@@ -26,7 +26,7 @@ namespace _COBRA_
                             if (Enum.TryParse(arg, true, out PATH_FLAGS flags) && flags > 0)
                             {
                                 exe.args.Add(flags);
-                                if (exe.line.TryReadArgument(out string path, out bool seems_valid, path_mode: PATH_FLAGS.FILE))
+                                if (exe.line.TryReadArgument(out string path, out bool seems_valid, path_mode: PATH_FLAGS.DIRECTORY))
                                     if (seems_valid)
                                         exe.args.Add(path);
                             }
@@ -37,20 +37,27 @@ namespace _COBRA_
                     string full_path = (string)exe.args[1];
                     full_path = exe.shell.PathCheck(full_path, PathModes.ForceFull);
 
-                    exe.opts.TryGetValue(opt_pattern, out object _pattern);
-                    string pattern = (string)_pattern;
+                    string pattern;
+                    if (exe.opts.TryGetValue(opt_pattern, out object _pattern))
+                        pattern = (string)_pattern;
+                    else
+                        pattern = "*";
 
                     switch (flags)
                     {
                         case PATH_FLAGS.FILE:
-                            foreach (string file_path in Directory.EnumerateFiles(full_path, pattern))
-                                exe.Stdout(file_path);
+                            foreach (string file in Directory.EnumerateFiles(full_path, pattern))
+                                exe.Stdout(exe.shell.PathCheck(file, PathModes.ForceFull));
                             break;
 
                         case PATH_FLAGS.DIRECTORY:
+                            foreach (string dir in Directory.EnumerateDirectories(full_path, pattern))
+                                exe.Stdout(exe.shell.PathCheck(dir, PathModes.ForceFull));
                             break;
 
                         case PATH_FLAGS.BOTH:
+                            foreach (string fse in Directory.EnumerateFileSystemEntries(full_path, pattern))
+                                exe.Stdout(exe.shell.PathCheck(fse, PathModes.ForceFull));
                             break;
                     }
                 });

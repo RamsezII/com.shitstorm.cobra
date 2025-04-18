@@ -20,7 +20,8 @@ namespace _COBRA_
         public readonly Action<Executor> opts, args;
         public readonly Type input_type, output_type;
 
-        public bool IsDomain => _commands.Count >= 0 || action == null && on_pipe == null && routine == null;
+        public bool IsDomain => _commands.Count >= 0;
+        public bool IsDomain_old => _commands.Count >= 0 || action == null && on_pipe == null && routine == null;
 
         //--------------------------------------------------------------------------------------------------------------
 
