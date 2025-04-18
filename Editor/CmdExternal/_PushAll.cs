@@ -12,7 +12,6 @@ namespace _COBRA_e
                 flag_blocking = "--blocking";
 
             Command.static_domain.AddRoutine("push-all-repos",
-                manual: new("<commit message>"),
                 min_args: 1,
                 opts: static exe =>
                 {
@@ -24,9 +23,9 @@ namespace _COBRA_e
                     if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
-                routine: ERoutine);
+                routine: EPush);
 
-            static IEnumerator<CMD_STATUS> ERoutine(Command.Executor exe)
+            static IEnumerator<CMD_STATUS> EPush(Command.Executor exe)
             {
                 string arg = (string)exe.args[0];
                 bool blocking = exe.opts.ContainsKey(flag_blocking);
@@ -36,6 +35,28 @@ namespace _COBRA_e
                 else
                 {
                     var routine = GitBatchPusher.EPushAllGitRepos(arg);
+                    while (routine.MoveNext())
+                        yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: routine.Current);
+                }
+            }
+
+            Command.static_domain.AddRoutine("pull-all-repos",
+                opts: static exe =>
+                {
+                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, flag_blocking))
+                        exe.opts.Add(flag_blocking, null);
+                },
+                routine: EPull);
+
+            static IEnumerator<CMD_STATUS> EPull(Command.Executor exe)
+            {
+                bool blocking = exe.opts.ContainsKey(flag_blocking);
+
+                if (blocking)
+                    GitBatchPusher.PullAllGitRepos();
+                else
+                {
+                    var routine = GitBatchPusher.EPullAllGitRepos();
                     while (routine.MoveNext())
                         yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: routine.Current);
                 }
