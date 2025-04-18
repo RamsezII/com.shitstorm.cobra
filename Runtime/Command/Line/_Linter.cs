@@ -17,6 +17,7 @@ namespace _COBRA_
                 public readonly StringBuilder sb = new();
 
                 public Color _default_ = Color.gray;
+                public Color _readall_ = Color.gray;
                 public Color command = Color.gray;
                 public Color argument = Color.gray;
                 public Color option = Color.gray;

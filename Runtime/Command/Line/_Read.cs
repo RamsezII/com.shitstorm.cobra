@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -8,6 +9,14 @@ namespace _COBRA_
     {
         partial class Line
         {
+            public string ReadAll()
+            {
+                string read = text[read_i..];
+                read_i = text.Length;
+                LintToThisPosition(linter._readall_);
+                return read;
+            }
+
             public bool TryReadCommandSeparator(out string argument)
             {
                 if (!HasNext(true))
@@ -82,7 +91,7 @@ namespace _COBRA_
 
             public bool TryReadArgument(
                 out string argument,
-                out bool is_candidate,
+                out bool seems_valid,
                 IEnumerable<string> completions = null,
                 in bool complete_if_option = false,
                 in PATH_FLAGS path_mode = 0,
@@ -134,7 +143,18 @@ namespace _COBRA_
                                             ComputeCompletion_alt(argument, completions);
                                 }
 
-                is_candidate = completions != null && completions.Contains(argument);
+                if (path_mode == PATH_FLAGS._none_)
+                    seems_valid = completions != null && completions.Contains(argument);
+                else
+                {
+                    string full_path = shell.PathCheck(argument, PathModes.ForceFull);
+                    if (path_mode.HasFlag(PATH_FLAGS.FILE) && File.Exists(full_path))
+                        seems_valid = true;
+                    else if (path_mode.HasFlag(PATH_FLAGS.DIRECTORY) && Directory.Exists(full_path))
+                        seems_valid = true;
+                    else
+                        seems_valid = false;
+                }
 
                 return isNotEmpty;
             }

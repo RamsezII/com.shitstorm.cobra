@@ -9,6 +9,19 @@ namespace _COBRA_
     {
         partial class Line
         {
+            public const string
+                opt_workdir = "--working-directory";
+
+            //--------------------------------------------------------------------------------------------------------------
+
+            public void TryReadWorkingDir(in Executor exe)
+            {
+                if (TryRead_one_flag(exe, opt_workdir))
+                    if (TryReadArgument(out string path, out bool seems_valid, path_mode: PATH_FLAGS.DIRECTORY))
+                        if (seems_valid)
+                            exe.opts.Add(opt_workdir, path);
+            }
+
             public void LintPath()
             {
                 string full_path = arg_last;

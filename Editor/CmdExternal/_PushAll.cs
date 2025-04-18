@@ -11,7 +11,7 @@ namespace _COBRA_e
             const string
                 flag_blocking = "--blocking";
 
-            domain_git.AddRoutine("push-all-repos",
+            Command.static_domain.AddRoutine("push-all-repos",
                 manual: new("<commit message>"),
                 min_args: 1,
                 opts: static exe =>
