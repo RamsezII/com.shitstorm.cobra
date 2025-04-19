@@ -21,6 +21,7 @@ namespace _COBRA_
             Init_edit();
             Init_ToFile();
             Init_Enumerates();
+            Init_CombinePaths();
 
             Command.static_domain.AddAction(
                 "working-directory",
@@ -31,24 +32,6 @@ namespace _COBRA_
                 "reset-working-dir",
                 action: static exe => exe.shell.working_dir = NUCLEOR.home_path
                 );
-
-            Command.static_domain.AddAction(
-                "ls",
-                opts: static exe =>
-                {
-                    if (exe.line.TryRead_options(exe, out var opts, opt_search_pattern))
-                        if (opts.ContainsKey(opt_search_pattern))
-                            exe.opts.Add(opt_search_pattern, opts[opt_search_pattern]);
-                },
-                action: static exe =>
-                {
-                    string search_pattern = "*";
-                    if (exe.opts.TryGetValue(opt_search_pattern, out object value))
-                        search_pattern = (string)value;
-
-                    foreach (string dir in Directory.EnumerateFileSystemEntries(exe.shell.working_dir, search_pattern))
-                        exe.Stdout(Path.GetRelativePath(exe.shell.working_dir, dir));
-                });
 
             Command.static_domain.AddAction(
                 "read",

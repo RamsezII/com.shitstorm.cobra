@@ -6,6 +6,7 @@ namespace _COBRA_
         {
             Command.static_domain.AddPipe(
                 "as",
+                manual: new("as <var_name> <command>"),
                 min_args: 2,
                 args: static exe =>
                 {
