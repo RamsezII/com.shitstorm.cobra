@@ -24,11 +24,12 @@ namespace _COBRA_
                         case string str:
                             {
                                 string[] splits = str.Split('\n', '\r');
-                                List<string> result = new();
+                                List<string> matches = new();
                                 for (int i = 0; i < splits.Length; ++i)
                                     if (regex.IsMatch(splits[i]))
-                                        result.Add(splits[i]);
-                                exe.Stdout(result.Join("\n"));
+                                        matches.Add(splits[i]);
+                                if (matches.Count > 0)
+                                    exe.Stdout(matches.Join("\n"));
                             }
                             break;
 

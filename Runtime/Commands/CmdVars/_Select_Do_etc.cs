@@ -5,40 +5,44 @@ namespace _COBRA_
         static void Init_For()
         {
             Command.static_domain.AddPipe(
-                "select",
-                min_args: 1,
+                "as",
+                min_args: 2,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg, out _))
-                        exe.args.Add(arg);
-                },
-                on_pipe: static (exe, data) =>
-                {
-                    string var_name = (string)exe.args[0];
-                    exe.janitor.temp_vars[var_name] = data;
-                }
-            );
-
-            Command.static_domain.AddPipe(
-                "do",
-                min_args: 1,
-                args: static exe =>
-                {
-                    if (Command.static_domain.TryReadCommand_path(exe.line, out var path))
+                    if (exe.line.TryReadArgument(out string var_name, out _))
                     {
-                        Command.Executor exe2 = new(exe.shell, exe, exe.line, path);
-                        if (exe2.error != null)
-                            exe.error = exe2.error;
-                        else
-                            exe.args.Add(path);
-                        exe.Dispose();
+                        exe.args.Add(var_name);
+
+                        int read_i = exe.line.read_i;
+                        if (Command.static_domain.TryReadCommand_path(exe.line, out var path))
+                        {
+                            Command.Executor exe2 = new(exe.shell, exe, exe.line, path);
+                            if (exe2.error != null)
+                                exe.error = exe2.error;
+                            else
+                                exe.args.Add(exe.line.text[read_i..exe.line.read_i]);
+                            exe2.Dispose();
+                        }
                     }
                 },
                 on_pipe: static (exe, data) =>
                 {
-                    Command.Executor exe2 = (Command.Executor)exe.args[0];
-                    Command.Executor exe3 = new(exe.shell, exe, exe.line, exe2.path);
-                    exe.janitor.AddExecutor(exe3);
+                    string var_name = (string)exe.args[0];
+                    string cmd_line = (string)exe.args[1];
+                    Command.Line subline = new(cmd_line, exe.line.signal, exe.line.shell);
+
+                    exe.shell.shell_vars[var_name] = data;
+
+                    if (Command.static_domain.TryReadCommand_path(subline, out var path))
+                    {
+                        Command.Executor do_exe = new(exe.shell, exe, subline, path);
+                        if (do_exe.error != null)
+                            exe.error = do_exe.error;
+                        else
+                            exe.janitor.AddExecutor(do_exe);
+                    }
+
+                    exe.shell.shell_vars.Remove(var_name);
                 }
             );
         }

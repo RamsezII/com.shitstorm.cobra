@@ -11,6 +11,19 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
+        public bool TryGetValue_str(in string key, out string value)
+        {
+            if (TryGetValue(key, out object o))
+            {
+                value = o.ToString();
+                return true;
+            }
+            value = null;
+            return false;
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+
         public void Dispose()
         {
             foreach (var value in Values)

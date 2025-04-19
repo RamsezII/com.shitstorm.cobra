@@ -117,7 +117,7 @@ namespace _COBRA_
                         error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
 
             previous_state = current_status.state;
-            if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe))
+            if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe) && active_exe.routine != null)
                 current_status = active_exe.routine.Current;
             else
                 current_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: GetPrefixe(), immortal: true);

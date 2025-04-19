@@ -130,12 +130,13 @@ namespace _COBRA_
                     ? argument[1..]
                     : argument;
 
-                string var_value_str = var_name;
-                if (shell.shell_vars.TryGetValue(var_name, out var var_value) || Shell.global_vars.TryGetValue(var_name, out var_value))
-                {
-                    var_value_str = var_value.ToString();
-                    seems_valid = true;
-                }
+                string var_value_str = is_var ? string.Empty : argument;
+                if (is_var)
+                    if (shell.shell_vars.TryGetValue(var_name, out var var_value) || Shell.global_vars.TryGetValue(var_name, out var_value))
+                    {
+                        var_value_str = var_value.ToString();
+                        seems_valid = true;
+                    }
 
                 if (isNotEmpty)
                 {
