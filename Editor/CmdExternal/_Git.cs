@@ -21,6 +21,7 @@ namespace _COBRA_e
         */
 
         // for d in */; do (cd "$d" && [ -d .git ] && echo "➡️ $d" && git pull); done
+        // for d in */; do (cd "$d" && [ -d .git ] && echo "➡️ $d" && git reset --hard); done
 
         // for d in */; do
         // if [ -d "$d/.git" ]; then
