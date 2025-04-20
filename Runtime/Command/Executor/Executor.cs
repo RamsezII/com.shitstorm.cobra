@@ -20,7 +20,7 @@ namespace _COBRA_
             public bool background;
             internal Executor stdout_exe, next_exe;
             public readonly List<object> args;
-            public readonly Dictionary<string, object> opts;
+            public readonly VarDict opts;
             public IEnumerator<CMD_STATUS> routine;
 
             internal bool started, disposed;
@@ -72,7 +72,7 @@ namespace _COBRA_
                 if (error == null)
                     if (command.opts != null)
                     {
-                        opts = new(StringComparer.OrdinalIgnoreCase);
+                        opts = new();
                         if (parse_options)
                             ParseOptions(line);
                     }
@@ -189,6 +189,13 @@ namespace _COBRA_
                 exe = next_exe;
                 next_exe = null;
                 return true;
+            }
+
+            public string GetWorkdir()
+            {
+                if (opts.TryGetValue_str(Line.opt_workdir, out string workdir))
+                    return workdir;
+                return shell.working_dir;
             }
 
             public void Stdout(in object data, string lint = null)

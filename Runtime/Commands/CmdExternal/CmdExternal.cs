@@ -14,7 +14,7 @@ namespace _COBRA_
             cmd_ext = Command.static_domain.AddAction(
                 "run-external-command",
                 min_args: 1,
-                opts: static exe => exe.line.TryReadWorkingDir(exe),
+                opts: static exe => exe.line.TryReadOption_workdir(exe),
                 args: static exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg0, out _, lint: false))

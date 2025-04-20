@@ -22,6 +22,7 @@ namespace _COBRA_
             Init_ToFile();
             Init_Enumerates();
             Init_CombinePaths();
+            Init_Remove();
 
             Command.static_domain.AddAction(
                 "working-directory",
@@ -32,6 +33,36 @@ namespace _COBRA_
                 "reset-working-dir",
                 action: static exe => exe.shell.working_dir = NUCLEOR.home_path
                 );
+
+            Command.static_domain.AddAction(
+                "file-exists",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string file_path, out bool is_valid, path_mode: PATH_FLAGS.FILE))
+                        exe.args.Add(file_path);
+                },
+                action: static exe =>
+                {
+                    string file_path = (string)exe.args[0];
+                    file_path = exe.shell.PathCheck(file_path, PathModes.ForceFull);
+                    exe.Stdout(File.Exists(file_path));
+                });
+
+            Command.static_domain.AddAction(
+                "directory-exists",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string dir_path, out bool is_valid, path_mode: PATH_FLAGS.DIRECTORY))
+                        exe.args.Add(dir_path);
+                },
+                action: static exe =>
+                {
+                    string dir_path = (string)exe.args[0];
+                    dir_path = exe.shell.PathCheck(dir_path, PathModes.ForceFull);
+                    exe.Stdout(Directory.Exists(dir_path));
+                });
 
             Command.static_domain.AddAction(
                 "read",
@@ -66,73 +97,6 @@ namespace _COBRA_
                     Directory.CreateDirectory(path);
                 },
                 aliases: "mkdir");
-
-            Command.static_domain.AddAction(
-                "rm",
-                min_args: 1,
-                opts: static exe =>
-                {
-                    if (exe.line.TryRead_one_flag(exe, "-r", flag_recursive))
-                        exe.opts.Add(flag_recursive, null);
-                },
-                args: static exe =>
-                {
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
-                        if (is_candidate)
-                            exe.args.Add(path);
-                },
-                action: static exe =>
-                {
-                    bool recursive = exe.opts.ContainsKey(flag_recursive);
-                    string path = (string)exe.args[0];
-                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
-
-                    try
-                    {
-                        if (Directory.Exists(path))
-                            Directory.Delete(path, recursive);
-                        if (File.Exists(path))
-                            File.Delete(path);
-                    }
-                    catch (IOException ioe)
-                    {
-                        Debug.LogException(ioe);
-                        Debug.LogWarning($"use the '{flag_recursive}' flag if you want to remove recursively (including inside content)");
-                    }
-                });
-
-            Command.static_domain.AddAction(
-                "remove-directory",
-                min_args: 1,
-                opts: static exe =>
-                {
-                    if (exe.line.TryRead_one_flag(exe, "-r", flag_recursive))
-                        exe.opts.Add(flag_recursive, null);
-                },
-                args: static exe =>
-                {
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
-                        if (is_candidate)
-                            exe.args.Add(path);
-                        else
-                            exe.error = $"invalid directory: '{path}'";
-                },
-                action: static exe =>
-                {
-                    bool recursive = exe.opts.ContainsKey(flag_recursive);
-                    string path = (string)exe.args[0];
-                    path = exe.shell.PathCheck(path, PathModes.ForceFull);
-
-                    try
-                    {
-                        Directory.Delete(path, recursive);
-                    }
-                    catch (IOException ioe)
-                    {
-                        Debug.LogException(ioe);
-                        Debug.LogWarning($"use the '{flag_recursive}' flag if you want to remove recursively (including inside content)");
-                    }
-                });
         }
     }
 }

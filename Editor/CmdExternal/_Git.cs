@@ -34,15 +34,42 @@ namespace _COBRA_e
 
         static void Init_Git()
         {
-            Command cmd_git = Command.static_domain.AddDomain("git");
-
-            cmd_git.AddAction(
-                "status",
+            Command.static_domain.AddAction(
+                "git",
+                min_args: 1,
+                max_args: 2,
+                opts: static exe => exe.line.TryReadOption_workdir(exe),
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string subcommand, out bool is_valid, new string[] { "status", "add-all", "commit", "push", "pull", "fetch", }))
+                        if (is_valid)
+                        {
+                            subcommand = subcommand.ToLower();
+                            exe.args.Add(subcommand);
+                            switch (subcommand)
+                            {
+                                case "commit":
+                                    if (exe.line.TryReadArgument(out string commit_msg, out _))
+                                        exe.args.Add(commit_msg);
+                                    break;
+                            }
+                        }
+                },
                 action: static exe =>
                 {
+                    string subcommand = (string)exe.args[0];
 
-                }
-            );
+                    string input = $"git ";
+
+                    input += subcommand switch
+                    {
+                        "commit" => $"-m \"{exe.args[1]}\"",
+                        "add-all" => "add .",
+                        _ => subcommand,
+                    };
+                    string workdir = exe.GetWorkdir();
+                    Util.RunExternalCommand(workdir, input, stdout => exe.Stdout(stdout));
+                });
         }
     }
 }

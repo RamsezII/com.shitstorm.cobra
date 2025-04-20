@@ -14,7 +14,7 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            public void TryReadWorkingDir(in Executor exe)
+            public void TryReadOption_workdir(in Executor exe)
             {
                 if (TryRead_one_flag(exe, opt_workdir))
                     if (TryReadArgument(out string path, out bool seems_valid, path_mode: PATH_FLAGS.DIRECTORY))
