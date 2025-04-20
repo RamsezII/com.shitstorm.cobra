@@ -103,11 +103,11 @@ namespace _COBRA_
 
                         if (Command.static_domain.TryReadCommand_path(line, out var path))
                         {
-                            Command.Executor exe1 = new(exe.shell, exe, line, path);
-                            if (exe1.error != null)
-                                exe.error = exe1.error;
+                            Command.Executor exe2 = new(exe.shell, exe, line, path);
+                            if (exe2.error != null)
+                                exe.error = exe2.error;
                             else
-                                exe.janitor.AddExecutor(exe.line, exe1);
+                                exe.janitor.AddExecutor(exe.line, exe2);
                         }
                     }
                 });

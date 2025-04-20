@@ -9,12 +9,15 @@ namespace _COBRA_
     {
         partial class Line
         {
-            public string ReadAll()
+            public bool TryReadArguments(out string arguments)
             {
-                string read = text[read_i..];
-                read_i = text.Length;
-                LintToThisPosition(linter._readall_);
-                return read;
+                LintToThisPosition(linter._default_);
+                if (text.TryReadArguments(out _, ref read_i, out arguments))
+                {
+                    LintToThisPosition(linter._readall_);
+                    return true;
+                }
+                return false;
             }
 
             public bool TryReadCommandSeparator(out string argument)

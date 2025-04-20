@@ -194,7 +194,7 @@ namespace _COBRA_
             public string GetWorkdir()
             {
                 if (opts.TryGetValue_str(Line.opt_workdir, out string workdir))
-                    return workdir;
+                    return shell.PathCheck(workdir, PathModes.ForceFull);
                 return shell.working_dir;
             }
 

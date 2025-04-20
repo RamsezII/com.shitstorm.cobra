@@ -17,18 +17,13 @@ namespace _COBRA_
                 opts: static exe => exe.line.TryReadOption_workdir(exe),
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg0, out _, lint: false))
-                    {
-                        exe.args.Add(arg0);
-                        exe.line.LintToThisPosition(exe.line.linter._readall_);
-                    }
+                    if (exe.line.TryReadArguments(out string command_line))
+                        exe.args.Add(command_line);
                 },
                 action: static exe =>
                 {
                     string command_line = (string)exe.args[0];
-                    string workdir = exe.shell.working_dir;
-                    if (exe.opts.TryGetValue(Command.Line.opt_workdir, out object _val))
-                        workdir = (string)_val;
+                    string workdir = exe.GetWorkdir();
                     Util.RunExternalCommand(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout));
                 },
                 aliases: "."
