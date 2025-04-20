@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace _COBRA_
 {
@@ -42,15 +43,14 @@ namespace _COBRA_
                 max_args: 2,
                 args: static exe =>
                 {
-                    if (Command.static_domain.TryReadCommand_path(exe.line, out var cmd1_path))
+                    int read_i = exe.line.read_i;
+                    if (Command.static_domain.TryReadCommand_path(exe.line, out var path1))
                     {
-                        Command cmd = cmd1_path[^1];
-                        Command.Executor exe1 = new(exe.shell, exe, exe.line, cmd1_path);
-
+                        Command.Executor exe1 = new(exe.shell, exe, exe.line, path1);
                         if (exe1.error != null)
                             exe.error = exe1.error;
                         else
-                            exe.args.Add(exe1);
+                            exe.args.Add(exe.line.text[read_i..exe.line.read_i]);
                     }
                     else
                         exe.error = $"command '{exe.command.name}' could not find command '{exe.line.arg_last}'";
@@ -60,16 +60,17 @@ namespace _COBRA_
 
                     if (exe.line.TryRead_flags(exe, out var flags, flag_else))
                         if (flags.Contains(flag_else))
-                            if (Command.static_domain.TryReadCommand_path(exe.line, out var cmd2_path))
+                        {
+                            read_i = exe.line.read_i;
+                            if (Command.static_domain.TryReadCommand_path(exe.line, out var path2))
                             {
-                                Command cmd = cmd2_path[^1];
-                                Command.Executor exe2 = new(exe.shell, exe, exe.line, cmd2_path);
-
+                                Command.Executor exe2 = new(exe.shell, exe, exe.line, path2);
                                 if (exe2.error != null)
                                     exe.error = exe2.error;
                                 else
-                                    exe.args.Add(exe2);
+                                    exe.args.Add(exe.line.text[read_i..exe.line.read_i]);
                             }
+                        }
                 },
                 on_pipe: static (exe, data) =>
                 {
@@ -81,17 +82,35 @@ namespace _COBRA_
                         _ => false,
                     };
 
-                    Command.Executor exe1 = (Command.Executor)exe.args[0];
-
                     if (isTrue)
-                        exe.janitor.AddExecutor(exe.line, exe1);
+                    {
+                        string cmd_line = (string)exe.args[0];
+                        Command.Line line = new(cmd_line, exe.line.signal, exe.line.shell);
+
+                        if (Command.static_domain.TryReadCommand_path(line, out var path))
+                        {
+                            Command.Executor exe1 = new(exe.shell, exe, line, path);
+                            if (exe1.error != null)
+                                exe.error = exe1.error;
+                            else
+                                exe.janitor.AddExecutor(exe.line, exe1);
+                        }
+                    }
                     else if (exe.args.Count > 1)
                     {
-                        Command.Executor exe2 = (Command.Executor)exe.args[1];
-                        exe.janitor.AddExecutor(exe.line, exe2);
+                        string cmd_line = (string)exe.args[1];
+                        Command.Line line = new(cmd_line, exe.line.signal, exe.line.shell);
+
+                        if (Command.static_domain.TryReadCommand_path(line, out var path))
+                        {
+                            Command.Executor exe1 = new(exe.shell, exe, line, path);
+                            if (exe1.error != null)
+                                exe.error = exe1.error;
+                            else
+                                exe.janitor.AddExecutor(exe.line, exe1);
+                        }
                     }
-                }
-                );
+                });
         }
     }
 }

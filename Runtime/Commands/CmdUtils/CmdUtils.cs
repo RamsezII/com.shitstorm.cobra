@@ -9,7 +9,6 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Init_Args();
             InitManual();
             InitGrep();
             InitLinter();
