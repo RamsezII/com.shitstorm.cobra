@@ -22,7 +22,10 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                internal Janitor(in Executor executor) => AddExecutor(executor);
+                internal Janitor(in Line line, in Executor exe)
+                {
+                    AddExecutor(line, exe);
+                }
 
                 //--------------------------------------------------------------------------------------------------------------
 
@@ -40,17 +43,18 @@ namespace _COBRA_
                     return err;
                 }
 
-                internal void AddExecutor(in Executor executor)
+                internal void AddExecutor(in Line line, in Executor exe)
                 {
                     if (disposed)
-                        Debug.LogError($"adding {executor.GetType().FullName} '{executor.command.name}' ({executor.cmd_longname}) to disposed pipeline[{pipeline_ID}].");
+                        Debug.LogError($"adding {exe.GetType().FullName} '{exe.command.name}' ({exe.cmd_longname}) to disposed pipeline[{pipeline_ID}].");
 
-                    executor.janitor = this;
+                    exe.janitor = this;
 
-                    if (_executors.Remove(executor))
-                        Debug.LogWarning($"'{executor.GetType().FullName}' '{executor.command.name}' ({executor.cmd_longname}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
+                    if (_executors.Remove(exe))
+                        Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
 
-                    _executors.Add(executor);
+                    _executors.Add(exe);
+                    TryExecute(line, exe);
                 }
 
                 internal bool TryGetCurrent(out Executor executor)
@@ -89,13 +93,24 @@ namespace _COBRA_
                         else if (exe.TryPullNext(out exe))
                         {
                             if (exe.background)
-                                Shell.background_janitors.Add(new Janitor(exe));
+                                Shell.background_janitors.Add(new Janitor(line, exe));
                             else
                                 _executors.Add(exe);
                             return true;
                         }
                     }
 
+                    if (!TryExecute(line, exe))
+                        return false;
+
+                    if (exe.disposed)
+                        goto before_execution;
+
+                    return true;
+                }
+
+                bool TryExecute(in Line line, in Executor exe)
+                {
                     if (exe.command.action == null && exe.routine == null)
                     {
                         Debug.LogError($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) has no {nameof(exe.command.action)} or {nameof(exe.routine)} to execute.");
@@ -164,10 +179,6 @@ namespace _COBRA_
                     }
 
                     exe.line = null;
-
-                    if (exe.disposed)
-                        goto before_execution;
-
                     return true;
                 }
 

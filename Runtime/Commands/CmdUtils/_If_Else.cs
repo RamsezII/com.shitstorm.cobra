@@ -84,11 +84,11 @@ namespace _COBRA_
                     Command.Executor exe1 = (Command.Executor)exe.args[0];
 
                     if (isTrue)
-                        exe.janitor.AddExecutor(exe1);
+                        exe.janitor.AddExecutor(exe.line, exe1);
                     else if (exe.args.Count > 1)
                     {
                         Command.Executor exe2 = (Command.Executor)exe.args[1];
-                        exe.janitor.AddExecutor(exe2);
+                        exe.janitor.AddExecutor(exe.line, exe2);
                     }
                 }
                 );

@@ -61,12 +61,21 @@ namespace _COBRA_e
 
                     string input = $"git ";
 
-                    input += subcommand switch
+                    switch (subcommand)
                     {
-                        "commit" => $"-m \"{exe.args[1]}\"",
-                        "add-all" => "add .",
-                        _ => subcommand,
-                    };
+                        case "commit":
+                            input += $"-m \"{exe.args[1]}\"";
+                            break;
+
+                        case "add-all":
+                            input += "add .";
+                            break;
+
+                        default:
+                            input += subcommand;
+                            break;
+                    }
+
                     string workdir = exe.GetWorkdir();
                     Util.RunExternalCommand(workdir, input, stdout => exe.Stdout(stdout));
                 });

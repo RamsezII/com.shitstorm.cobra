@@ -29,6 +29,7 @@ namespace _COBRA_
         {
             string error = null;
 
+            // kill top executor
             if (error == null)
                 if (line.signal.HasFlag(SIGNALS.KILL))
                     if (front_janitors.Count > 0)
@@ -51,8 +52,8 @@ namespace _COBRA_
                                 }
                     }
 
+                // executate top executor
                 before_active_executors:
-
             if (error == null)
                 if (front_janitors.Count > 0)
                 {
@@ -71,8 +72,8 @@ namespace _COBRA_
                     }
                 }
 
+            // pull pending queue
             before_pending_queue:
-
             if (error == null)
                 if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
                     if (front_janitors.Count == 0 && pending_executors.Count > 0)
@@ -83,14 +84,15 @@ namespace _COBRA_
                         else if (exe.disposed)
                             error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} ({exe}) in {nameof(pending_executors)}";
                         else if (exe.background)
-                            background_janitors.Add(new Command.Executor.Janitor(exe));
+                            background_janitors.Add(new Command.Executor.Janitor(line, exe));
                         else
                         {
-                            front_janitors.Add(new Command.Executor.Janitor(exe));
+                            front_janitors.Add(new Command.Executor.Janitor(line, exe));
                             goto before_active_executors;
                         }
                     }
 
+            // parse stdin as new command line
             if (front_janitors.Count == 0)
                 if (error == null && line.HasNext(true))
                     if (Command.static_domain.TryReadCommand_path(line, out var path))
@@ -105,7 +107,7 @@ namespace _COBRA_
                             if (exe.background)
                             {
                                 exe.PropagateBackground();
-                                background_janitors.Add(new Command.Executor.Janitor(exe));
+                                background_janitors.Add(new Command.Executor.Janitor(line, exe));
                             }
                             else
                             {
@@ -116,6 +118,7 @@ namespace _COBRA_
                     else if (!string.IsNullOrWhiteSpace(line.arg_last))
                         error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
 
+            // update state
             previous_state = current_status.state;
             if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe) && active_exe.routine != null)
                 current_status = active_exe.routine.Current;
@@ -123,12 +126,14 @@ namespace _COBRA_
                 current_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: GetPrefixe(), immortal: true);
             state_changed = previous_state != current_status.state;
 
+            // show error
             if (error != null)
                 if (line.signal.HasFlag(SIGNALS.CHECK))
                     Debug.LogWarning($"[WARN {this}] -> {error}");
                 else if (line.signal.HasFlag(SIGNALS.EXEC))
                     Debug.LogError($"[ERROR {this}] -> {error}");
 
+            // null if everything good
             return error;
         }
     }

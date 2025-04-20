@@ -38,7 +38,7 @@ namespace _COBRA_
                     if (exe2.error != null)
                         exe.error = exe2.error;
                     else
-                        exe.janitor.AddExecutor(exe2);
+                        exe.janitor.AddExecutor(exe.line, exe2);
                 },
                 aliases: "xargs");
         }
