@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using _COBRA_;
 
 namespace _COBRA_e
@@ -22,6 +19,15 @@ namespace _COBRA_e
                 ├── -d [branch]
                 └── [new-branch]
         */
+
+        // for d in */; do (cd "$d" && [ -d .git ] && echo "➡️ $d" && git pull); done
+
+        // for d in */; do
+        // if [ -d "$d/.git" ]; then
+        //     echo -e "\n\e[1;36m📂 $d\e[0m"
+        //     (cd "$d" && git pull)
+        // fi
+        // done
 
         //--------------------------------------------------------------------------------------------------------------
 
