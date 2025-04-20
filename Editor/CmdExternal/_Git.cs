@@ -37,11 +37,11 @@ namespace _COBRA_e
             Command.static_domain.AddAction(
                 "git",
                 min_args: 1,
-                max_args: 2,
+                max_args: 4,
                 opts: static exe => exe.line.TryReadOption_workdir(exe),
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string subcommand, out bool is_valid, new string[] { "status", "add-all", "commit", "push", "pull", "fetch", }))
+                    if (exe.line.TryReadArgument(out string subcommand, out bool is_valid, new string[] { "status", "add-all", "commit", "push", "pull", "fetch", "clone", }))
                         if (is_valid)
                         {
                             subcommand = subcommand.ToLower();
@@ -51,6 +51,23 @@ namespace _COBRA_e
                                 case "commit":
                                     if (exe.line.TryReadArgument(out string commit_msg, out _))
                                         exe.args.Add(commit_msg);
+                                    break;
+
+                                case "clone":
+                                    if (exe.line.TryReadArgument(out string author_name, out _))
+                                    {
+                                        exe.args.Add(author_name);
+                                        if (exe.line.TryReadArgument(out string repo_name, out _))
+                                        {
+                                            exe.args.Add(repo_name);
+                                            if (exe.line.TryReadArgument(out string local_name, out _))
+                                                exe.args.Add(local_name);
+                                        }
+                                        else
+                                            exe.error = $"specify {nameof(repo_name)}";
+                                    }
+                                    else
+                                        exe.error = $"please specify {nameof(author_name)}";
                                     break;
                             }
                         }
@@ -69,6 +86,18 @@ namespace _COBRA_e
 
                         case "add-all":
                             input += "add .";
+                            break;
+
+                        case "clone":
+                            {
+                                string author_name = (string)exe.args[1];
+                                string repo_name = (string)exe.args[2];
+                                string local_name = exe.args.Count == 2 ? repo_name : (string)exe.args[3];
+
+                                string url = $"git@github.com:{author_name}/{repo_name}.git {local_name}";
+
+                                input += "clone " + url;
+                            }
                             break;
 
                         default:
