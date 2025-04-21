@@ -212,7 +212,11 @@ namespace _COBRA_
                 }
                 else if (data != null)
                     if (line != null && line.shell != null && line.shell.terminal != null)
-                        line.shell.terminal.AddLine(data, lint ?? data.ToString());
+                        if (lint == null)
+                            foreach (string str in data.IterateThroughData_str())
+                                line.shell.terminal.AddLine(str, str);
+                        else
+                            line.shell.terminal.AddLine(data, lint ?? data.ToString());
                     else
                         foreach (object o in data.IterateThroughData())
                             Debug.Log(o);

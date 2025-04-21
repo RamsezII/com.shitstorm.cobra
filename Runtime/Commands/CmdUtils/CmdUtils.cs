@@ -57,27 +57,6 @@ namespace _COBRA_
                 );
 
             Command.static_domain.AddPipe(
-                "enumerate",
-                on_pipe: static (exe, data) =>
-                {
-                    switch (data)
-                    {
-                        case string str:
-                            exe.Stdout(new[] { str, });
-                            break;
-
-                        case IEnumerable<object> e:
-                            foreach (object o in e)
-                                exe.Stdout(o);
-                            break;
-
-                        default:
-                            exe.Stdout(new[] { data, });
-                            break;
-                    }
-                });
-
-            Command.static_domain.AddPipe(
                 "split",
                 min_args: 1,
                 opts: static exe =>
@@ -92,21 +71,8 @@ namespace _COBRA_
                     if (exe.opts.ContainsKey(flag_remove_empties))
                         options |= StringSplitOptions.RemoveEmptyEntries;
 
-                    switch (data)
-                    {
-                        case string str:
-                            exe.Stdout(str.Split(new[] { ' ', '\n' }, options));
-                            break;
-
-                        case IEnumerable<object> e:
-                            foreach (object o in e)
-                                exe.Stdout(o.ToString().Split(new[] { ' ', '\n', }, options));
-                            break;
-
-                        default:
-                            exe.Stdout(data.ToString().Split(new[] { ' ', '\n', }, options));
-                            break;
-                    }
+                    foreach (string str in data.IterateThroughData_str())
+                        exe.Stdout(str.Split(' ', options));
                 });
 
             Command.static_domain.AddPipe(
