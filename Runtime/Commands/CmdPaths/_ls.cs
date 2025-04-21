@@ -23,10 +23,6 @@ namespace _COBRA_
                         return arg;
                     return null;
                 }
-            },
-            {
-                Command.Line.opt_workdir,
-                Command.Line.OptionParser.parser_workingdir
             }
         };
 
@@ -58,17 +54,17 @@ namespace _COBRA_
                     {
                         case PATH_FLAGS.FILE:
                             foreach (string file in Directory.EnumerateFiles(workdir, pattern))
-                                sb.AppendLine(exe.shell.PathCheck(file, PathModes.ForceFull));
+                                sb.AppendLine(exe.shell.PathCheck(file, PathModes.TryLocal));
                             break;
 
                         case PATH_FLAGS.DIRECTORY:
                             foreach (string dir in Directory.EnumerateDirectories(workdir, pattern))
-                                sb.AppendLine(exe.shell.PathCheck(dir, PathModes.ForceFull));
+                                sb.AppendLine(exe.shell.PathCheck(dir, PathModes.TryLocal));
                             break;
 
                         case PATH_FLAGS.BOTH:
                             foreach (string fse in Directory.EnumerateFileSystemEntries(workdir, pattern))
-                                sb.AppendLine(exe.shell.PathCheck(fse, PathModes.ForceFull));
+                                sb.AppendLine(exe.shell.PathCheck(fse, PathModes.TryLocal));
                             break;
                     }
 

@@ -140,9 +140,9 @@ namespace _COBRA_
             // show error
             if (error != null)
                 if (line.signal.HasFlag(SIGNALS.CHECK))
-                    Debug.LogWarning($"[WARN {this}] -> {error}");
+                    Debug.LogWarning($"[WARN {this}] signal[{line.signal}] -> {error}");
                 else if (line.signal.HasFlag(SIGNALS.EXEC))
-                    Debug.LogError($"[ERROR {this}] -> {error}");
+                    Debug.LogError($"[ERROR {this} signal[{line.signal}] -> {error}");
 
             // null if everything good
             return error;
