@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using System.IO;
+using UnityEngine;
 
 namespace _COBRA_
 {
@@ -19,7 +20,10 @@ namespace _COBRA_
 
         void AwakeWorkDir()
         {
-            working_dir = PathCheck(NUCLEOR.home_path, PathModes.ForceFull);
+            if (Application.isEditor)
+                working_dir = Application.dataPath;
+            else
+                working_dir = PathCheck(NUCLEOR.home_path, PathModes.ForceFull);
         }
 
         //--------------------------------------------------------------------------------------------------------------

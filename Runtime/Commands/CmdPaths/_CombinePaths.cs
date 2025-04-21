@@ -25,7 +25,8 @@ namespace _COBRA_
 
                     string combine = Path.Combine(path1, path2).Replace("\\","/");
                     exe.Stdout(combine);
-                });
+                },
+                aliases: "cmbp");
         }
     }
 }

@@ -192,7 +192,7 @@ namespace _COBRA_
                                 }
 
                 if (!is_var)
-                    if (path_mode == PATH_FLAGS._none_)
+                    if (path_mode == 0)
                         seems_valid = completions != null && completions.Contains(var_value_str);
                     else
                     {

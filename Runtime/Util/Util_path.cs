@@ -10,7 +10,6 @@ namespace _COBRA_
 
     public enum PATH_FLAGS : byte
     {
-        _none_,
         FILE = 1 << PATH_ENUMS.File,
         DIRECTORY = 1 << PATH_ENUMS.Dir,
         BOTH = FILE | DIRECTORY,

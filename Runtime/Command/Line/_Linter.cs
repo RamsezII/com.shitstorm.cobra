@@ -29,6 +29,7 @@ namespace _COBRA_
                 public Color var_shell = Color.gray;
                 public Color var_local = Color.gray;
                 public Color var_unknown = Color.gray;
+                public Color literal = Color.gray;
                 public Color value = Color.gray;
                 public Color type = Color.gray;
                 public Color directory = Color.gray;

@@ -18,6 +18,7 @@ namespace _COBRA_
             Init_Logs();
             Init_Seconds();
             Init_Signal();
+            Init_Routines();
 
             CmdExecutors.Init();
 

@@ -47,7 +47,8 @@ namespace _COBRA_
                     string file_path = (string)exe.args[0];
                     file_path = exe.shell.PathCheck(file_path, PathModes.ForceFull);
                     exe.Stdout(File.Exists(file_path));
-                });
+                },
+                aliases: "fex");
 
             Command.static_domain.AddAction(
                 "directory-exists",
@@ -62,7 +63,8 @@ namespace _COBRA_
                     string dir_path = (string)exe.args[0];
                     dir_path = exe.shell.PathCheck(dir_path, PathModes.ForceFull);
                     exe.Stdout(Directory.Exists(dir_path));
-                });
+                },
+                aliases: "dex");
 
             Command.static_domain.AddAction(
                 "read",

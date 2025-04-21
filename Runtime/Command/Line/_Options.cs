@@ -181,11 +181,12 @@ namespace _COBRA_
                 return true;
             }
 
-            public bool TryRead_options_parsed(in Executor executor, in Dictionary<string, Action<string>> options_parser)
+            public bool TryRead_options_parsed(in Executor executor, out VarDict output, in OptionParser parser)
             {
                 SkipLintToThisPosition();
 
-                HashSet<string> options_remaining = new(options_parser.Keys, StringComparer.OrdinalIgnoreCase);
+                output = new VarDict();
+                HashSet<string> options_remaining = new(parser.Keys, StringComparer.OrdinalIgnoreCase);
 
                 while (TryReadArgument(out string split, out bool is_candidate, options_remaining, complete_if_option: true, lint: false))
                 {
@@ -196,7 +197,7 @@ namespace _COBRA_
                     }
                     cpl_stop = true;
 
-                    if (!options_parser.ContainsKey(split))
+                    if (!parser.ContainsKey(split))
                     {
                         LintToThisPosition(linter.error);
                         executor.error = $"wrong option '{split}'";
@@ -211,7 +212,7 @@ namespace _COBRA_
 
                     LintToThisPosition(linter.option);
                     options_remaining.Remove(split);
-                    options_parser[split]?.Invoke(split);
+                    output.Add(split, parser[split]?.Invoke(this));
                 }
                 return true;
             }
