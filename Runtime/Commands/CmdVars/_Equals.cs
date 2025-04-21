@@ -7,7 +7,7 @@ namespace _COBRA_
         static void Init_Equals()
         {
             Command.static_domain.AddPipe(
-                "equals-literal",
+                "equals",
                 manual: new("[pipe output] <value>"),
                 max_args: 1,
                 args: static exe =>
