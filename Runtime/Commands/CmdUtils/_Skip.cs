@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace _COBRA_
+﻿namespace _COBRA_
 {
     partial class CmdUtils
     {
@@ -24,27 +22,9 @@ namespace _COBRA_
                     int skips = (int)exe.args[0];
                     int iterations = (int)exe.opts["i"];
 
-                    bool Check() => iterations++ >= skips;
-
-                    switch (data)
-                    {
-                        case string str:
-                            foreach (string line in str.TextToLines(true))
-                                if (Check())
-                                    exe.Stdout(line);
-                            break;
-
-                        case IEnumerable<object> objects:
-                            foreach (object obj in objects)
-                                if (Check())
-                                    exe.Stdout(obj);
-                            break;
-
-                        default:
-                            if (Check())
-                                exe.Stdout(data);
-                            break;
-                    }
+                    foreach (object o in data.IterateThroughData())
+                        if (iterations++ >= skips)
+                            exe.Stdout(o);
 
                     exe.opts["i"] = iterations;
                 });

@@ -59,7 +59,7 @@ namespace _COBRA_
 
                 internal bool TryGetCurrent(out Executor executor)
                 {
-                    for (int i = 0; i < _executors.Count; i++)
+                    for (int i = _executors.Count - 1; i >= 0; i--)
                     {
                         executor = _executors[i];
                         if (!executor.disposed)

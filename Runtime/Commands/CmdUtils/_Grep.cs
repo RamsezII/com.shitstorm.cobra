@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace _COBRA_
@@ -19,46 +20,12 @@ namespace _COBRA_
                 on_pipe: static (exe, data) =>
                 {
                     Regex regex = new((string)exe.args[0], RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-                    switch (data)
-                    {
-                        case string str:
-                            {
-                                string[] splits = str.Split('\n', '\r');
-                                List<string> matches = new();
-                                for (int i = 0; i < splits.Length; ++i)
-                                    if (regex.IsMatch(splits[i]))
-                                        matches.Add(splits[i]);
-                                if (matches.Count > 0)
-                                    exe.Stdout(matches.Join("\n"));
-                            }
-                            break;
-
-                        case IEnumerable<object> objects:
-                            {
-                                List<object> filtered = new();
-                                foreach (object obj in objects)
-                                {
-                                    string str = obj switch
-                                    {
-                                        string s => s,
-                                        _ => obj.ToString()
-                                    };
-                                    if (regex.IsMatch(str))
-                                        filtered.Add(obj);
-                                }
-                                if (filtered.Count > 0)
-                                    exe.Stdout(filtered.LinesToText());
-                            }
-                            break;
-
-                        default:
-                            {
-                                string str = data.ToString();
-                                if (regex.IsMatch(str))
-                                    exe.Stdout(str);
-                            }
-                            break;
-                    }
+                    StringBuilder sb = new();
+                    foreach (string str in data.IterateThroughData_str())
+                        if (regex.IsMatch(str))
+                            sb.AppendLine(str);
+                    if (sb.Length > 0)
+                        exe.Stdout(sb.TroncatedForLog());
                 },
                 aliases: "regex");
         }

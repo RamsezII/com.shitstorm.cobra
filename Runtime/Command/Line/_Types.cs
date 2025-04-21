@@ -17,6 +17,20 @@
                 value = 0;
                 return false;
             }
+
+            public bool TryReadFloat(out float value)
+            {
+                if (TryReadArgument(out string arg, out _, lint: false))
+                    if (arg.TryParse(out value))
+                    {
+                        LintToThisPosition(linter.literal);
+                        return true;
+                    }
+                    else
+                        ReadBack();
+                value = 0;
+                return false;
+            }
         }
     }
 }

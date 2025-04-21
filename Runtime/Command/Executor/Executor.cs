@@ -136,7 +136,7 @@ namespace _COBRA_
 
                 if (error == null)
                     if (command.routine != null)
-                        if (line.signal.HasFlag(SIGNALS.EXEC))
+                        if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
                             routine = command.routine(this);
             }
 
@@ -200,35 +200,22 @@ namespace _COBRA_
 
             public void Stdout(in object data, string lint = null)
             {
-                if (string.IsNullOrEmpty(lint))
-                    lint = data.ToString();
+                if (data == null)
+                    lint = null;
 
-                if (stdout_exe == null)
-                    if (line != null && line.shell != null && line.shell.terminal != null)
-                        line.shell.terminal.AddLine(data, lint);
-                    else
-                        switch (data)
-                        {
-                            case IEnumerable<string> lines:
-                                foreach (string line in lines)
-                                    Debug.Log(line);
-                                break;
-
-                            case string str:
-                                Debug.Log(str);
-                                break;
-
-                            default:
-                                Debug.Log(data);
-                                break;
-                        }
-                else
+                if (stdout_exe != null)
                 {
                     stdout_exe.line = line;
                     stdout_exe.janitor = janitor;
                     stdout_exe.command.on_pipe(stdout_exe, data);
                     stdout_exe.line = null;
                 }
+                else if (data != null)
+                    if (line != null && line.shell != null && line.shell.terminal != null)
+                        line.shell.terminal.AddLine(data, lint ?? data.ToString());
+                    else
+                        foreach (object o in data.IterateThroughData())
+                            Debug.Log(o);
             }
 
             //--------------------------------------------------------------------------------------------------------------

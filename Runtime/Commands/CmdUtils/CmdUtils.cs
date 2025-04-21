@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace _COBRA_
@@ -56,7 +57,29 @@ namespace _COBRA_
                 );
 
             Command.static_domain.AddPipe(
+                "enumerate",
+                on_pipe: static (exe, data) =>
+                {
+                    switch (data)
+                    {
+                        case string str:
+                            exe.Stdout(new[] { str, });
+                            break;
+
+                        case IEnumerable<object> e:
+                            foreach (object o in e)
+                                exe.Stdout(o);
+                            break;
+
+                        default:
+                            exe.Stdout(new[] { data, });
+                            break;
+                    }
+                });
+
+            Command.static_domain.AddPipe(
                 "split",
+                min_args: 1,
                 opts: static exe =>
                 {
                     if (exe.line.TryRead_flags(exe, out var flags, flag_remove_empties))
@@ -65,22 +88,38 @@ namespace _COBRA_
                 },
                 on_pipe: static (exe, data) =>
                 {
-                    if (data is string str)
-                    {
-                        StringSplitOptions options = 0;
-                        if (exe.opts.ContainsKey(flag_remove_empties))
-                            options |= StringSplitOptions.RemoveEmptyEntries;
+                    StringSplitOptions options = 0;
+                    if (exe.opts.ContainsKey(flag_remove_empties))
+                        options |= StringSplitOptions.RemoveEmptyEntries;
 
-                        foreach (string line in str.Split(new[] { ' ', '\n' }, options))
-                            exe.Stdout(line);
+                    switch (data)
+                    {
+                        case string str:
+                            exe.Stdout(str.Split(new[] { ' ', '\n' }, options));
+                            break;
+
+                        case IEnumerable<object> e:
+                            foreach (object o in e)
+                                exe.Stdout(o.ToString().Split(new[] { ' ', '\n', }, options));
+                            break;
+
+                        default:
+                            exe.Stdout(data.ToString().Split(new[] { ' ', '\n', }, options));
+                            break;
                     }
-                    else
-                        exe.Stdout(data);
                 });
 
             Command.static_domain.AddPipe(
                 "prefixe",
                 min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string prefixe, out _))
+                        exe.args.Add(prefixe);
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_no_white_space))
+                        foreach (string flag in flags)
+                            exe.args.Add(flag);
+                },
                 on_pipe: static (exe, data) =>
                 {
                     string prefixe = (string)exe.args[0];
@@ -90,16 +129,7 @@ namespace _COBRA_
                         exe.Stdout($"{prefixe} {data}");
                     else
                         exe.Stdout($"{prefixe}{data}");
-                },
-                args: static exe =>
-                {
-                    if (exe.line.TryReadArgument(out string prefixe, out _))
-                        exe.args.Add(prefixe);
-                    if (exe.line.TryRead_flags(exe, out var flags, flag_no_white_space))
-                        foreach (string flag in flags)
-                            exe.args.Add(flag);
-                }
-                );
+                });
         }
     }
 }

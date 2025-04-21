@@ -4,6 +4,10 @@ namespace _COBRA_
 {
     partial class Shell
     {
+        int last_tick;
+
+        //--------------------------------------------------------------------------------------------------------------
+
         static void UpdateBackgroundJanitors()
         {
             Command.Line line = new(string.Empty, SIGNALS.TICK, null);
@@ -28,6 +32,13 @@ namespace _COBRA_
         public string PropagateLine(in Command.Line line)
         {
             string error = null;
+
+            if (line.signal.HasFlag(SIGNALS.TICK))
+            {
+                if (Time.frameCount == last_tick)
+                    error = $"tick redundancy ({nameof(Time.frameCount)}: {Time.frameCount})";
+                last_tick = Time.frameCount;
+            }
 
             // kill top executor
             if (error == null)

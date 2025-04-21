@@ -1,16 +1,20 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace _COBRA_
 {
     partial class CmdPaths
     {
         const string
-            opt_pattern = "--pattern";
+            opt_pattern = "--pattern",
+            flag_file = "-f",
+            flag_dir = "-d";
 
         static readonly Command.Line.OptionParser ls_opts = new(false)
         {
+            { flag_file, null },
+            { flag_dir, null },
             {
                 opt_pattern,
                 line =>
@@ -28,17 +32,10 @@ namespace _COBRA_
 
         static void Init_Enumerates()
         {
-            const string
-                flag_file = "-f",
-                flag_dir = "-d";
-
             Command.static_domain.AddAction(
                 "ls",
                 opts: static exe =>
                 {
-                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, flag_file, flag_dir))
-                        exe.opts.Add(flag, null);
-
                     if (exe.line.TryRead_options_parsed(exe, out var outputs, ls_opts))
                         foreach (var pair in outputs)
                             exe.opts.Add(pair.Key, pair.Value);
@@ -55,24 +52,27 @@ namespace _COBRA_
                         pattern = "*";
 
                     string workdir = exe.GetWorkdir();
+                    StringBuilder sb = new();
 
                     switch (flags)
                     {
                         case PATH_FLAGS.FILE:
                             foreach (string file in Directory.EnumerateFiles(workdir, pattern))
-                                exe.Stdout(exe.shell.PathCheck(file, PathModes.ForceFull));
+                                sb.AppendLine(exe.shell.PathCheck(file, PathModes.ForceFull));
                             break;
 
                         case PATH_FLAGS.DIRECTORY:
                             foreach (string dir in Directory.EnumerateDirectories(workdir, pattern))
-                                exe.Stdout(exe.shell.PathCheck(dir, PathModes.ForceFull));
+                                sb.AppendLine(exe.shell.PathCheck(dir, PathModes.ForceFull));
                             break;
 
                         case PATH_FLAGS.BOTH:
                             foreach (string fse in Directory.EnumerateFileSystemEntries(workdir, pattern))
-                                exe.Stdout(exe.shell.PathCheck(fse, PathModes.ForceFull));
+                                sb.AppendLine(exe.shell.PathCheck(fse, PathModes.ForceFull));
                             break;
                     }
+
+                    exe.Stdout(sb.TroncatedForLog());
                 });
         }
     }
