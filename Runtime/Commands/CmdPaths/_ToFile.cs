@@ -55,7 +55,8 @@ namespace _COBRA_
                         {
                             exe.error = $"failed to write to file: '{path}', error: {ex.TrimMessage()}";
                         }
-                });
+                },
+                aliases: ">>");
         }
     }
 }

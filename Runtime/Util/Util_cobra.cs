@@ -126,7 +126,7 @@
                         ++read_i;
                     }
                     ++read_i;
-                    return TryRead(start_i, ref read_i, out arguments);
+                    break;
             }
             ++read_i;
         }

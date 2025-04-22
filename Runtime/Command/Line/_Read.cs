@@ -14,7 +14,7 @@ namespace _COBRA_
                 LintToThisPosition(linter._default_);
                 if (text.TryReadArguments(out _, ref read_i, out arguments))
                 {
-                    LintToThisPosition(linter._readall_);
+                    LintToThisPosition(linter.external);
                     return true;
                 }
                 return false;
@@ -46,6 +46,18 @@ namespace _COBRA_
                             LintToThisPosition(linter.background);
                         argument = text[start_i..read_i];
                         return true;
+                        
+                    //case '>':
+                    //    ++read_i;
+                    //    if (read_i < text.Length && text[read_i] == '>')
+                    //    {
+                    //        ++read_i;
+                    //        LintToThisPosition(linter.redirect_overwrite);
+                    //    }
+                    //    else
+                    //        LintToThisPosition(linter.redirect_append);
+                    //    argument = text[start_i..read_i];
+                    //    return true;
 
                     case '|':
                         ++read_i;
