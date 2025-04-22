@@ -21,9 +21,10 @@ namespace _COBRA_
         void AwakeWorkDir()
         {
             if (Application.isEditor)
-                working_dir = Application.dataPath;
+                working_dir = Directory.GetParent(Application.dataPath).FullName;
             else
-                working_dir = PathCheck(NUCLEOR.home_path, PathModes.ForceFull);
+                working_dir = NUCLEOR.home_path;
+            working_dir = PathCheck(working_dir, PathModes.ForceFull);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -37,6 +38,8 @@ namespace _COBRA_
                 working_dir = "~";
             else if (working_dir.Contains(referent_dir))
                 working_dir = Path.Combine("~", Path.GetRelativePath(referent_dir, working_dir));
+
+            working_dir = working_dir.Replace("\\", "/");
 
             user_name ??= MachineSettings.machine_name.Value;
             cmd_path ??= working_dir;

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -15,6 +14,10 @@ namespace _COBRA_
         {
             { flag_file, null },
             { flag_dir, null },
+            {
+                Command.Line.opt_workdir,
+                Command.Line.OptionParser.parser_workingdir
+            },
             {
                 opt_pattern,
                 line =>

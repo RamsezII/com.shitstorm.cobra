@@ -8,7 +8,7 @@ namespace _COBRA_
         static void Init_Remove()
         {
             Command.static_domain.AddAction(
-                "rm",
+                "remove-file-or-directory",
                 min_args: 1,
                 opts: static exe =>
                 {
@@ -17,7 +17,7 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.BOTH))
                         if (is_candidate)
                             exe.args.Add(path);
                 },
@@ -39,7 +39,8 @@ namespace _COBRA_
                         Debug.LogException(ioe);
                         Debug.LogWarning($"use the '{flag_recursive}' flag if you want to remove recursively (including inside content)");
                     }
-                });
+                },
+                aliases: "rm");
 
             Command.static_domain.AddAction(
                 "remove-directory",

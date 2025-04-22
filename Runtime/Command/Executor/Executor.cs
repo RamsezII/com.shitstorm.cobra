@@ -209,6 +209,7 @@ namespace _COBRA_
                     stdout_exe.janitor = janitor;
                     stdout_exe.command.on_pipe(stdout_exe, data);
                     stdout_exe.line = null;
+                    error = stdout_exe.error;
                 }
                 else if (data != null)
                     if (line != null && line.shell != null && line.shell.terminal != null)

@@ -48,7 +48,8 @@ namespace _COBRA_
                         try
                         {
                             using StreamWriter writer = new(path, !overwrite);
-                            writer.Write(data);
+                            foreach (string line in data.IterateThroughData_str())
+                                writer.WriteLine(line);
                         }
                         catch (Exception ex)
                         {
