@@ -24,6 +24,7 @@ namespace _COBRA_
                 public Color option_value = Color.gray;
                 public Color pipe = Color.gray;
                 public Color chain = Color.gray;
+                public Color external = Color.gray;
                 public Color background = Color.gray;
                 public Color var_global = Color.gray;
                 public Color var_shell = Color.gray;

@@ -4,21 +4,20 @@ namespace _COBRA_
 {
     internal static class CmdExternal
     {
-        static Command cmd_ext;
-
-        //--------------------------------------------------------------------------------------------------------------
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            cmd_ext = Command.static_domain.AddAction(
+            Command.static_domain.AddAction(
                 "run-external-command",
                 min_args: 1,
                 opts: static exe => exe.line.TryReadOption_workdir(exe),
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArguments(out string command_line))
+                    if (exe.line.TryReadArgument(out string command_line, out _, lint: false))
+                    {
+                        exe.line.LintToThisPosition(exe.line.linter.external);
                         exe.args.Add(command_line);
+                    }
                 },
                 action: static exe =>
                 {
