@@ -46,7 +46,7 @@ namespace _COBRA_
                             LintToThisPosition(linter.background);
                         argument = text[start_i..read_i];
                         return true;
-                        
+
                     //case '>':
                     //    ++read_i;
                     //    if (read_i < text.Length && text[read_i] == '>')
@@ -152,6 +152,8 @@ namespace _COBRA_
                         var_value_str = var_value.ToString();
                         seems_valid = true;
                     }
+                    else if (HasFlags_any(SIGNALS.CHECK | SIGNALS.EXEC | SIGNALS.TICK))
+                        Debug.LogWarning($"no var named: '{var_name}'");
 
                 if (isNotEmpty)
                 {
