@@ -23,6 +23,7 @@ namespace _COBRA_
             Init_Enumerates();
             Init_CombinePaths();
             Init_Remove();
+            Init_EchoPaths();
 
             Command.static_domain.AddAction(
                 "working-directory",

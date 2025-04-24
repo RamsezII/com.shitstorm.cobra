@@ -37,6 +37,21 @@ namespace _COBRA_
                 action: exe => exe.Stdout(exe.args[0])
                 );
 
+            Command.static_domain.AddAction("echoes",
+                manual: new("up to 100 arguments sent into the pipe"),
+                min_args: 1,
+                max_args: 100,
+                args: exe =>
+                {
+                    while (exe.line.TryReadArgument(out string arg, out _))
+                        exe.args.Add(arg);
+                },
+                action: exe =>
+                {
+                    for (int i = 0; i < exe.args.Count; ++i)
+                        exe.Stdout(exe.args[i]);
+                });
+
             Command.static_domain.AddAction(
                 "shutdown",
                 manual: new("closes the application"),
