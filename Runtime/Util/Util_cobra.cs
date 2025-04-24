@@ -113,9 +113,6 @@
                     ++read_i;
                     break;
 
-                case '&' or '|':
-                    return TryRead(start_i, ref read_i, out arguments);
-
                 case '"':
                 case '\'':
                     ++read_i;

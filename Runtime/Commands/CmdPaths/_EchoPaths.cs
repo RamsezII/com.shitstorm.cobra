@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace _COBRA_
 {
     partial class CmdPaths
@@ -37,8 +39,10 @@ namespace _COBRA_
                 },
                 action: static exe =>
                 {
+                    StringBuilder sb = new();
                     for (int i = 0; i < exe.args.Count; ++i)
-                        exe.Stdout(exe.args[i]);
+                        sb.AppendLine(exe.args[i].ToString());
+                    exe.Stdout(sb.TroncatedForLog());
                 });
         }
     }

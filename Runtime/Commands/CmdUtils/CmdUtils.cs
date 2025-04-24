@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using System;
+using System.Text;
 using UnityEngine;
 
 namespace _COBRA_
@@ -48,8 +49,10 @@ namespace _COBRA_
                 },
                 action: exe =>
                 {
+                    StringBuilder sb = new();
                     for (int i = 0; i < exe.args.Count; ++i)
-                        exe.Stdout(exe.args[i]);
+                        sb.AppendLine(exe.args[i].ToString());
+                    exe.Stdout(sb.TroncatedForLog());
                 });
 
             Command.static_domain.AddAction(
