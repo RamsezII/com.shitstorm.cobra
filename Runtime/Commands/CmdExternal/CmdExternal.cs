@@ -1,3 +1,6 @@
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace _COBRA_
@@ -10,6 +13,33 @@ namespace _COBRA_
             const string
                 flag_read_all = "--read-all",
                 flag_r = "-r";
+
+            Command.static_domain.AddAction(
+                "os-terminal",
+                opts: static exe => exe.line.TryReadOption_workdir(exe),
+                action: static exe =>
+                {
+                    string workdir = exe.GetWorkdir();
+                    ProcessStartInfo psi = new()
+                    {
+                        FileName = GetTerminalCommand(),
+                        WorkingDirectory = workdir,
+                        UseShellExecute = true,
+                    };
+                    Process.Start(psi);
+
+                    static string GetTerminalCommand()
+                    {
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            return "powershell.exe";
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                            return "gnome-terminal";
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                            return "open -a Terminal";
+
+                        throw new PlatformNotSupportedException("Unsupported OS platform.");
+                    }
+                });
 
             Command.static_domain.AddAction(
                 "run-external-command",
