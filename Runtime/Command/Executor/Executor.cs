@@ -198,8 +198,10 @@ namespace _COBRA_
                 return shell.working_dir;
             }
 
-            public void Stdout(in object data, string lint = null)
+            public void Stdout(in object data, string lint = null, Line line = null)
             {
+                line ??= this.line;
+
                 if (data == null)
                     lint = null;
 
