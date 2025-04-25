@@ -48,17 +48,17 @@ namespace _COBRA_
                         argument = text[start_i..read_i];
                         return true;
 
-                    //case '>':
-                    //    ++read_i;
-                    //    if (read_i < text.Length && text[read_i] == '>')
-                    //    {
-                    //        ++read_i;
-                    //        LintToThisPosition(linter.redirect_overwrite);
-                    //    }
-                    //    else
-                    //        LintToThisPosition(linter.redirect_append);
-                    //    argument = text[start_i..read_i];
-                    //    return true;
+                    case '>':
+                        ++read_i;
+                        if (read_i < text.Length && text[read_i] == '>')
+                        {
+                            ++read_i;
+                            LintToThisPosition(linter.redirect_overwrite);
+                        }
+                        else
+                            LintToThisPosition(linter.redirect_append);
+                        argument = text[start_i..read_i];
+                        return true;
 
                     case '|':
                         ++read_i;
@@ -117,7 +117,8 @@ namespace _COBRA_
                 in bool strict = false,
                 in FS_TYPES path_mode = 0,
                 in bool stop_if_var = false,
-                in bool lint = true)
+                in bool lint = true,
+                in bool find_and_replace_variables = true)
             {
                 if (lint)
                     LintToThisPosition(linter._default_);
@@ -155,6 +156,29 @@ namespace _COBRA_
                     }
                     else if (HasFlags_any(SIGNALS.CHECK | SIGNALS.EXEC | SIGNALS.TICK))
                         Debug.LogWarning($"no var named: '{var_name}'");
+
+                // remplacer les @ par valeurs
+                if (!is_var)
+                    if (isNotEmpty)
+                        if (find_and_replace_variables)
+                            for (int i = 0; i < var_value_str.Length; ++i)
+                            {
+                                char c = var_value_str[i];
+                                if (c == '{')
+                                {
+                                    int vi = i;
+                                    while (i < var_value_str.Length - 1 && var_value_str[++i] != '}') ;
+                                    if (i > vi + 1)
+                                    {
+                                        string varname = var_value_str[(vi + 1)..i];
+                                        if (shell.shell_vars.TryGetValue(varname, out var var_value) || Shell.global_vars.TryGetValue(varname, out var_value))
+                                        {
+                                            string val = var_value.ToString();
+                                            var_value_str = var_value_str[..vi] + val + var_value_str[(i + 1)..];
+                                        }
+                                    }
+                                }
+                            }
 
                 if (isNotEmpty)
                 {
