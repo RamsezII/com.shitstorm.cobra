@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _UTIL_;
 
 namespace _COBRA_
 {
@@ -12,7 +13,7 @@ namespace _COBRA_
                 public static readonly Func<Line, object>
                     parser_workingdir = line =>
                     {
-                        if (line.TryReadArgument(out string path, out bool seems_valid, path_mode: PATH_FLAGS.DIRECTORY))
+                        if (line.TryReadArgument(out string path, out bool seems_valid, path_mode: FS_TYPES.DIRECTORY))
                             if (seems_valid)
                                 return path;
                         return null;

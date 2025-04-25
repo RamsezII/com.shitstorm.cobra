@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using _UTIL_;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -23,7 +24,7 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     bool is_url = exe.opts.ContainsKey(flag_url);
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
                         if (is_url)
                             exe.args.Add(path);
                         else

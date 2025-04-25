@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using _UTIL_;
 using UnityEngine;
 
 namespace _COBRA_
@@ -22,7 +23,7 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     bool force = exe.opts.ContainsKey(flag_force_file);
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
                         exe.args.Add(path);
                 },
                 action: static exe =>

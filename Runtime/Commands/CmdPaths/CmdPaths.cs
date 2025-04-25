@@ -1,4 +1,5 @@
 ﻿using _ARK_;
+using _UTIL_;
 using System.IO;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string file_path, out bool is_valid, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string file_path, out bool is_valid, path_mode: FS_TYPES.FILE))
                         exe.args.Add(file_path);
                 },
                 action: static exe =>
@@ -56,7 +57,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string dir_path, out bool is_valid, path_mode: PATH_FLAGS.DIRECTORY))
+                    if (exe.line.TryReadArgument(out string dir_path, out bool is_valid, path_mode: FS_TYPES.DIRECTORY))
                         exe.args.Add(dir_path);
                 },
                 action: static exe =>
@@ -72,7 +73,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
                         exe.args.Add(path);
                 },
                 action: static exe =>
@@ -90,7 +91,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, out _, path_mode: PATH_FLAGS.DIRECTORY))
+                    if (exe.line.TryReadArgument(out string path, out _, path_mode: FS_TYPES.DIRECTORY))
                         exe.args.Add(path);
                 },
                 action: static exe =>

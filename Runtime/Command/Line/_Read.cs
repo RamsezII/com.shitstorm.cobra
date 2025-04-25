@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using _UTIL_;
 using UnityEngine;
 
 namespace _COBRA_
@@ -114,7 +115,7 @@ namespace _COBRA_
                 IEnumerable<string> completions = null,
                 in bool complete_if_option = false,
                 in bool strict = false,
-                in PATH_FLAGS path_mode = 0,
+                in FS_TYPES path_mode = 0,
                 in bool stop_if_var = false,
                 in bool lint = true)
             {
@@ -188,18 +189,18 @@ namespace _COBRA_
                 if (!cpl_done)
                     if (signal.HasFlag(SIGNALS.CPL))
                         if (IsOnCursor)
-                            if (path_mode.HasFlags_any(PATH_FLAGS.BOTH) || completions != null)
+                            if (path_mode.HasFlags_any(FS_TYPES.BOTH) || completions != null)
                                 if (!complete_if_option || argument.StartsWith('-'))
                                 {
                                     cpl_done = true;
                                     cpl_start_i = read_i;
                                     if (signal.HasFlag(SIGNALS.CPL_TAB))
-                                        if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
+                                        if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_tab(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_tab(var_value_str, completions);
                                     else if (signal.HasFlag(SIGNALS.CPL_ALT))
-                                        if (path_mode.HasFlags_any(PATH_FLAGS.BOTH))
+                                        if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_alt(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_alt(var_value_str, completions);
@@ -211,9 +212,9 @@ namespace _COBRA_
                     else
                     {
                         string full_path = shell.PathCheck(argument, PathModes.ForceFull);
-                        if (path_mode.HasFlag(PATH_FLAGS.FILE) && File.Exists(full_path))
+                        if (path_mode.HasFlag(FS_TYPES.FILE) && File.Exists(full_path))
                             seems_valid = true;
-                        else if (path_mode.HasFlag(PATH_FLAGS.DIRECTORY) && Directory.Exists(full_path))
+                        else if (path_mode.HasFlag(FS_TYPES.DIRECTORY) && Directory.Exists(full_path))
                             seems_valid = true;
                         else
                             seems_valid = false;

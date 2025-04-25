@@ -1,4 +1,5 @@
 using System.Text;
+using _UTIL_;
 
 namespace _COBRA_
 {
@@ -23,11 +24,11 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    PATH_FLAGS mode = PATH_FLAGS.BOTH;
+                    FS_TYPES mode = FS_TYPES.BOTH;
                     if (exe.opts.ContainsKey(flag_dir))
-                        mode = PATH_FLAGS.DIRECTORY;
+                        mode = FS_TYPES.DIRECTORY;
                     if (exe.opts.ContainsKey(flag_file))
-                        mode = PATH_FLAGS.FILE;
+                        mode = FS_TYPES.FILE;
 
                     bool full = exe.opts.ContainsKey(flag_full);
                     while (exe.line.TryReadArgument(out string path, out _, strict: true, path_mode: mode))

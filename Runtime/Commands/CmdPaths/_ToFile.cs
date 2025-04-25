@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using _UTIL_;
 
 namespace _COBRA_
 {
@@ -23,7 +24,7 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     bool create_if_empty = exe.opts.ContainsKey(flag_create_if_empty);
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
                         exe.args.Add(path);
                 },
                 on_pipe: static (exe, data) =>

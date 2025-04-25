@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using _UTIL_;
 
 namespace _COBRA_
 {
@@ -13,7 +14,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: exe =>
                 {
-                    if (exe.line.TryReadArgument(out string script_path, out _, strict: true, path_mode: PATH_FLAGS.FILE))
+                    if (exe.line.TryReadArgument(out string script_path, out _, strict: true, path_mode: FS_TYPES.FILE))
                         exe.args.Add(script_path);
                 },
                 routine: ERun);

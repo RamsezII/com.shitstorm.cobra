@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using _UTIL_;
 
 namespace _COBRA_
 {
@@ -41,11 +42,11 @@ namespace _COBRA_
                 },
                 action: static exe =>
                 {
-                    PATH_FLAGS flags = PATH_FLAGS.BOTH;
+                    FS_TYPES flags = FS_TYPES.BOTH;
                     if (exe.opts.ContainsKey(flag_dir))
-                        flags = PATH_FLAGS.DIRECTORY;
+                        flags = FS_TYPES.DIRECTORY;
                     if (exe.opts.ContainsKey(flag_file))
-                        flags |= PATH_FLAGS.FILE;
+                        flags |= FS_TYPES.FILE;
 
                     if (!exe.opts.TryGetValue_str(opt_pattern, out string pattern))
                         pattern = "*";
@@ -55,17 +56,17 @@ namespace _COBRA_
 
                     switch (flags)
                     {
-                        case PATH_FLAGS.FILE:
+                        case FS_TYPES.FILE:
                             foreach (string file in Directory.EnumerateFiles(workdir, pattern))
                                 sb.AppendLine(exe.shell.PathCheck(file, PathModes.TryLocal));
                             break;
 
-                        case PATH_FLAGS.DIRECTORY:
+                        case FS_TYPES.DIRECTORY:
                             foreach (string dir in Directory.EnumerateDirectories(workdir, pattern))
                                 sb.AppendLine(exe.shell.PathCheck(dir, PathModes.TryLocal));
                             break;
 
-                        case PATH_FLAGS.BOTH:
+                        case FS_TYPES.BOTH:
                             foreach (string fse in Directory.EnumerateFileSystemEntries(workdir, pattern))
                                 sb.AppendLine(exe.shell.PathCheck(fse, PathModes.TryLocal));
                             break;

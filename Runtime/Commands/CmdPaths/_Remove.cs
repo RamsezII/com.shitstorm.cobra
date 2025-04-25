@@ -1,4 +1,5 @@
 using System.IO;
+using _UTIL_;
 using UnityEngine;
 
 namespace _COBRA_
@@ -17,7 +18,7 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.BOTH))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.BOTH))
                         if (is_candidate)
                             exe.args.Add(path);
                 },
@@ -52,7 +53,7 @@ namespace _COBRA_
                 },
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: PATH_FLAGS.DIRECTORY))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.DIRECTORY))
                         if (is_candidate)
                             exe.args.Add(path);
                         else
