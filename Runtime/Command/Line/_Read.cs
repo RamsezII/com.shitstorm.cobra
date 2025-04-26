@@ -157,7 +157,6 @@ namespace _COBRA_
                     else if (HasFlags_any(SIGNALS.CHECK | SIGNALS.EXEC | SIGNALS.TICK))
                         Debug.LogWarning($"no var named: '{var_name}'");
 
-                // remplacer les @ par valeurs
                 if (!is_var)
                     if (isNotEmpty)
                         if (find_and_replace_variables)
