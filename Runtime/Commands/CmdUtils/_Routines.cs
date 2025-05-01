@@ -70,7 +70,8 @@ namespace _COBRA_
                     if (exe.line.TryReadFloat(out float value))
                         exe.args.Add(value);
                 },
-                routine: EWaitSeconds);
+                routine: EWaitSeconds,
+                aliases: "wsec");
 
             static IEnumerator<CMD_STATUS> ETick(Command.Executor exe)
             {
