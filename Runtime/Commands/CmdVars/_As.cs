@@ -61,7 +61,7 @@ namespace _COBRA_
                 on_pipe: static (exe, data) =>
                 {
                     string cmd_line = (string)exe.args[0];
-                    Command.Line subline = new(cmd_line, exe.line.signal, exe.line.shell);
+                    Command.Line subline = new(cmd_line, exe.line?.signal ?? SIGNALS.EXEC, exe.line?.shell ?? exe.shell);
 
                     if (Command.static_domain.TryReadCommand_path(subline, out var path))
                     {
