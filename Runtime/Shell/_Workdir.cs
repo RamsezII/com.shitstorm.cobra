@@ -41,7 +41,7 @@ namespace _COBRA_
 
             working_dir = working_dir.Replace("\\", "/");
 
-            user_name ??= MachineSettings.machine_name.Value;
+            user_name ??= MachineSettings.user_name.Value;
             cmd_path ??= working_dir;
             return $"{user_name.SetColor("#73CC26")}:{cmd_path.SetColor("#73B2D9")}$";
         }
