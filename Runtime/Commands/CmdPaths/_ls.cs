@@ -8,6 +8,7 @@ namespace _COBRA_
     {
         const string
             opt_pattern = "--pattern",
+            flag_r = "-r",
             flag_file = "-f",
             flag_dir = "-d";
 
@@ -15,6 +16,7 @@ namespace _COBRA_
         {
             { flag_file, null },
             { flag_dir, null },
+            { flag_r, null },
             {
                 Command.Line.opt_workdir,
                 Command.Line.OptionParser.parser_workingdir
@@ -51,23 +53,25 @@ namespace _COBRA_
                     if (!exe.opts.TryGetValue_str(opt_pattern, out string pattern))
                         pattern = "*";
 
+                    SearchOption search_option = exe.opts.ContainsKey(flag_r) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
                     string workdir = exe.GetWorkdir();
                     StringBuilder sb = new();
 
                     switch (flags)
                     {
                         case FS_TYPES.FILE:
-                            foreach (string file in Directory.EnumerateFiles(workdir, pattern))
+                            foreach (string file in Directory.EnumerateFiles(workdir, pattern, search_option))
                                 sb.AppendLine(exe.shell.PathCheck(file, PathModes.TryLocal));
                             break;
 
                         case FS_TYPES.DIRECTORY:
-                            foreach (string dir in Directory.EnumerateDirectories(workdir, pattern))
+                            foreach (string dir in Directory.EnumerateDirectories(workdir, pattern, search_option))
                                 sb.AppendLine(exe.shell.PathCheck(dir, PathModes.TryLocal));
                             break;
 
                         case FS_TYPES.BOTH:
-                            foreach (string fse in Directory.EnumerateFileSystemEntries(workdir, pattern))
+                            foreach (string fse in Directory.EnumerateFileSystemEntries(workdir, pattern, search_option))
                                 sb.AppendLine(exe.shell.PathCheck(fse, PathModes.TryLocal));
                             break;
                     }

@@ -9,7 +9,7 @@ namespace _COBRA_
     {
         partial class Line
         {
-            static readonly string history_file_name = typeof(Line).TypeToFileName() + ".history.txt";
+            static readonly string history_file_name = typeof(Line).FullName + ".history.txt";
             static string GetHistoryPath() => Path.Combine(NUCLEOR.home_path.GetDir(true).FullName, history_file_name);
 
             const int max_history = 50;
