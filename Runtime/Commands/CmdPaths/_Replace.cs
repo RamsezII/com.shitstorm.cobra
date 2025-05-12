@@ -36,7 +36,8 @@ namespace _COBRA_
                         {
                             string new_path = path[..^ext1.Length] + ext2;
                             File.Move(path, new_path);
-                            Debug.Log($"{Path.GetFileName(path)} -> {Path.GetFileName(new_path)}".ToSubLog());
+                            Debug.Log(Path.GetFileName(path));
+                            Debug.Log($"{path}\n{new_path}\n".ToSubLog());
                         }
                         else
                             exe.error = $"File '{path}' does not end with '{ext1}'";
@@ -46,7 +47,8 @@ namespace _COBRA_
                         {
                             string new_path = file[..^ext1.Length] + ext2;
                             File.Move(file, new_path);
-                            Debug.Log($"{Path.GetFileName(file)} -> {Path.GetFileName(new_path)}".ToSubLog());
+                            Debug.Log(Path.GetFileName(file));
+                            Debug.Log($"{file}\n{new_path}\n".ToSubLog());
                         }
                 });
         }
