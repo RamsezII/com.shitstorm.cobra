@@ -116,7 +116,6 @@ namespace _COBRA_
                 in bool complete_if_option = false,
                 in bool strict = false,
                 in FS_TYPES path_mode = 0,
-                in string search_pattern = "*",
                 in bool stop_if_var = false,
                 in bool lint = true,
                 in bool find_and_replace_variables = true)
@@ -220,12 +219,12 @@ namespace _COBRA_
                                     cpl_start_i = read_i;
                                     if (signal.HasFlag(SIGNALS.CPL_TAB))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
-                                            PathCompletion_tab(var_value_str, search_pattern, path_mode, out completions);
+                                            PathCompletion_tab(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_tab(var_value_str, completions);
                                     else if (signal.HasFlag(SIGNALS.CPL_ALT))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
-                                            PathCompletion_alt(var_value_str, search_pattern, path_mode, out completions);
+                                            PathCompletion_alt(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_alt(var_value_str, completions);
                                 }

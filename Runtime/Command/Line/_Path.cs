@@ -47,7 +47,7 @@ namespace _COBRA_
                     LintToThisPosition(linter.path);
             }
 
-            void PathCompletion_tab(string arg, string search_pattern, in FS_TYPES flags, out IEnumerable<string> candidates)
+            void PathCompletion_tab(string arg, in FS_TYPES flags, out IEnumerable<string> candidates)
             {
                 string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool arg_rooted, out bool arg_in_workdir);
 
@@ -60,16 +60,11 @@ namespace _COBRA_
 
                 candidates = flags switch
                 {
-                    FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(parent_dir, search_pattern),
-                    FS_TYPES.BOTH => Directory.EnumerateFileSystemEntries(parent_dir, search_pattern),
+                    FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(parent_dir),
                     _ => Directory.EnumerateFileSystemEntries(parent_dir),
                 };
 
                 candidates = candidates.Select(path => shell.PathCheck(path, arg_rooted ? PathModes.ForceFull : PathModes.TryLocal));
-
-                if (search_pattern != "*")
-                    if (flags == FS_TYPES.FILE)
-                        candidates = candidates.Where(path => Directory.Exists(path) || path.MatchesPattern(search_pattern));
 
                 string[] array = ECompletionCandidates_tab(arg, candidates).ToArray();
                 if (array.Length == 0)
@@ -77,7 +72,7 @@ namespace _COBRA_
                 InsertCompletionCandidate(array[cpl_index % array.Length]);
             }
 
-            void PathCompletion_alt(in string arg, string search_pattern, in FS_TYPES flags, out IEnumerable<string> candidates)
+            void PathCompletion_alt(in string arg, in FS_TYPES flags, out IEnumerable<string> candidates)
             {
                 string full_path = shell.PathCheck(arg, PathModes.ForceFull, out bool arg_rooted, out bool arg_in_workdir);
 
@@ -94,22 +89,6 @@ namespace _COBRA_
                     };
 
                     candidates = candidates.Select(path => shell.PathCheck(path, arg_rooted ? PathModes.ForceFull : PathModes.TryLocal));
-
-                    if (search_pattern != "*")
-                        switch (flags)
-                        {
-                            case FS_TYPES.FILE:
-                                candidates = candidates.Where(path => path.EndsWith(search_pattern, StringComparison.OrdinalIgnoreCase) && File.Exists(path));
-                                break;
-
-                            case FS_TYPES.DIRECTORY:
-                                candidates = candidates.Where(path => path.EndsWith(search_pattern, StringComparison.OrdinalIgnoreCase) && Directory.Exists(path));
-                                break;
-
-                            case FS_TYPES.BOTH:
-                                candidates = candidates.Where(path => path.EndsWith(search_pattern, StringComparison.OrdinalIgnoreCase));
-                                break;
-                        }
 
                     string[] dirs = candidates.ToArray();
 
@@ -139,22 +118,6 @@ namespace _COBRA_
                         FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(full_path),
                         _ => Directory.EnumerateFileSystemEntries(full_path),
                     };
-
-                    if (search_pattern != "*")
-                        switch (flags)
-                        {
-                            case FS_TYPES.FILE:
-                                candidates = candidates.Where(path => path.EndsWith(search_pattern, StringComparison.OrdinalIgnoreCase) && File.Exists(path));
-                                break;
-
-                            case FS_TYPES.DIRECTORY:
-                                candidates = candidates.Where(path => path.EndsWith(search_pattern, StringComparison.OrdinalIgnoreCase) && Directory.Exists(path));
-                                break;
-
-                            case FS_TYPES.BOTH:
-                                candidates = candidates.Where(path => path.EndsWith(search_pattern, StringComparison.OrdinalIgnoreCase));
-                                break;
-                        }
 
                     foreach (string fs in candidates)
                     {
