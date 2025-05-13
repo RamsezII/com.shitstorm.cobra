@@ -54,7 +54,7 @@ namespace _COBRA_
                         }
                         catch (Exception ex)
                         {
-                            exe.error = $"failed to write to file: '{path}', error: {ex.TrimMessage()}";
+                            exe.error = $"failed to write to file: '{path}', error: {ex.TrimmedMessage()}";
                         }
                 },
                 aliases: ">>");
