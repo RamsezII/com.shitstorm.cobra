@@ -162,7 +162,7 @@ namespace _COBRA_
                                 if (exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
                                 {
                                     error = $"{this} {exe} {Util.PullValue(ref exe.error)}";
-                                    Debug.LogError(error);
+                                    Debug.LogWarning(error);
                                     exe.Dispose();
                                 }
                                 else

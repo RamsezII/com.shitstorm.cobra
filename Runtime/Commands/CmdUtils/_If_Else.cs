@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _COBRA_
 {
@@ -74,13 +75,26 @@ namespace _COBRA_
                 },
                 on_pipe: static (exe, data) =>
                 {
-                    bool isTrue = data switch
+                    bool isTrue;
+                    switch (data)
                     {
-                        bool b => b,
-                        string str => str.Equals("true", StringComparison.OrdinalIgnoreCase),
-                        int i => i != 0,
-                        _ => false,
-                    };
+                        case bool _bool:
+                            isTrue = _bool;
+                            break;
+
+                        case string _string:
+                            isTrue = _string.Equals("true", StringComparison.OrdinalIgnoreCase);
+                            break;
+
+                        case int _int:
+                            isTrue = _int != 0;
+                            break;
+
+                        default:
+                            isTrue = false;
+                            exe.error = $"received wrong argument '{data}'.";
+                            break;
+                    }
 
                     if (isTrue)
                     {

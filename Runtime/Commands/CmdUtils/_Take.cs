@@ -2,10 +2,10 @@
 {
     partial class CmdUtils
     {
-        static void Init_Stop()
+        static void Init_Take()
         {
             Command.static_domain.AddPipe(
-                "stop",
+                "take",
                 max_args: 1,
                 opts: static exe => exe.opts.Add("i", 0),
                 args: static exe =>

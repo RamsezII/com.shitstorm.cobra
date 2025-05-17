@@ -15,7 +15,7 @@ namespace _COBRA_
             InitLinter();
             Init_If_Else();
             Init_Skip();
-            Init_Stop();
+            Init_Take();
             Init_Logs();
             Init_Seconds();
             Init_Signal();
