@@ -64,13 +64,19 @@ namespace _COBRA_
             Command.static_domain.AddAction(
                 "clear",
                 manual: new("clear all previous logs"),
-                action: exe => Application.Quit()
+                action: exe => exe.shell.terminal.ClearLines()
                 );
 
             Command.static_domain.AddAction(
                 "clear-history",
                 manual: new("clear all previous entries"),
                 action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
+                );
+
+            Command.static_domain.AddAction(
+                "exit",
+                manual: new("close the terminal"),
+                action: exe => exe.shell.terminal.Exit()
                 );
 
             Command.static_domain.AddPipe(
