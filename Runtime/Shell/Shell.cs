@@ -101,6 +101,8 @@ namespace _COBRA_
             for (int i = 0; i < front_janitors.Count; i++)
                 front_janitors[i].Dispose();
             front_janitors.Clear();
+
+            Debug.Log($"destroyed {GetType().FullName} ({transform.GetPath(true)})".ToSubLog());
         }
 
         static void OnNucleorQuit()
