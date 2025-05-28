@@ -44,9 +44,9 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                public string GetLint(in Shell shell, in string input, out Signal signal, in SIG_FLAGS flags = 0)
+                public string GetLint(in Shell shell, in string input, out Signal signal, in SIG_FLAGS flags = 0, in int cursor_i = -1)
                 {
-                    signal = new(input, SIG_FLAGS.LINT | flags, shell);
+                    signal = new(input, SIG_FLAGS.LINT | flags, shell, cursor_i: cursor_i);
                     shell.PropagateSignal(signal);
                     signal.EndLint(error);
                     string res = sb.PullValue();

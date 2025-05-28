@@ -217,16 +217,20 @@ namespace _COBRA_
                                 {
                                     cpl_done = true;
                                     cpl_start_i = read_i;
-                                    if (flags.HasFlag(SIG_FLAGS.TAB))
-                                        if (path_mode.HasFlags_any(FS_TYPES.BOTH))
-                                            PathCompletion_tab(var_value_str, path_mode, out completions);
-                                        else
-                                            ComputeCompletion_tab(var_value_str, completions);
-                                    else if (flags.HasFlag(SIG_FLAGS.ALT))
+
+                                    if (flags.HasFlag(SIG_FLAGS.ALT))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_alt(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_alt(var_value_str, completions);
+                                    else if (HasFlags_any(SIG_FLAGS.CPL))
+                                    {
+                                        if (path_mode.HasFlags_any(FS_TYPES.BOTH))
+                                            PathCompletion_tab(var_value_str, path_mode, out completions);
+                                        else
+                                            ComputeCompletion_tab(var_value_str, ref completions);
+                                        this.completions = completions;
+                                    }
                                 }
 
                 if (!is_var)

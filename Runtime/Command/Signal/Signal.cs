@@ -1,4 +1,5 @@
 ﻿using _ARK_;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace _COBRA_
@@ -14,11 +15,12 @@ namespace _COBRA_
             public int cpl_index;
             public SIG_FLAGS flags;
             public bool cpl_stop, cpl_done, is_cursor_on_path;
-            public int cursor_i, read_i, start_i, path_i, end_i, arg_i = -1, cpl_start_i;
+            public int cursor_i = -1, read_i, start_i, path_i, end_i, arg_i = -1, cpl_start_i;
             public string arg_last, path_last;
             public CMDLINE_DATA data;
             public bool HasFlags_any(in SIG_FLAGS flags) => (this.flags & flags) != 0;
             bool IsOnCursor => cursor_i >= start_i && cursor_i <= read_i;
+            public IEnumerable<string> completions;
 
             //--------------------------------------------------------------------------------------------------------------
 

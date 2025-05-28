@@ -10,6 +10,9 @@ namespace _COBRA_
         {
             void InsertCompletionCandidate(string candidate)
             {
+                if (flags.HasFlag(SIG_FLAGS.LIST))
+                    return;
+
                 if (candidate.Contains(' '))
                     candidate = candidate.QuoteStringSafely();
 
@@ -17,11 +20,15 @@ namespace _COBRA_
                 cursor_i = read_i = start_i + candidate.Length;
             }
 
-            void ComputeCompletion_tab(in string argument, in IEnumerable<string> candidates)
+            void ComputeCompletion_tab(in string argument, ref IEnumerable<string> candidates)
             {
                 string[] array = ECompletionCandidates_tab(argument, candidates).ToArray();
                 if (array.Length == 0)
+                {
+                    candidates = null;
                     return;
+                }
+                candidates = array;
                 InsertCompletionCandidate(array[cpl_index % array.Length]);
             }
 
