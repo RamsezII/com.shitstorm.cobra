@@ -8,7 +8,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Line
+        partial class Signal
         {
             public bool TryReadArguments(out string arguments)
             {
@@ -154,7 +154,7 @@ namespace _COBRA_
                         var_value_str = var_value.ToString();
                         seems_valid = true;
                     }
-                    else if (HasFlags_any(SIGNALS.CHECK | SIGNALS.EXEC | SIGNALS.TICK))
+                    else if (HasFlags_any(SIG_FLAGS.CHECK | SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                         Debug.LogWarning($"no var named: '{var_name}'");
 
                 if (!is_var)
@@ -210,19 +210,19 @@ namespace _COBRA_
                 }
 
                 if (!cpl_done)
-                    if (signal.HasFlag(SIGNALS.CPL))
+                    if (flags.HasFlag(SIG_FLAGS.CPL))
                         if (IsOnCursor)
                             if (path_mode.HasFlags_any(FS_TYPES.BOTH) || completions != null)
                                 if (!complete_if_option || argument.StartsWith('-'))
                                 {
                                     cpl_done = true;
                                     cpl_start_i = read_i;
-                                    if (signal.HasFlag(SIGNALS.TAB))
+                                    if (flags.HasFlag(SIG_FLAGS.TAB))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_tab(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_tab(var_value_str, completions);
-                                    else if (signal.HasFlag(SIGNALS.ALT))
+                                    else if (flags.HasFlag(SIG_FLAGS.ALT))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_alt(var_value_str, path_mode, out completions);
                                         else

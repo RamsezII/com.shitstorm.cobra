@@ -22,9 +22,9 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                internal Janitor(in Line line, in Executor exe)
+                internal Janitor(in Signal signal, in Executor exe)
                 {
-                    AddExecutor(line, exe);
+                    AddExecutor(signal, exe);
                 }
 
                 //--------------------------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ namespace _COBRA_
                     return err;
                 }
 
-                internal void AddExecutor(in Line line, in Executor exe)
+                internal void AddExecutor(in Signal signal, in Executor exe)
                 {
                     if (disposed)
                         Debug.LogError($"adding {exe.GetType().FullName} '{exe.command.name}' ({exe.cmd_longname}) to disposed pipeline[{pipeline_ID}].");
@@ -54,7 +54,7 @@ namespace _COBRA_
                         Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
 
                     _executors.Add(exe);
-                    TryExecute(line, exe);
+                    TryExecute(signal, exe);
                 }
 
                 internal bool TryGetCurrent(out Executor executor)
@@ -74,7 +74,7 @@ namespace _COBRA_
                     return false;
                 }
 
-                internal bool TryExecuteCurrent(in Line line, out Executor exe)
+                internal bool TryExecuteCurrent(in Signal signal, out Executor exe)
                 {
                 before_execution:
                     exe = null;
@@ -93,14 +93,14 @@ namespace _COBRA_
                         else if (exe.TryPullNext(out exe))
                         {
                             if (exe.background)
-                                Shell.background_janitors.Add(new Janitor(line, exe));
+                                Shell.background_janitors.Add(new Janitor(signal, exe));
                             else
                                 _executors.Add(exe);
                             return true;
                         }
                     }
 
-                    if (!TryExecute(line, exe))
+                    if (!TryExecute(signal, exe))
                         return false;
 
                     if (exe.disposed)
@@ -109,7 +109,7 @@ namespace _COBRA_
                     return true;
                 }
 
-                bool TryExecute(in Line line, in Executor exe)
+                bool TryExecute(in Signal signal, in Executor exe)
                 {
                     if (exe.command.action == null && exe.routine == null)
                     {
@@ -117,10 +117,10 @@ namespace _COBRA_
                         return false;
                     }
 
-                    exe.line = line;
+                    exe.signal = signal;
 
                     if (exe.command.action != null)
-                        if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                        if (signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                         {
                             if (exe.started)
                                 Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) has already been started.");
@@ -134,7 +134,7 @@ namespace _COBRA_
                                 exe.command.action(exe);
 
                                 if (exe.error != null)
-                                    if (exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                                    if (exe.signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                                         error = $"{this} {exe} {exe.error}";
                             }
                             catch (Exception e)
@@ -147,7 +147,7 @@ namespace _COBRA_
 
                     if (exe.routine != null)
                     {
-                        if (line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                        if (signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                         {
                             if (!exe.started && exe.background)
                                 exe.LogBackgroundStart();
@@ -159,7 +159,7 @@ namespace _COBRA_
                             bool has_next = exe.routine.MoveNext();
 
                             if (exe.error != null)
-                                if (exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK))
+                                if (exe.signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                                 {
                                     error = $"{this} {exe} {Util.PullValue(ref exe.error)}";
                                     Debug.LogWarning(error);
@@ -178,7 +178,7 @@ namespace _COBRA_
                         }
                     }
 
-                    exe.line = null;
+                    exe.signal = null;
                     return true;
                 }
 

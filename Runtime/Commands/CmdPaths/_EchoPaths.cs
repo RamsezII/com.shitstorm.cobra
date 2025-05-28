@@ -16,10 +16,10 @@ namespace _COBRA_
                 max_args: 100,
                 opts: static exe =>
                 {
-                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, flag_dir, flag_file))
+                    if (exe.signal.TryRead_one_of_the_flags(exe, out string flag, flag_dir, flag_file))
                         exe.opts.Add(flag, null);
 
-                    if (exe.line.TryRead_one_flag(exe, flag_full))
+                    if (exe.signal.TryRead_one_flag(exe, flag_full))
                         exe.opts.Add(flag_full, null);
                 },
                 args: static exe =>
@@ -31,7 +31,7 @@ namespace _COBRA_
                         mode = FS_TYPES.FILE;
 
                     bool full = exe.opts.ContainsKey(flag_full);
-                    while (exe.line.TryReadArgument(out string path, out _, strict: true, path_mode: mode))
+                    while (exe.signal.TryReadArgument(out string path, out _, strict: true, path_mode: mode))
                     {
                         if (full)
                             path = exe.shell.PathCheck(path, PathModes.ForceFull);

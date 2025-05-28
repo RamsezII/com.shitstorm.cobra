@@ -16,9 +16,9 @@ namespace _COBRA_
                 min_args: 1,
                 args: exe =>
                 {
-                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, new[] { flag_warning, flag_error, flag_background, }))
+                    if (exe.signal.TryRead_one_of_the_flags(exe, out string flag, new[] { flag_warning, flag_error, flag_background, }))
                         exe.opts[flag] = null;
-                    if (exe.line.TryReadArgument(out string message, out _))
+                    if (exe.signal.TryReadArgument(out string message, out _))
                         exe.args.Add(message);
                 },
                 action: static exe =>

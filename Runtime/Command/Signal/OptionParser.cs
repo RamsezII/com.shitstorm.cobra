@@ -6,11 +6,11 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Line
+        partial class Signal
         {
-            public class OptionParser : Dictionary<string, Func<Line, object>>
+            public class OptionParser : Dictionary<string, Func<Signal, object>>
             {
-                public static readonly Func<Line, object>
+                public static readonly Func<Signal, object>
                     parser_workingdir = line =>
                     {
                         if (line.TryReadArgument(out string path, out bool seems_valid, path_mode: FS_TYPES.DIRECTORY))

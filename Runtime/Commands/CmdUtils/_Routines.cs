@@ -22,7 +22,7 @@ namespace _COBRA_
                 CMD_STATUS status = new(CMD_STATES.BLOCKING, progress: (float)i / datas.Length);
 
                 do yield return status;
-                while (!exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK));
+                while (!exe.signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK));
 
                 exe.Stdout(datas[i]);
             }
@@ -34,7 +34,7 @@ namespace _COBRA_
                 "routinize",
                 on_pipe: static (exe, data) =>
                 {
-                    Command.Executor exe2 = new(exe.shell, exe, exe.line, new() { cmd_routinize, })
+                    Command.Executor exe2 = new(exe.shell, exe, exe.signal, new() { cmd_routinize, })
                     {
                         stdout_exe = exe.stdout_exe,
                         next_exe = exe.next_exe,
@@ -45,7 +45,7 @@ namespace _COBRA_
 
                     exe2.args[0] = data;
 
-                    exe.janitor.AddExecutor(exe.line, exe2);
+                    exe.janitor.AddExecutor(exe.signal, exe2);
                 });
 
             Command.static_domain.AddRoutine(
@@ -57,7 +57,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadInt(out int value))
+                    if (exe.signal.TryReadInt(out int value))
                         exe.args.Add(value);
                 },
                 routine: EWaitFrames);
@@ -67,7 +67,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadFloat(out float value))
+                    if (exe.signal.TryReadFloat(out float value))
                         exe.args.Add(value);
                 },
                 routine: EWaitSeconds,
@@ -76,7 +76,7 @@ namespace _COBRA_
             static IEnumerator<CMD_STATUS> ETick(Command.Executor exe)
             {
                 do yield return new CMD_STATUS(CMD_STATES.BLOCKING);
-                while (!exe.line.signal.HasFlag(SIGNALS.TICK));
+                while (!exe.signal.flags.HasFlag(SIG_FLAGS.TICK));
 
                 exe.Stdout(null);
             }
@@ -88,11 +88,11 @@ namespace _COBRA_
 
                 do
                 {
-                    if (exe.line.signal.HasFlag(SIGNALS.TICK))
+                    if (exe.signal.flags.HasFlag(SIG_FLAGS.TICK))
                         ++frames;
                     yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: Mathf.InverseLerp(0, wait_amount, frames));
                 }
-                while (frames < wait_amount || !exe.line.HasFlags_any(SIGNALS.EXEC | SIGNALS.TICK));
+                while (frames < wait_amount || !exe.signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK));
 
                 exe.Stdout(null);
             }
@@ -104,11 +104,11 @@ namespace _COBRA_
 
                 do
                 {
-                    if (exe.line.signal.HasFlag(SIGNALS.TICK))
+                    if (exe.signal.flags.HasFlag(SIG_FLAGS.TICK))
                         timer += Time.unscaledDeltaTime;
                     yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: Mathf.InverseLerp(0, wait_seconds, timer));
                 }
-                while (timer < wait_seconds || !exe.line.signal.HasFlag(SIGNALS.TICK));
+                while (timer < wait_seconds || !exe.signal.flags.HasFlag(SIG_FLAGS.TICK));
 
                 exe.Stdout(null);
             }

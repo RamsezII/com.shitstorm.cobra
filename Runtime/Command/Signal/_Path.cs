@@ -8,7 +8,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Line
+        partial class Signal
         {
             public const string
                 opt_workdir = "--working-directory",
@@ -80,7 +80,7 @@ namespace _COBRA_
                 if (!Directory.Exists(parent_dir))
                     parent_dir = shell.working_dir;
 
-                if (HasFlags_any(SIGNALS.UP | SIGNALS.DOWN))
+                if (HasFlags_any(SIG_FLAGS.UP | SIG_FLAGS.DOWN))
                 {
                     candidates = flags switch
                     {
@@ -96,10 +96,10 @@ namespace _COBRA_
                     if (indexOf == -1)
                         cpl_index = 0;
                     else
-                        cpl_index = indexOf + signal switch
+                        cpl_index = indexOf + this.flags switch
                         {
-                            SIGNALS s when s.HasFlag(SIGNALS.UP) => -1,
-                            SIGNALS s when s.HasFlag(SIGNALS.DOWN) => 1,
+                            SIG_FLAGS f when f.HasFlag(SIG_FLAGS.UP) => -1,
+                            SIG_FLAGS f when f.HasFlag(SIG_FLAGS.DOWN) => 1,
                             _ => 0,
                         };
 
@@ -109,9 +109,9 @@ namespace _COBRA_
 
                     InsertCompletionCandidate(dirs[cpl_index]);
                 }
-                else if (signal.HasFlag(SIGNALS.LEFT))
+                else if (this.flags.HasFlag(SIG_FLAGS.LEFT))
                     InsertCompletionCandidate(shell.PathCheck(parent_dir, arg_rooted ? PathModes.ForceFull : PathModes.TryLocal));
-                else if (signal.HasFlag(SIGNALS.RIGHT))
+                else if (this.flags.HasFlag(SIG_FLAGS.RIGHT))
                 {
                     candidates = flags switch
                     {

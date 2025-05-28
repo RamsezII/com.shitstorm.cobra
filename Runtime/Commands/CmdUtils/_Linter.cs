@@ -13,15 +13,15 @@ namespace _COBRA_
                 max_args: 20,
                 args: exe =>
                 {
-                    var dict = exe.line.linter.GetColorProperties();
-                    if (exe.line.TryRead_options_with_allowed_values(exe, new(StringComparer.OrdinalIgnoreCase) { { "--option", new[] { "yes", "no", "maybe", } } }, out var output))
+                    var dict = exe.signal.linter.GetColorProperties();
+                    if (exe.signal.TryRead_options_with_allowed_values(exe, new(StringComparer.OrdinalIgnoreCase) { { "--option", new[] { "yes", "no", "maybe", } } }, out var output))
                         ;
 
-                    while (exe.line.TryReadArgument(out string arg, out bool is_candidate, dict.Keys, lint: false))
+                    while (exe.signal.TryReadArgument(out string arg, out bool is_candidate, dict.Keys, lint: false))
                         if (dict.TryGetValue(arg, out Color color))
-                            exe.line.LintToThisPosition(color);
+                            exe.signal.LintToThisPosition(color);
                         else
-                            exe.line.LintToThisPosition(exe.line.linter.error);
+                            exe.signal.LintToThisPosition(exe.signal.linter.error);
                 });
         }
     }

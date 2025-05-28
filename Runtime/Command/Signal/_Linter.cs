@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Line
+        partial class Signal
         {
             [Serializable]
             public class Linter
@@ -44,11 +44,11 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                public string GetLint(in Shell shell, in string input, out Line line, in SIGNALS signal = 0)
+                public string GetLint(in Shell shell, in string input, out Signal signal, in SIG_FLAGS flags = 0)
                 {
-                    line = new(input, SIGNALS.LINT | signal, shell);
-                    shell.PropagateLine(line);
-                    line.EndLint(error);
+                    signal = new(input, SIG_FLAGS.LINT | flags, shell);
+                    shell.PropagateSignal(signal);
+                    signal.EndLint(error);
                     string res = sb.PullValue();
                     Clear();
                     return res;
@@ -73,7 +73,7 @@ namespace _COBRA_
 
             public void EndLint(in Color color)
             {
-                if (!signal.HasFlag(SIGNALS.LINT))
+                if (!flags.HasFlag(SIG_FLAGS.LINT))
                     return;
 
                 if (string.IsNullOrEmpty(text))
@@ -88,7 +88,7 @@ namespace _COBRA_
 
             public void SkipLintToThisPosition()
             {
-                if (!signal.HasFlag(SIGNALS.LINT))
+                if (!flags.HasFlag(SIG_FLAGS.LINT))
                     return;
 
                 if (read_i < linter.last_i)
@@ -112,7 +112,7 @@ namespace _COBRA_
 
             public void LintToThisPosition(in Color color)
             {
-                if (!signal.HasFlag(SIGNALS.LINT))
+                if (!flags.HasFlag(SIG_FLAGS.LINT))
                     return;
 
                 if (read_i < linter.last_i)

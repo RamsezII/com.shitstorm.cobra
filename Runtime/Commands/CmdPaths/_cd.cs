@@ -12,13 +12,13 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.line.TryRead_one_flag(exe, flag_create_if_empty))
+                    if (exe.signal.TryRead_one_flag(exe, flag_create_if_empty))
                         exe.opts.Add(flag_create_if_empty, null);
                 },
                 args: static exe =>
                 {
                     bool flag_create = exe.opts.ContainsKey(flag_create_if_empty);
-                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.DIRECTORY))
+                    if (exe.signal.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.DIRECTORY))
                     {
                         path = exe.shell.PathCheck(path, PathModes.ForceFull);
                         if (flag_create || Directory.Exists(path))

@@ -13,10 +13,10 @@ namespace _COBRA_et
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg, out bool is_candidate, new string[] { "tiz", "taz", "toz", }) && is_candidate)
+                    if (exe.signal.TryReadArgument(out string arg, out bool is_candidate, new string[] { "tiz", "taz", "toz", }) && is_candidate)
                         exe.args.Add(arg);
                     else
-                        exe.error = $"invalid arg ('{exe.line.arg_last}')";
+                        exe.error = $"invalid arg ('{exe.signal.arg_last}')";
                 },
                 action: static exe =>
                 {

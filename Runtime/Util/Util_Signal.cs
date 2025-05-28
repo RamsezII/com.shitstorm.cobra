@@ -2,7 +2,7 @@
 
 namespace _COBRA_
 {
-    enum SIGNALS_enum : byte
+    enum _SigFlags : byte
     {
         _kill,
         _save,
@@ -24,25 +24,25 @@ namespace _COBRA_
     }
 
     [Flags]
-    public enum SIGNALS : ushort
+    public enum SIG_FLAGS : ushort
     {
         _none_,
-        KILL = 1 << SIGNALS_enum._kill,
-        SAVE = 1 << SIGNALS_enum._save,
-        LINT = 1 << SIGNALS_enum._lint,
-        CHECK = 1 << SIGNALS_enum._check,
-        EXEC = 1 << SIGNALS_enum._exec,
-        TICK = 1 << SIGNALS_enum._tick,
-        DOUBLE = 1 << SIGNALS_enum._double,
-        CPL = 1 << SIGNALS_enum._cpl,
-        TAB = CPL | 1 << SIGNALS_enum._tab,
-        LIST = CPL | 1 << SIGNALS_enum._list,
-        ALT = CPL | 1 << SIGNALS_enum._alt,
-        HIST = 1 << SIGNALS_enum._hist,
-        UP = 1 << SIGNALS_enum._up,
-        RIGHT = 1 << SIGNALS_enum._right,
-        DOWN = 1 << SIGNALS_enum._down,
-        LEFT = 1 << SIGNALS_enum._left,
+        KILL = 1 << _SigFlags._kill,
+        SAVE = 1 << _SigFlags._save,
+        LINT = 1 << _SigFlags._lint,
+        CHECK = 1 << _SigFlags._check,
+        EXEC = 1 << _SigFlags._exec,
+        TICK = 1 << _SigFlags._tick,
+        DOUBLE = 1 << _SigFlags._double,
+        CPL = 1 << _SigFlags._cpl,
+        TAB = CPL | 1 << _SigFlags._tab,
+        LIST = CPL | 1 << _SigFlags._list,
+        ALT = CPL | 1 << _SigFlags._alt,
+        HIST = 1 << _SigFlags._hist,
+        UP = 1 << _SigFlags._up,
+        RIGHT = 1 << _SigFlags._right,
+        DOWN = 1 << _SigFlags._down,
+        LEFT = 1 << _SigFlags._left,
 
         ALT_UP = ALT | UP,
         ALT_RIGHT = ALT | RIGHT,

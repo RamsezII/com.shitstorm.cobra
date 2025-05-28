@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Line
+        partial class Signal
         {
             void InsertCompletionCandidate(string candidate)
             {
@@ -53,10 +53,10 @@ namespace _COBRA_
                 int indexOf = list.IndexOf(argument);
                 if (indexOf >= 0)
                 {
-                    cpl_index = indexOf + signal switch
+                    cpl_index = indexOf + flags switch
                     {
-                        SIGNALS.ALT_UP => -1,
-                        SIGNALS.ALT_DOWN => 1,
+                        SIG_FLAGS.ALT_UP => -1,
+                        SIG_FLAGS.ALT_DOWN => 1,
                         _ => 0,
                     };
 

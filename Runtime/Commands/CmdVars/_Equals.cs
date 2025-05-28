@@ -12,7 +12,7 @@ namespace _COBRA_
                 max_args: 1,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string literal, out _))
+                    if (exe.signal.TryReadArgument(out string literal, out _))
                         exe.args.Add(literal);
                 },
                 on_pipe: static (exe, data) =>

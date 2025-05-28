@@ -13,13 +13,13 @@ namespace _COBRA_
                 min_args: 3,
                 args: static exe =>
                 {
-                    if (exe.line.TryReadArgument(out string path, out bool seems_valid, strict: true, path_mode: FS_TYPES.BOTH))
+                    if (exe.signal.TryReadArgument(out string path, out bool seems_valid, strict: true, path_mode: FS_TYPES.BOTH))
                     {
                         exe.args.Add(path);
-                        if (exe.line.TryReadArgument(out string ext1, out _))
+                        if (exe.signal.TryReadArgument(out string ext1, out _))
                         {
                             exe.args.Add(ext1);
-                            if (exe.line.TryReadArgument(out string ext2, out _))
+                            if (exe.signal.TryReadArgument(out string ext2, out _))
                                 exe.args.Add(ext2);
                         }
                     }

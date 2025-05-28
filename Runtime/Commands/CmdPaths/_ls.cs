@@ -12,14 +12,14 @@ namespace _COBRA_
             flag_file = "-f",
             flag_dir = "-d";
 
-        static readonly Command.Line.OptionParser ls_opts = new(false)
+        static readonly Command.Signal.OptionParser ls_opts = new(false)
         {
             { flag_file, null },
             { flag_dir, null },
             { flag_r, null },
             {
-                Command.Line.opt_workdir,
-                Command.Line.OptionParser.parser_workingdir
+                Command.Signal.opt_workdir,
+                Command.Signal.OptionParser.parser_workingdir
             },
             {
                 opt_pattern,
@@ -38,7 +38,7 @@ namespace _COBRA_
                 "ls",
                 opts: static exe =>
                 {
-                    if (exe.line.TryRead_options_parsed(exe, out var outputs, ls_opts))
+                    if (exe.signal.TryRead_options_parsed(exe, out var outputs, ls_opts))
                         foreach (var pair in outputs)
                             exe.opts.Add(pair.Key, pair.Value);
                 },

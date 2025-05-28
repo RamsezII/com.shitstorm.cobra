@@ -35,9 +35,9 @@ namespace _COBRA_
             return true;
         }
 
-        public bool TryReadCommand(in Line line, out Command command)
+        public bool TryReadCommand(in Signal signal, out Command command)
         {
-            if (TryReadCommand_path(line, out var path))
+            if (TryReadCommand_path(signal, out var path))
             {
                 command = path[^1];
                 return true;
@@ -46,33 +46,33 @@ namespace _COBRA_
             return false;
         }
 
-        public bool TryReadCommand_path(in Line line, out List<Command> path, in bool pipe_only = false)
+        public bool TryReadCommand_path(in Signal signal, out List<Command> path, in bool pipe_only = false)
         {
             path = new();
-            line.LintToThisPosition(line.linter._default_);
+            signal.LintToThisPosition(signal.linter._default_);
 
-            bool res = TryReadCommand_ref(line, this, pipe_only, path);
+            bool res = TryReadCommand_ref(signal, this, pipe_only, path);
             if (res)
-                line.LintToThisPosition(line.linter.command);
+                signal.LintToThisPosition(signal.linter.command);
             else
             {
                 path = null;
-                line.LintToThisPosition(line.linter.error);
+                signal.LintToThisPosition(signal.linter.error);
             }
             return res && path != null && path.Count > 0;
 
-            static bool TryReadCommand_ref(in Line line, Command domain, bool pipe_only, in List<Command> path)
+            static bool TryReadCommand_ref(in Signal signal, Command domain, bool pipe_only, in List<Command> path)
             {
                 IEnumerable<string> keys = domain.ECommands_keys;
                 if (pipe_only)
                     keys = keys.Where(keys => domain._commands[keys].on_pipe != null);
 
-                if (line.TryReadArgument(out string cmd_name, out bool is_candidate, keys, strict: true, stop_if_var: true, lint: false))
+                if (signal.TryReadArgument(out string cmd_name, out bool is_candidate, keys, strict: true, stop_if_var: true, lint: false))
                     if (is_candidate && domain._commands.TryGetValue(cmd_name, out Command intermediate))
                     {
                         path.Add(intermediate);
                         if (intermediate.IsDomain)
-                            return TryReadCommand_ref(line, intermediate, pipe_only, path);
+                            return TryReadCommand_ref(signal, intermediate, pipe_only, path);
                     }
 
                 return path.Count > 0;
