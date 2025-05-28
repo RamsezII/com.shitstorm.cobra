@@ -217,12 +217,12 @@ namespace _COBRA_
                                 {
                                     cpl_done = true;
                                     cpl_start_i = read_i;
-                                    if (signal.HasFlag(SIGNALS.CPL_TAB))
+                                    if (signal.HasFlag(SIGNALS.TAB))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_tab(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_tab(var_value_str, completions);
-                                    else if (signal.HasFlag(SIGNALS.CPL_ALT))
+                                    else if (signal.HasFlag(SIGNALS.ALT))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_alt(var_value_str, path_mode, out completions);
                                         else

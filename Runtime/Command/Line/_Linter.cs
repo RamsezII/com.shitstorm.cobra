@@ -44,9 +44,9 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                public string GetLint(in Shell shell, in string input, out Line line)
+                public string GetLint(in Shell shell, in string input, out Line line, in SIGNALS signal = 0)
                 {
-                    line = new(input, SIGNALS.LINT, shell);
+                    line = new(input, SIGNALS.LINT | signal, shell);
                     shell.PropagateLine(line);
                     line.EndLint(error);
                     string res = sb.PullValue();
