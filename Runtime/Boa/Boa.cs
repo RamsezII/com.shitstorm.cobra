@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace _COBRA_
 {
-    static internal partial class CmdBoa
+    public static partial class Boa
     {
         static Command cmd_boa;
 
@@ -13,7 +13,7 @@ namespace _COBRA_
         {
             cmd_boa = Command.static_domain.AddDomain(
                 "boa",
-                manual: new("create and run your own shitstorm scripts :)")
+                manual: new("create and run your own Boa scripts :)")
                 );
 
             Init_Run();

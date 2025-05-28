@@ -104,7 +104,7 @@ namespace _COBRA_
                     }
 
             // parse stdin as new command line
-            if (front_janitors.Count == 0)
+            //if (front_janitors.Count == 0)
                 if (error == null && line.HasNext(true))
                     if (Command.static_domain.TryReadCommand_path(line, out var path))
                     {

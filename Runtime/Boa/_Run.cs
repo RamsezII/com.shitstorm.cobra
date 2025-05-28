@@ -4,7 +4,7 @@ using _UTIL_;
 
 namespace _COBRA_
 {
-    partial class CmdBoa
+    partial class Boa
     {
         static void Init_Run()
         {
@@ -24,11 +24,11 @@ namespace _COBRA_
                 string script_path = (string)exe.args[0];
                 script_path = exe.shell.PathCheck(script_path, PathModes.ForceFull);
 
-                string script_text = File.ReadAllText(script_path);
+                string[] script_lines = File.ReadAllLines(script_path);
 
-                List<int> stack_starts = new();
-                foreach (string script_line in script_text.IterateThroughData_str())
+                for (int i = 0; i < script_lines.Length; i++)
                 {
+                    string script_line = script_lines[i];
                     Command.Line cmd_line = new(script_line, exe.line.signal, exe.shell, cursor_i: int.MaxValue);
                     if (Command.static_domain.TryReadCommand_path(cmd_line, out var path))
                     {
