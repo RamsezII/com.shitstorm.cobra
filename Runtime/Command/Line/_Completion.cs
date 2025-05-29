@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Signal
+        partial class Line
         {
             void InsertCompletionCandidate(string candidate)
             {

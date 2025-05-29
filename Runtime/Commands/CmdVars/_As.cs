@@ -13,12 +13,12 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_one_flag(exe, flag_grouped))
+                    if (exe.line.TryRead_one_flag(exe, flag_grouped))
                         exe.opts.Add(flag_grouped, null);
                 },
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string var_name, out _))
+                    if (exe.line.TryReadArgument(out string var_name, out _))
                         exe.args.Add(var_name);
                 },
                 on_pipe: static (exe, data) =>
@@ -47,29 +47,29 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    int read_i = exe.signal.read_i;
-                    if (Command.static_domain.TryReadCommand_path(exe.signal, out var path))
+                    int read_i = exe.line.read_i;
+                    if (Command.static_domain.TryReadCommand_path(exe.line, out var path))
                     {
-                        Command.Executor exe2 = new(exe.shell, exe, exe.signal, path);
+                        Command.Executor exe2 = new(exe.shell, exe, exe.line, path);
                         if (exe2.error != null)
                             exe.error = exe2.error;
                         else
-                            exe.args.Add(exe.signal.text[read_i..exe.signal.read_i]);
+                            exe.args.Add(exe.line.text[read_i..exe.line.read_i]);
                         exe2.Dispose();
                     }
                 },
                 on_pipe: static (exe, data) =>
                 {
                     string cmd_line = (string)exe.args[0];
-                    Command.Signal signal = new(cmd_line, exe.signal?.flags ?? SIG_FLAGS.EXEC, exe.signal?.shell ?? exe.shell);
+                    Command.Line line = new(cmd_line, exe.line?.flags ?? SIG_FLAGS.EXEC, exe.line?.shell ?? exe.shell);
 
-                    if (Command.static_domain.TryReadCommand_path(signal, out var path))
+                    if (Command.static_domain.TryReadCommand_path(line, out var path))
                     {
-                        Command.Executor do_exe = new(exe.shell, exe, signal, path);
+                        Command.Executor do_exe = new(exe.shell, exe, line, path);
                         if (do_exe.error != null)
                             exe.error = do_exe.error;
                         else
-                            exe.janitor.AddExecutor(exe.signal, do_exe);
+                            exe.janitor.AddExecutor(exe.line, do_exe);
                     }
                 }
             );

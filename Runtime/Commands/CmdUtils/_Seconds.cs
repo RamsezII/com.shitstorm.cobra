@@ -15,12 +15,12 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_one_of_the_flags(exe, out string flag, flag_count_down))
+                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, flag_count_down))
                         exe.opts.Add(flag_count_down, true);
                 },
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string arg, out _))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(int.Parse(arg));
                 },
                 routine: ERoutineTest);
@@ -41,7 +41,7 @@ namespace _COBRA_
                         float timer = 0;
                         while (timer < 1)
                         {
-                            if (exe.signal.flags.HasFlag(SIG_FLAGS.TICK))
+                            if (exe.line.flags.HasFlag(SIG_FLAGS.TICK))
                                 timer += 3 * Time.deltaTime;
 
                             yield return new CMD_STATUS()

@@ -2,7 +2,7 @@
 {
     partial class Command
     {
-        partial class Signal
+        partial class Line
         {
             public bool TryReadInt(out int value)
             {

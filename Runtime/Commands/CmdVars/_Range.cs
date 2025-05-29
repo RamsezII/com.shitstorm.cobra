@@ -14,7 +14,7 @@ namespace _COBRA_
                 args: static exe =>
                 {
                     for (int i = 0; i < 3; ++i)
-                        if (exe.signal.TryReadArgument(out string arg, out _))
+                        if (exe.line.TryReadArgument(out string arg, out _))
                             exe.args.Add(arg);
                         else
                             break;

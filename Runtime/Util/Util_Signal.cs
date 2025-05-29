@@ -2,7 +2,7 @@
 
 namespace _COBRA_
 {
-    enum _SigFlags : byte
+    enum SIG_ENUM : byte
     {
         _kill,
         _save,
@@ -27,22 +27,22 @@ namespace _COBRA_
     public enum SIG_FLAGS : ushort
     {
         _none_,
-        KILL = 1 << _SigFlags._kill,
-        SAVE = 1 << _SigFlags._save,
-        LINT = 1 << _SigFlags._lint,
-        CHECK = 1 << _SigFlags._check,
-        EXEC = 1 << _SigFlags._exec,
-        TICK = 1 << _SigFlags._tick,
-        DOUBLE = 1 << _SigFlags._double,
-        CPL = 1 << _SigFlags._cpl,
-        TAB = CPL | 1 << _SigFlags._tab,
-        LIST = CPL | 1 << _SigFlags._list,
-        ALT = CPL | 1 << _SigFlags._alt,
-        HIST = 1 << _SigFlags._hist,
-        UP = 1 << _SigFlags._up,
-        RIGHT = 1 << _SigFlags._right,
-        DOWN = 1 << _SigFlags._down,
-        LEFT = 1 << _SigFlags._left,
+        KILL = 1 << SIG_ENUM._kill,
+        SAVE = 1 << SIG_ENUM._save,
+        LINT = 1 << SIG_ENUM._lint,
+        CHECK = 1 << SIG_ENUM._check,
+        EXEC = 1 << SIG_ENUM._exec,
+        TICK = 1 << SIG_ENUM._tick,
+        DOUBLE = 1 << SIG_ENUM._double,
+        CPL = 1 << SIG_ENUM._cpl,
+        TAB = CPL | 1 << SIG_ENUM._tab,
+        LIST = CPL | 1 << SIG_ENUM._list,
+        ALT = CPL | 1 << SIG_ENUM._alt,
+        HIST = 1 << SIG_ENUM._hist,
+        UP = 1 << SIG_ENUM._up,
+        RIGHT = 1 << SIG_ENUM._right,
+        DOWN = 1 << SIG_ENUM._down,
+        LEFT = 1 << SIG_ENUM._left,
 
         ALT_UP = ALT | UP,
         ALT_RIGHT = ALT | RIGHT,

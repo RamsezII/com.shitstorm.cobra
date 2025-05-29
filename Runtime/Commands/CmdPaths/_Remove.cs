@@ -13,12 +13,12 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_one_flag(exe, "-r", flag_recursive))
+                    if (exe.line.TryRead_one_flag(exe, "-r", flag_recursive))
                         exe.opts.Add(flag_recursive, null);
                 },
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.BOTH))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.BOTH))
                         if (is_candidate)
                             exe.args.Add(path);
                 },
@@ -48,12 +48,12 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_one_flag(exe, "-r", flag_recursive))
+                    if (exe.line.TryRead_one_flag(exe, "-r", flag_recursive))
                         exe.opts.Add(flag_recursive, null);
                 },
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.DIRECTORY))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.DIRECTORY))
                         if (is_candidate)
                             exe.args.Add(path);
                         else

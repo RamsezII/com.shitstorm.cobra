@@ -14,10 +14,10 @@ namespace _COBRA_et
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string arg, out bool is_candidate, new string[] { "tiz", "taz", "toz", }) && is_candidate)
+                    if (exe.line.TryReadArgument(out string arg, out bool is_candidate, new string[] { "tiz", "taz", "toz", }) && is_candidate)
                         exe.args.Add(arg);
                     else
-                        exe.error = $"invalid arg ('{exe.signal.arg_last}')";
+                        exe.error = $"invalid arg ('{exe.line.arg_last}')";
                 },
                 action: static exe =>
                 {
@@ -35,10 +35,10 @@ namespace _COBRA_et
 
                 while (true)
                 {
-                    exe.signal.TryReadArgument(out string arg, out _);
-                    if (exe.signal.flags.HasFlag(SIG_FLAGS.EXEC))
+                    exe.line.TryReadArgument(out string arg, out _);
+                    if (exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
                     {
-                        exe.Stdout(arg, signal: exe.signal);
+                        exe.Stdout(arg, line: exe.line);
                         yield break;
                     }
                     yield return new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, "balls:");

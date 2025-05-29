@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Signal
+        partial class Line
         {
             public bool TryRead_one_flag(in Executor executor, params string[] flags)
             {

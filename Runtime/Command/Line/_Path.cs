@@ -8,7 +8,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Signal
+        partial class Line
         {
             public const string
                 opt_workdir = "--working-directory",

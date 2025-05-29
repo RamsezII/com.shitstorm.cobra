@@ -12,10 +12,10 @@ namespace _COBRA_
                 min_args: 2,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string path1, out _, path_mode: FS_TYPES.BOTH))
+                    if (exe.line.TryReadArgument(out string path1, out _, path_mode: FS_TYPES.BOTH))
                     {
                         exe.args.Add(path1);
-                        if (exe.signal.TryReadArgument(out string path2, out _, path_mode: FS_TYPES.BOTH))
+                        if (exe.line.TryReadArgument(out string path2, out _, path_mode: FS_TYPES.BOTH))
                             exe.args.Add(path2);
                     }
                 },

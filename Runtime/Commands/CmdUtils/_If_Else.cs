@@ -44,32 +44,32 @@ namespace _COBRA_
                 max_args: 2,
                 args: static exe =>
                 {
-                    int read_i = exe.signal.read_i;
-                    if (Command.static_domain.TryReadCommand_path(exe.signal, out var path1))
+                    int read_i = exe.line.read_i;
+                    if (Command.static_domain.TryReadCommand_path(exe.line, out var path1))
                     {
-                        Command.Executor exe1 = new(exe.shell, exe, exe.signal, path1);
+                        Command.Executor exe1 = new(exe.shell, exe, exe.line, path1);
                         if (exe1.error != null)
                             exe.error = exe1.error;
                         else
-                            exe.args.Add(exe.signal.text[read_i..exe.signal.read_i]);
+                            exe.args.Add(exe.line.text[read_i..exe.line.read_i]);
                     }
                     else
-                        exe.error = $"command '{exe.command.name}' could not find command '{exe.signal.arg_last}'";
+                        exe.error = $"command '{exe.command.name}' could not find command '{exe.line.arg_last}'";
 
                     if (exe.error != null)
                         return;
 
-                    if (exe.signal.TryRead_flags(exe, out var flags, flag_else))
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_else))
                         if (flags.Contains(flag_else))
                         {
-                            read_i = exe.signal.read_i;
-                            if (Command.static_domain.TryReadCommand_path(exe.signal, out var path2))
+                            read_i = exe.line.read_i;
+                            if (Command.static_domain.TryReadCommand_path(exe.line, out var path2))
                             {
-                                Command.Executor exe2 = new(exe.shell, exe, exe.signal, path2);
+                                Command.Executor exe2 = new(exe.shell, exe, exe.line, path2);
                                 if (exe2.error != null)
                                     exe.error = exe2.error;
                                 else
-                                    exe.args.Add(exe.signal.text[read_i..exe.signal.read_i]);
+                                    exe.args.Add(exe.line.text[read_i..exe.line.read_i]);
                             }
                         }
                 },
@@ -99,29 +99,29 @@ namespace _COBRA_
                     if (isTrue)
                     {
                         string cmd_line = (string)exe.args[0];
-                        Command.Signal signal = new(cmd_line, exe.signal.flags, exe.signal.shell);
+                        Command.Line line = new(cmd_line, exe.line.flags, exe.line.shell);
 
-                        if (Command.static_domain.TryReadCommand_path(signal, out var path))
+                        if (Command.static_domain.TryReadCommand_path(line, out var path))
                         {
-                            Command.Executor exe1 = new(exe.shell, exe, signal, path);
+                            Command.Executor exe1 = new(exe.shell, exe, line, path);
                             if (exe1.error != null)
                                 exe.error = exe1.error;
                             else
-                                exe.janitor.AddExecutor(exe.signal, exe1);
+                                exe.janitor.AddExecutor(exe.line, exe1);
                         }
                     }
                     else if (exe.args.Count > 1)
                     {
                         string cmd_line = (string)exe.args[1];
-                        Command.Signal signal = new(cmd_line, exe.signal.flags, exe.signal.shell);
+                        Command.Line line = new(cmd_line, exe.line.flags, exe.line.shell);
 
-                        if (Command.static_domain.TryReadCommand_path(signal, out var path))
+                        if (Command.static_domain.TryReadCommand_path(line, out var path))
                         {
-                            Command.Executor exe2 = new(exe.shell, exe, signal, path);
+                            Command.Executor exe2 = new(exe.shell, exe, line, path);
                             if (exe2.error != null)
                                 exe.error = exe2.error;
                             else
-                                exe.janitor.AddExecutor(exe.signal, exe2);
+                                exe.janitor.AddExecutor(exe.line, exe2);
                         }
                     }
                 });

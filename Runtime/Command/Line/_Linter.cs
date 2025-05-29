@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        partial class Signal
+        partial class Line
         {
             [Serializable]
             public class Linter
@@ -44,11 +44,11 @@ namespace _COBRA_
 
                 //--------------------------------------------------------------------------------------------------------------
 
-                public string GetLint(in Shell shell, in string input, out Signal signal, in SIG_FLAGS flags = 0, in int cursor_i = -1)
+                public string GetLint(in Shell shell, in string input, out Line line, in SIG_FLAGS flags = 0, in int cursor_i = -1)
                 {
-                    signal = new(input, SIG_FLAGS.LINT | flags, shell, cursor_i: cursor_i);
-                    shell.PropagateSignal(signal);
-                    signal.EndLint(error);
+                    line = new(input, SIG_FLAGS.LINT | flags, shell, cursor_i: cursor_i);
+                    shell.PropagateSignal(line);
+                    line.EndLint(error);
                     string res = sb.PullValue();
                     Clear();
                     return res;

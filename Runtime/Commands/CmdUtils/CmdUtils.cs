@@ -32,7 +32,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string arg, out _))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 action: exe => exe.Stdout(exe.args[0])
@@ -44,7 +44,7 @@ namespace _COBRA_
                 max_args: 100,
                 args: exe =>
                 {
-                    while (exe.signal.TryReadArgument(out string arg, out _))
+                    while (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 action: exe =>
@@ -76,7 +76,7 @@ namespace _COBRA_
             Command.static_domain.AddAction(
                 "clear-history",
                 manual: new("clear all previous entries"),
-                action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Signal.ClearHistory
+                action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
                 );
 
             Command.static_domain.AddAction(
@@ -90,7 +90,7 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_flags(exe, out var flags, flag_remove_empties))
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_remove_empties))
                         foreach (string flag in flags)
                             exe.opts.Add(flag, null);
                 },
@@ -109,9 +109,9 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string prefixe, out _))
+                    if (exe.line.TryReadArgument(out string prefixe, out _))
                         exe.args.Add(prefixe);
-                    if (exe.signal.TryRead_flags(exe, out var flags, flag_no_white_space))
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_no_white_space))
                         foreach (string flag in flags)
                             exe.args.Add(flag);
                 },

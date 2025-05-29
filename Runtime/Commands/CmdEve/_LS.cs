@@ -20,9 +20,9 @@ namespace _COBRA_
                     sb.Append(entry.name);
                     sb_lint.Append($"{entry.name} ".SetColor(entry.GetEntryType switch
                     {
-                        NGinxIndex.TYPES.DIRECTORY => eve_exe.signal.linter.directory,
-                        NGinxIndex.TYPES.FILE => eve_exe.signal.linter.file,
-                        _ => eve_exe.signal.linter.path,
+                        NGinxIndex.TYPES.DIRECTORY => eve_exe.line.linter.directory,
+                        NGinxIndex.TYPES.FILE => eve_exe.line.linter.file,
+                        _ => eve_exe.line.linter.path,
                     }));
                 }
 

@@ -17,14 +17,14 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_flags(exe, out var flags, flag_create_if_empty, flag_overwrite))
+                    if (exe.line.TryRead_flags(exe, out var flags, flag_create_if_empty, flag_overwrite))
                         foreach (string flag in flags)
                             exe.opts.Add(flag, null);
                 },
                 args: static exe =>
                 {
                     bool create_if_empty = exe.opts.ContainsKey(flag_create_if_empty);
-                    if (exe.signal.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
                         exe.args.Add(path);
                 },
                 on_pipe: static (exe, data) =>

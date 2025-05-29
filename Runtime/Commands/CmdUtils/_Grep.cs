@@ -14,7 +14,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string arg, out _))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 on_pipe: static (exe, data) =>

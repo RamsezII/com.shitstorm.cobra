@@ -30,7 +30,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string arg, out _))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 action: null);
@@ -40,7 +40,7 @@ namespace _COBRA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string arg, out _))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 action: null);
@@ -56,12 +56,12 @@ namespace _COBRA_
 
                 while (true)
                 {
-                    if (domain_eve.TryReadCommand_path(eve_exe.signal, out var path))
+                    if (domain_eve.TryReadCommand_path(eve_exe.line, out var path))
                     {
-                        Command.Executor cmd_exe = new(eve_exe.shell, eve_exe, eve_exe.signal, path);
+                        Command.Executor cmd_exe = new(eve_exe.shell, eve_exe, eve_exe.line, path);
                         if (cmd_exe.error != null)
                             eve_exe.error = cmd_exe.error;
-                        else if (eve_exe.signal.flags.HasFlag(SIG_FLAGS.EXEC))
+                        else if (eve_exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
                         {
                             IEnumerator<float> routine = null;
 
@@ -72,19 +72,19 @@ namespace _COBRA_
                                 ChangeDirectory(eve_exe, cmd_exe, EvePathStr(), eve_path_list);
 
                             if (cmd_exe.command == cmd_cat)
-                               routine = EReadFile(eve_exe, cmd_exe, EvePathStr());
+                                routine = EReadFile(eve_exe, cmd_exe, EvePathStr());
 
-                            cmd_exe.signal = eve_exe.signal;
+                            cmd_exe.line = eve_exe.line;
                             if (routine != null)
                                 while (routine.MoveNext())
                                 {
                                     yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: routine.Current);
-                                    cmd_exe.signal = eve_exe.signal;
+                                    cmd_exe.line = eve_exe.line;
                                 }
                         }
 
                         if (cmd_exe.error != null)
-                            if (eve_exe.signal.HasFlags_any(SIG_FLAGS.CHECK | SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                            if (eve_exe.line.HasFlags_any(SIG_FLAGS.CHECK | SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                                 Debug.LogWarning($"[EVE_ERROR] {cmd_exe.error}");
 
                         cmd_exe.Dispose();

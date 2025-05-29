@@ -16,7 +16,7 @@ namespace _COBRA_
 
             Command.static_domain.AddAction(
                 "os-terminal",
-                opts: static exe => exe.signal.TryReadOption_workdir(exe),
+                opts: static exe => exe.line.TryReadOption_workdir(exe),
                 action: static exe =>
                 {
                     string workdir = exe.GetWorkdir();
@@ -46,22 +46,22 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_one_of_the_flags(exe, out string flag, flag_read_all, flag_r))
+                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, flag_read_all, flag_r))
                         exe.opts.Add(flag_r, null);
-                    exe.signal.TryReadOption_workdir(exe);
+                    exe.line.TryReadOption_workdir(exe);
                 },
                 args: static exe =>
                 {
                     if (exe.opts.ContainsKey(flag_r))
                     {
-                        if (exe.signal.TryReadArguments(out string command_line))
+                        if (exe.line.TryReadArguments(out string command_line))
                             exe.args.Add(command_line);
                     }
                     else
                     {
-                        if (exe.signal.TryReadArgument(out string command_line, out _, lint: false))
+                        if (exe.line.TryReadArgument(out string command_line, out _, lint: false))
                         {
-                            exe.signal.LintToThisPosition(exe.signal.linter.external);
+                            exe.line.LintToThisPosition(exe.line.linter.external);
                             exe.args.Add(command_line);
                         }
                     }

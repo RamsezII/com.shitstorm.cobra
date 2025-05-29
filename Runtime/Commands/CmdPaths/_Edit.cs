@@ -17,13 +17,13 @@ namespace _COBRA_
                 no_background: true,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_one_flag(exe, flag_force_file))
+                    if (exe.line.TryRead_one_flag(exe, flag_force_file))
                         exe.opts.Add(flag_force_file, null);
                 },
                 args: static exe =>
                 {
                     bool force = exe.opts.ContainsKey(flag_force_file);
-                    if (exe.signal.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
                         exe.args.Add(path);
                 },
                 action: static exe =>

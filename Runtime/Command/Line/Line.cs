@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     partial class Command
     {
-        public sealed partial class Signal
+        public sealed partial class Line
         {
             public readonly Shell shell;
             public readonly Linter linter = new();
@@ -38,7 +38,7 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            public Signal(in string text, in SIG_FLAGS flags, in Shell shell, in int cursor_i = default, in int cpl_index = default)
+            public Line(in string text, in SIG_FLAGS flags, in Shell shell, in int cursor_i = default, in int cpl_index = default)
             {
                 notEmpty = !string.IsNullOrWhiteSpace(text);
                 this.text = notEmpty ? text : string.Empty;

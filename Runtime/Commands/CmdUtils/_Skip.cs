@@ -11,7 +11,7 @@
                 opts: static exe => exe.opts.Add("i", 0),
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string arg, out _))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         if (int.TryParse(arg, out int count))
                             exe.args.Add(count);
                         else

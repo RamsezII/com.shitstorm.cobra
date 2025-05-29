@@ -18,13 +18,13 @@ namespace _COBRA_
                 min_args: 1,
                 opts: static exe =>
                 {
-                    if (exe.signal.TryRead_one_flag(exe, flag_url))
+                    if (exe.line.TryRead_one_flag(exe, flag_url))
                         exe.opts.Add(flag_url, null);
                 },
                 args: static exe =>
                 {
                     bool is_url = exe.opts.ContainsKey(flag_url);
-                    if (exe.signal.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
+                    if (exe.line.TryReadArgument(out string path, out bool is_candidate, path_mode: FS_TYPES.FILE))
                         if (is_url)
                             exe.args.Add(path);
                         else
@@ -43,7 +43,7 @@ namespace _COBRA_
                 using UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.UNKNOWN);
                 UnityWebRequestAsyncOperation operation = request.SendWebRequest();
 
-                while (!operation.isDone || !exe.signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                while (!operation.isDone || !exe.line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                     yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: operation.progress);
 
                 if (request.result != UnityWebRequest.Result.Success)

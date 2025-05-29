@@ -14,7 +14,7 @@ namespace _COBRA_
                 max_args: 2,
                 args: exe =>
                 {
-                    if (Command.static_domain.TryReadCommand_path(exe.signal, out var path))
+                    if (Command.static_domain.TryReadCommand_path(exe.line, out var path))
                     {
                         exe.args.Add(path[^1]);
                         exe.args.Add(path.Select(cmd => cmd.name).Join("/"));

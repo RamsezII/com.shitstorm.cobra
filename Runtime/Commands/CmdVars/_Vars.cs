@@ -13,9 +13,9 @@
                 min_args: 2,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string name, out _, exe.shell.shell_vars.Keys))
+                    if (exe.line.TryReadArgument(out string name, out _, exe.shell.shell_vars.Keys))
                         exe.args.Add(name);
-                    if (exe.signal.TryReadArgument(out string value, out _))
+                    if (exe.line.TryReadArgument(out string value, out _))
                         exe.args.Add(value);
                 },
                 action: static exe =>
@@ -30,9 +30,9 @@
                 min_args: 2,
                 args: static exe =>
                 {
-                    if (exe.signal.TryReadArgument(out string name, out _, Shell.global_vars.Keys))
+                    if (exe.line.TryReadArgument(out string name, out _, Shell.global_vars.Keys))
                         exe.args.Add(name);
-                    if (exe.signal.TryReadArgument(out string value, out _))
+                    if (exe.line.TryReadArgument(out string value, out _))
                         exe.args.Add(value);
                 },
                 action: static exe =>
