@@ -21,7 +21,7 @@ namespace _COBRA_
                 return false;
             }
 
-            public bool TryReadCommandSeparator(out string argument)
+            public bool TryReadCommandSeparator(out string argument, in bool is_pipe = false)
             {
                 if (!HasNext(true))
                 {
@@ -36,7 +36,7 @@ namespace _COBRA_
 
                 switch (c)
                 {
-                    case '&':
+                    case '&' when !is_pipe:
                         ++read_i;
                         if (read_i < text.Length && text[read_i] == '&')
                         {
@@ -154,8 +154,12 @@ namespace _COBRA_
                         var_value_str = var_value.ToString();
                         seems_valid = true;
                     }
-                    else if (HasFlags_any(SIG_FLAGS.CHECK | SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
-                        Debug.LogWarning($"no var named: '{var_name}'");
+                    else
+                    {
+                        var_value_str = string.Empty;
+                        if (HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                            Debug.LogWarning($"no var named: '{var_name}'");
+                    }
 
                 if (!is_var)
                     if (isNotEmpty)
@@ -174,6 +178,7 @@ namespace _COBRA_
                                         {
                                             string val = var_value.ToString();
                                             var_value_str = var_value_str[..vi] + val + var_value_str[(i + 1)..];
+                                            i = vi + val.Length;
                                         }
                                     }
                                 }

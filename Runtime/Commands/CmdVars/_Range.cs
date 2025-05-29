@@ -1,4 +1,6 @@
-﻿namespace _COBRA_
+﻿using System.Linq;
+
+namespace _COBRA_
 {
     partial class CmdVars
     {
@@ -6,9 +8,9 @@
         {
             Command.static_domain.AddAction(
                 "range",
-                manual: new("<min><pad><max>"),
+                manual: new("{<max>} {<min> <max> [pad]}"),
                 min_args: 1,
-                max_args: 3,
+                max_args: 2,
                 args: static exe =>
                 {
                     for (int i = 0; i < 3; ++i)
@@ -20,14 +22,14 @@
                 action: static exe =>
                 {
                     int count = exe.args.Count;
-                    int min = 0, increment = 1, max = 0;
+                    int min = 0, pad = 1, max = 0;
 
                     switch (count)
                     {
                         case 3:
                             min = int.Parse((string)exe.args[0]);
-                            increment = int.Parse((string)exe.args[1]);
-                            max = int.Parse((string)exe.args[2]);
+                            max = int.Parse((string)exe.args[1]);
+                            pad = int.Parse((string)exe.args[2]);
                             break;
 
                         case 2:
@@ -39,8 +41,7 @@
                             break;
                     }
 
-                    for (int i = min; i < max; i += increment)
-                        exe.Stdout(i);
+                    exe.Stdout(Enumerable.Range(min, max));
                 });
         }
     }

@@ -55,6 +55,12 @@ namespace _COBRA_
                     exe.Stdout(sb.TroncatedForLog());
                 });
 
+            Command.static_domain.AddPipe(
+                "null",
+                on_pipe: static (exe, data) =>
+                {
+                });
+
             Command.static_domain.AddAction(
                 "shutdown",
                 manual: new("closes the application"),

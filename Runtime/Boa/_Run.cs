@@ -29,25 +29,28 @@ namespace _COBRA_
                 for (int i = 0; i < script_lines.Length; i++)
                 {
                     string script_line = script_lines[i];
-                    Command.Signal signal = new(script_line, exe.signal.flags, exe.shell, cursor_i: int.MaxValue);
-                    if (Command.static_domain.TryReadCommand_path(signal, out var path))
+                    if (!string.IsNullOrWhiteSpace(script_line))
                     {
-                        Command.Executor exe2 = new(exe.shell, exe, signal, path);
-                        if (exe2.error != null)
+                        Command.Signal signal = new(script_line, exe.signal.flags, exe.shell, cursor_i: int.MaxValue);
+                        if (Command.static_domain.TryReadCommand_path(signal, out var path))
                         {
-                            exe.error = exe2.error;
+                            Command.Executor exe2 = new(exe.shell, exe, signal, path);
+                            if (exe2.error != null)
+                            {
+                                exe.error = exe2.error;
+                                yield break;
+                            }
+
+                            exe.janitor.AddExecutor(exe.signal, exe2);
+
+                            while (!exe2.disposed)
+                                yield return exe2.routine.Current;
+                        }
+                        else
+                        {
+                            exe.error = $"could not find command ({nameof(exe.signal.arg_last)}: {exe.signal.arg_last})";
                             yield break;
                         }
-
-                        exe.janitor.AddExecutor(exe.signal, exe2);
-
-                        while (!exe2.disposed)
-                            yield return exe2.routine.Current;
-                    }
-                    else
-                    {
-                        exe.error = $"could not find command ({nameof(exe.signal.arg_last)}: {exe.signal.arg_last})";
-                        yield break;
                     }
                 }
             }

@@ -43,7 +43,7 @@ namespace _COBRA_
                     return err;
                 }
 
-                internal void AddExecutor(in Signal signal, in Executor exe)
+                internal void AddExecutor(in Signal signal, in Executor exe, in bool insert = false)
                 {
                     if (disposed)
                         Debug.LogError($"adding {exe.GetType().FullName} '{exe.command.name}' ({exe.cmd_longname}) to disposed pipeline[{pipeline_ID}].");
@@ -53,7 +53,10 @@ namespace _COBRA_
                     if (_executors.Remove(exe))
                         Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
 
-                    _executors.Add(exe);
+                    if (insert)
+                        _executors.Insert(0, exe);
+                    else
+                        _executors.Add(exe);
                     TryExecute(signal, exe);
                 }
 
@@ -78,9 +81,9 @@ namespace _COBRA_
                 {
                 before_execution:
                     exe = null;
-                    for (int i = 0; i <= _executors.Count; i++)
+                    for (int i = _executors.Count - 1; i >= -1; i--)
                     {
-                        if (i == _executors.Count)
+                        if (i == -1)
                         {
                             exe = null;
                             return false;
@@ -95,7 +98,7 @@ namespace _COBRA_
                             if (exe.background)
                                 Shell.background_janitors.Add(new Janitor(signal, exe));
                             else
-                                _executors.Add(exe);
+                                AddExecutor(signal, exe);
                             return true;
                         }
                     }

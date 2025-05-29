@@ -35,7 +35,7 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            internal Executor(in Shell shell, in Executor parent, in Signal signal, in List<Command> path, in bool parse_options = true, in bool parse_arguments = true)
+            internal Executor(in Shell shell, in Executor parent, in Signal signal, in List<Command> path)
             {
                 instances.Add(this);
 
@@ -73,29 +73,50 @@ namespace _COBRA_
                     if (command.opts != null)
                     {
                         opts = new();
-                        if (parse_options)
-                            ParseOptions(signal);
+
+                        if (command.opts == null)
+                            return;
+
+                        this.signal = signal;
+                        command.opts(this);
+                        this.signal = null;
                     }
 
                 if (error == null)
                     if (command.args != null)
                     {
                         args = new(command.min_args);
-                        if (parse_arguments)
-                            ParseArguments(signal);
+
+                        if (command.args == null)
+                            return;
+
+                        this.signal = signal;
+                        command.args(this);
+                        this.signal = null;
+
+                        if (error == null)
+                            if (args.Count < command.min_args || args.Count > command.max_args)
+                                if (command.min_args == command.max_args)
+                                    error = $"{this} expects {command.min_args} arguments, {args.Count} were given.";
+                                else
+                                    error = $"{this} accepts from {command.min_args} to {command.max_args} arguments, {args.Count} were given.";
                     }
 
                 before_parsing_separator:
                 if (error == null)
-                    if (signal.TryReadCommandSeparator(out string spr))
+                    if (signal.TryReadCommandSeparator(out string spr, is_pipe: command.on_pipe != null))
                     {
                         bool
                             is_pipe = spr.Equals("|", StringComparison.OrdinalIgnoreCase),
                             is_chain = spr.Equals("&&", StringComparison.OrdinalIgnoreCase),
                             is_background = spr.Equals("&", StringComparison.OrdinalIgnoreCase);
 
-                        if (!is_pipe && !is_chain && !is_background)
-                            error = $"'{signal.arg_last}' is no valid command separator";
+                        if (is_background && command.on_pipe != null)
+                            error = $"piped command can not request background execution";
+
+                        if (error == null)
+                            if (!is_pipe && !is_chain && !is_background)
+                                error = $"'{signal.arg_last}' is no valid command separator";
 
                         if (error == null)
                             if (is_background)
@@ -118,7 +139,10 @@ namespace _COBRA_
                                         error = $"{this} -> {exe} has no '{nameof(exe.command.on_pipe)}' callback, it can not be piped into.";
                                     else if (is_pipe)
                                         if (command.output_type.IsAssignableFrom(exe.command.input_type))
+                                        {
                                             stdout_exe = exe;
+                                            goto before_parsing_separator;
+                                        }
                                         else
                                             error = $"{this}.{nameof(command.output_type)} can not be piped into {exe}.{nameof(exe.command.input_type)} {exe.command.input_type}";
                                     else
@@ -138,33 +162,6 @@ namespace _COBRA_
                     if (command.routine != null)
                         if (signal.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
                             routine = command.routine(this);
-            }
-
-            internal void ParseOptions(in Signal signal)
-            {
-                if (command.opts == null)
-                    return;
-
-                this.signal = signal;
-                command.opts(this);
-                this.signal = null;
-            }
-
-            internal void ParseArguments(in Signal signal)
-            {
-                if (command.args == null)
-                    return;
-
-                this.signal = signal;
-                command.args(this);
-                this.signal = null;
-
-                if (error == null)
-                    if (args.Count < command.min_args || args.Count > command.max_args)
-                        if (command.min_args == command.max_args)
-                            error = $"{this} expects {command.min_args} arguments, {args.Count} were given.";
-                        else
-                            error = $"{this} accepts from {command.min_args} to {command.max_args} arguments, {args.Count} were given.";
             }
 
             //--------------------------------------------------------------------------------------------------------------
