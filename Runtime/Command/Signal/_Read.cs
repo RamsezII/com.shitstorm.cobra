@@ -221,7 +221,7 @@ namespace _COBRA_
                                 if (!complete_if_option || argument.StartsWith('-'))
                                 {
                                     cpl_done = true;
-                                    cpl_start_i = read_i;
+                                    cpl_last_i = cpl_start_i = read_i;
 
                                     if (flags.HasFlag(SIG_FLAGS.ALT))
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
