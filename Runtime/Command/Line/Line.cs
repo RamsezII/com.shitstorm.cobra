@@ -15,7 +15,16 @@ namespace _COBRA_
             public int cpl_index;
             public SIG_FLAGS flags;
             public bool cpl_stop, cpl_done, is_cursor_on_path;
-            public int cursor_i = -1, read_i, start_i, path_i, end_i, arg_i = -1, cpl_start_i, cpl_last_i;
+
+            public int
+                cursor_i = -1, 
+                read_i, last_read_i, 
+                start_i, last_start_i, 
+                path_i, 
+                end_i, 
+                arg_i = -1,
+                cpl_start_i, cpl_last_i;
+
             public string arg_last, path_last;
             public CMDLINE_DATA data;
             public bool HasFlags_any(in SIG_FLAGS flags) => (this.flags & flags) != 0;

@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ namespace _COBRA_
             Init_Seconds();
             Init_Signal();
             Init_Routines();
+            Init_StdinRead();
 
             CmdExecutors.Init();
 

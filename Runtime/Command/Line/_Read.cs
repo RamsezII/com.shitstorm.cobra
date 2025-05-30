@@ -141,6 +141,11 @@ namespace _COBRA_
                 seems_valid = false;
 
                 bool isNotEmpty = Util_cobra.TryReadArgument(text, out start_i, ref read_i, out argument, stop_at_separators: true);
+                if (had_next)
+                {
+                    last_start_i = start_i;
+                    last_read_i = read_i;
+                }
                 end_i = read_i;
 
                 string var_name = is_var && argument.Length > 1
