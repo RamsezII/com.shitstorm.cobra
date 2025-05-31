@@ -43,7 +43,7 @@ namespace _COBRA_
                 using UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.UNKNOWN);
                 UnityWebRequestAsyncOperation operation = request.SendWebRequest();
 
-                while (!operation.isDone || !exe.line.flags.HasFlag(SIG_FLAGS.TICK))
+                while (!operation.isDone || !exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
                     yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: operation.progress);
 
                 if (request.result != UnityWebRequest.Result.Success)

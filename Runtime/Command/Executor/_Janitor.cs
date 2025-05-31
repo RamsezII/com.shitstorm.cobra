@@ -46,7 +46,7 @@ namespace _COBRA_
                     return err;
                 }
 
-                internal void AddExecutor(in Line line, in Executor exe, in bool insert = false)
+                internal void AddExecutor(in Line line, in Executor exe)
                 {
                     if (disposed)
                         Debug.LogError($"adding {exe.GetType().FullName} '{exe.command.name}' ({exe.cmd_longname}) to disposed pipeline[{pipeline_ID}].");
@@ -56,10 +56,7 @@ namespace _COBRA_
                     if (_executors.Remove(exe))
                         Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
 
-                    if (insert)
-                        _executors.Insert(0, exe);
-                    else
-                        _executors.Add(exe);
+                    _executors.Add(exe);
                     TryExecute(line, exe);
                 }
 
@@ -126,7 +123,7 @@ namespace _COBRA_
                     exe.line = line;
 
                     if (exe.command.action != null)
-                        if (line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                        if (line.flags.HasFlag(SIG_FLAGS.EXEC))
                         {
                             if (exe.started)
                                 Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) has already been started.");

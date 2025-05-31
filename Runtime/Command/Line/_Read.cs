@@ -162,7 +162,7 @@ namespace _COBRA_
                     else
                     {
                         var_value_str = string.Empty;
-                        if (flags.HasFlag(SIG_FLAGS.TICK))
+                        if (flags.HasFlag(SIG_FLAGS.EXEC))
                             Debug.LogWarning($"no var named: '{var_name}'");
                     }
 

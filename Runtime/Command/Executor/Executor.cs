@@ -44,7 +44,7 @@ namespace _COBRA_
                 this.path = path;
                 command = path[^1];
 
-                if (line.flags.HasFlag(SIG_FLAGS.TICK))
+                if (line.flags.HasFlag(SIG_FLAGS.EXEC))
                     EID = ++PID_counter;
 
                 switch (path.Count)
@@ -160,7 +160,7 @@ namespace _COBRA_
 
                 if (error == null)
                     if (command.routine != null)
-                        if (line.flags.HasFlag(SIG_FLAGS.TICK))
+                        if (line.flags.HasFlag(SIG_FLAGS.EXEC))
                             routine = command.routine(this);
             }
 

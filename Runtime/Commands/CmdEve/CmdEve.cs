@@ -61,7 +61,7 @@ namespace _COBRA_
                         Command.Executor cmd_exe = new(eve_exe.shell, eve_exe, eve_exe.line, path);
                         if (cmd_exe.error != null)
                             eve_exe.error = cmd_exe.error;
-                        else if (eve_exe.line.flags.HasFlag(SIG_FLAGS.TICK))
+                        else if (eve_exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
                         {
                             IEnumerator<float> routine = null;
 
@@ -86,7 +86,7 @@ namespace _COBRA_
                         if (cmd_exe.error != null)
                             if (eve_exe.line.flags.HasFlag(SIG_FLAGS.CHECK))
                                 Debug.LogWarning($"[EVE_WARN] {cmd_exe.error}");
-                            else if (eve_exe.line.flags.HasFlag(SIG_FLAGS.TICK))
+                            else if (eve_exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
                                 Debug.LogError($"[EVE_ERROR] {cmd_exe.error}");
 
                         cmd_exe.Dispose();

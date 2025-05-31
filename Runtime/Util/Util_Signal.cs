@@ -5,11 +5,11 @@ namespace _COBRA_
     enum SIG_ENUM : byte
     {
         _kill,
-        _save,
         _lint,
         _check,
         _exec,
         _tick,
+        _submit,
         _double,
         _cpl,
         _tab,
@@ -28,12 +28,11 @@ namespace _COBRA_
     {
         _none_,
         KILL = 1 << SIG_ENUM._kill,
-        SAVE = 1 << SIG_ENUM._save,
         LINT = 1 << SIG_ENUM._lint,
         CHECK = 1 << SIG_ENUM._check,
         EXEC = 1 << SIG_ENUM._exec,
-        TICK = 1 << SIG_ENUM._tick,
-        SUBMIT = EXEC | TICK,
+        TICK = EXEC | 1 << SIG_ENUM._tick,
+        SUBMIT = EXEC | 1 << SIG_ENUM._submit,
         DOUBLE = 1 << SIG_ENUM._double,
         CPL = 1 << SIG_ENUM._cpl,
         TAB = CPL | 1 << SIG_ENUM._tab,

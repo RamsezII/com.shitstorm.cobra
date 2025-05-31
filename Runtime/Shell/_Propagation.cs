@@ -75,8 +75,8 @@ namespace _COBRA_
                                 }
                     }
 
-                // executate top executor
-                before_active_executors:
+                // executate top janitor
+                before_top_janitor:
             if (error == null)
                 if (front_janitors.Count > 0)
                 {
@@ -91,12 +91,11 @@ namespace _COBRA_
                         front_janitors.Remove(janitor);
 
                         if (error == null)
-                            goto before_active_executors;
+                            goto before_top_janitor;
                     }
                 }
 
             // pull pending queue
-            before_pending_queue:
             if (error == null)
                 if (line.flags.HasFlag(SIG_FLAGS.TICK))
                     if (front_janitors.Count == 0 && pending_executors.Count > 0)
@@ -110,38 +109,41 @@ namespace _COBRA_
                             background_janitors.Add(new Command.Executor.Janitor(line, exe));
                         else
                         {
+                            int count = front_janitors.Count;
                             front_janitors.Add(new Command.Executor.Janitor(line, exe));
-                            goto before_active_executors;
+                            if (count == 0)
+                                goto before_top_janitor;
                         }
                     }
 
             // parse stdin as new command line
-            //if (front_janitors.Count == 0)
-            if (error == null && line.HasNext(true))
-                if (Command.static_domain.TryReadCommand_path(line, out var path))
-                {
-                    Command.Executor exe = new(this, null, line, path);
-                    if (exe.error != null)
+            if (error == null)
+                if (line.HasNext(true))
+                    if (Command.static_domain.TryReadCommand_path(line, out var path))
                     {
-                        error = exe.error;
-                        exe.Dispose();
+                        Command.Executor exe = new(this, null, line, path);
+                        if (exe.error != null)
+                        {
+                            error = exe.error;
+                            exe.Dispose();
+                        }
+                        else if (line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                        {
+                            if (exe.background)
+                            {
+                                exe.PropagateBackground();
+                                background_janitors.Add(new Command.Executor.Janitor(line, exe));
+                            }
+                            else if (front_janitors.Count == 0)
+                                front_janitors.Add(new Command.Executor.Janitor(line, exe));
+                            else
+                                pending_executors.Enqueue(exe);
+                        }
+                        else if (line.flags.HasFlag(SIG_FLAGS.TICK))
+                            error = $"{typeof(SIG_FLAGS)}.{SIG_FLAGS.TICK} not intercepted ('{line.text[line.start_i..]}')";
                     }
-                    else if (line.flags.HasFlag(SIG_FLAGS.SUBMIT))
-                        if (exe.background)
-                        {
-                            exe.PropagateBackground();
-                            background_janitors.Add(new Command.Executor.Janitor(line, exe));
-                        }
-                        else
-                        {
-                            pending_executors.Enqueue(exe);
-                            goto before_pending_queue;
-                        }
-                    else if (line.flags.HasFlag(SIG_FLAGS.TICK))
-                        error = $"{typeof(SIG_FLAGS)}.{SIG_FLAGS.TICK} not intercepted ('{line.text[line.start_i..]}')";
-                }
-                else if (!string.IsNullOrWhiteSpace(line.arg_last))
-                    error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
+                    else if (!string.IsNullOrWhiteSpace(line.arg_last))
+                        error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
 
             // update state
             previous_state = current_status.state;
@@ -155,7 +157,7 @@ namespace _COBRA_
             if (error != null)
                 if (line.flags.HasFlag(SIG_FLAGS.CHECK))
                     Debug.LogWarning($"[WARN {this}] signal[{line.flags}] -> {error}");
-                else if (line.flags.HasFlag(SIG_FLAGS.TICK))
+                else if (line.flags.HasFlag(SIG_FLAGS.EXEC))
                     Debug.LogError($"[ERROR {this} signal[{line.flags}] -> {error}");
 
             // null if everything good
