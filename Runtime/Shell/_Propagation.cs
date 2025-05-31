@@ -75,47 +75,6 @@ namespace _COBRA_
                                 }
                     }
 
-                // executate top janitor
-                before_top_janitor:
-            if (error == null)
-                if (front_janitors.Count > 0)
-                {
-                    var janitor = front_janitors[^1];
-                    bool in_activity = janitor.TryExecuteCurrent(line, out _);
-
-                    janitor.TryPullError(out error);
-
-                    if (!in_activity || error != null)
-                    {
-                        janitor.Dispose();
-                        front_janitors.Remove(janitor);
-
-                        if (error == null)
-                            goto before_top_janitor;
-                    }
-                }
-
-            // pull pending queue
-            if (error == null)
-                if (line.flags.HasFlag(SIG_FLAGS.TICK))
-                    if (front_janitors.Count == 0 && pending_executors.Count > 0)
-                    {
-                        var exe = pending_executors.Dequeue();
-                        if (exe == null)
-                            error = $"[SHELL_WARNING] presence of NULL {exe.GetType().FullName} in {nameof(pending_executors)}";
-                        else if (exe.disposed)
-                            error = $"[SHELL_WARNING] oblivion of disposed {exe.GetType().FullName} ({exe}) in {nameof(pending_executors)}";
-                        else if (exe.background)
-                            background_janitors.Add(new Command.Executor.Janitor(line, exe));
-                        else
-                        {
-                            int count = front_janitors.Count;
-                            front_janitors.Add(new Command.Executor.Janitor(line, exe));
-                            if (count == 0)
-                                goto before_top_janitor;
-                        }
-                    }
-
             // parse stdin as new command line
             if (error == null)
                 if (line.HasNext(true))
@@ -144,6 +103,47 @@ namespace _COBRA_
                     }
                     else if (!string.IsNullOrWhiteSpace(line.arg_last))
                         error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
+
+                    // executate top janitor
+                    before_top_janitor:
+            if (error == null)
+                if (front_janitors.Count > 0)
+                {
+                    var janitor = front_janitors[^1];
+                    bool in_activity = janitor.TryExecuteCurrent(line, out _);
+
+                    janitor.TryPullError(out error);
+
+                    if (!in_activity || error != null)
+                    {
+                        janitor.Dispose();
+                        front_janitors.Remove(janitor);
+
+                        if (error == null)
+                            goto before_top_janitor;
+                    }
+                }
+
+            // pull pending queue
+            if (error == null)
+                if (line.flags.HasFlag(SIG_FLAGS.TICK))
+                    if (front_janitors.Count == 0 && pending_executors.Count > 0)
+                    {
+                        var exe = pending_executors.Dequeue();
+                        if (exe == null)
+                            error = $"presence of NULL {exe.GetType().FullName} in {nameof(pending_executors)}";
+                        else if (exe.disposed)
+                            error = $"oblivion of disposed {exe.GetType().FullName} ({exe}) in {nameof(pending_executors)}";
+                        else if (exe.background)
+                            background_janitors.Add(new Command.Executor.Janitor(line, exe));
+                        else
+                        {
+                            int count = front_janitors.Count;
+                            front_janitors.Add(new Command.Executor.Janitor(line, exe));
+                            if (count == 0)
+                                goto before_top_janitor;
+                        }
+                    }
 
             // update state
             previous_state = current_status.state;
