@@ -27,6 +27,7 @@ namespace _COBRA_
 
             public string arg_last, path_last;
             public CMDLINE_DATA data;
+            internal Executor.Janitor janitor;
             public bool HasFlags_any(in SIG_FLAGS flags) => (this.flags & flags) != 0;
             bool IsOnCursor => cursor_i >= start_i && cursor_i <= read_i;
             public IEnumerable<string> completions;

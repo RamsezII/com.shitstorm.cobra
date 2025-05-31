@@ -107,7 +107,7 @@ namespace _COBRA_
                             if (exe1.error != null)
                                 exe.error = exe1.error;
                             else
-                                exe.janitor.AddExecutor(exe.line, exe1);
+                                exe.janitor.AddExecutor(exe1);
                         }
                     }
                     else if (exe.args.Count > 1)
@@ -121,7 +121,7 @@ namespace _COBRA_
                             if (exe2.error != null)
                                 exe.error = exe2.error;
                             else
-                                exe.janitor.AddExecutor(exe.line, exe2);
+                                exe.janitor.AddExecutor(exe2);
                         }
                     }
                 });

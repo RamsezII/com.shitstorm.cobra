@@ -43,10 +43,10 @@ namespace _COBRA_
                                 yield break;
                             }
 
-                            exe.janitor.AddExecutor(exe.line, exe2);
+                            exe.janitor.AddExecutor(exe2);
 
                             while (!exe2.disposed)
-                                yield return exe2.routine.Current;
+                                yield return exe.janitor.exe_status;
                         }
                         else
                         {

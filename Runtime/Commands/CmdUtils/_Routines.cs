@@ -45,7 +45,7 @@ namespace _COBRA_
 
                     exe2.args[0] = data;
 
-                    exe.janitor.AddExecutor(exe.line, exe2);
+                    exe.janitor.AddExecutor(exe2);
                 });
 
             Command.static_domain.AddRoutine(

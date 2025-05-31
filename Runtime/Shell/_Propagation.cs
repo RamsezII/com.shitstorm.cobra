@@ -40,6 +40,7 @@ namespace _COBRA_
         public string PropagateSignal(in Command.Line line)
         {
             string error = null;
+            previous_state = current_state;
 
             if (line.flags.HasFlag(SIG_FLAGS.TICK))
             {
@@ -55,9 +56,7 @@ namespace _COBRA_
             // kill top executor
             if (error == null)
                 if (line.flags.HasFlag(SIG_FLAGS.KILL))
-                    if (front_janitors.Count > 0)
-                    {
-                        var janitor = front_janitors[^1];
+                    if (front_janitors.TryPeek(out var janitor))
                         if (janitor.TryGetCurrent(out var exe))
                             if (exe.routine != null)
                                 if (exe.command.immortal)
@@ -73,7 +72,36 @@ namespace _COBRA_
                                     exe.line = null;
                                     exe.Dispose();
                                 }
+
+                    // executate top janitor
+                    before_top_janitor:
+            if (error == null)
+                if (front_janitors.TryPeek(out var janitor))
+                {
+                    bool in_activity = janitor.TryExecuteCurrent(line, out _);
+                    current_state = new(janitor.current_eid, janitor.exe_status);
+
+                    janitor.TryPullError(out error);
+
+                    if (!in_activity || error != null)
+                    {
+                        janitor.Dispose();
+                        front_janitors.Dequeue();
+
+                        if (error == null)
+                            goto before_top_janitor;
                     }
+                }
+                else
+                    current_state = new(
+                        SID,
+                        new CMD_STATUS(
+                            CMD_STATES.WAIT_FOR_STDIN,
+                            prefixe: GetPrefixe(),
+                            immortal: true)
+                        );
+
+            stdin_change_flag |= stdin_change = !current_state.Equals(previous_state);
 
             // parse stdin as new command line
             if (error == null)
@@ -89,69 +117,20 @@ namespace _COBRA_
                         else if (line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                         {
                             if (exe.background)
-                            {
                                 exe.PropagateBackground();
-                                background_janitors.Add(new Command.Executor.Janitor(line, exe));
-                            }
-                            else if (front_janitors.Count == 0)
-                                front_janitors.Add(new Command.Executor.Janitor(line, exe));
+
+                            line.janitor = new Command.Executor.Janitor(line, exe);
+
+                            if (exe.background)
+                                background_janitors.Add(line.janitor);
                             else
-                                pending_executors.Enqueue(exe);
+                                front_janitors.Enqueue(line.janitor);
                         }
                         else if (line.flags.HasFlag(SIG_FLAGS.TICK))
                             error = $"{typeof(SIG_FLAGS)}.{SIG_FLAGS.TICK} not intercepted ('{line.text[line.start_i..]}')";
                     }
                     else if (!string.IsNullOrWhiteSpace(line.arg_last))
                         error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
-
-                    // executate top janitor
-                    before_top_janitor:
-            if (error == null)
-                if (front_janitors.Count > 0)
-                {
-                    var janitor = front_janitors[^1];
-                    bool in_activity = janitor.TryExecuteCurrent(line, out _);
-
-                    janitor.TryPullError(out error);
-
-                    if (!in_activity || error != null)
-                    {
-                        janitor.Dispose();
-                        front_janitors.Remove(janitor);
-
-                        if (error == null)
-                            goto before_top_janitor;
-                    }
-                }
-
-            // pull pending queue
-            if (error == null)
-                if (line.flags.HasFlag(SIG_FLAGS.TICK))
-                    if (front_janitors.Count == 0 && pending_executors.Count > 0)
-                    {
-                        var exe = pending_executors.Dequeue();
-                        if (exe == null)
-                            error = $"presence of NULL {exe.GetType().FullName} in {nameof(pending_executors)}";
-                        else if (exe.disposed)
-                            error = $"oblivion of disposed {exe.GetType().FullName} ({exe}) in {nameof(pending_executors)}";
-                        else if (exe.background)
-                            background_janitors.Add(new Command.Executor.Janitor(line, exe));
-                        else
-                        {
-                            int count = front_janitors.Count;
-                            front_janitors.Add(new Command.Executor.Janitor(line, exe));
-                            if (count == 0)
-                                goto before_top_janitor;
-                        }
-                    }
-
-            // update state
-            previous_state = current_status.state;
-            if (front_janitors.Count > 0 && front_janitors[^1].TryGetCurrent(out Command.Executor active_exe) && active_exe.routine != null)
-                current_status = active_exe.routine.Current;
-            else
-                current_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: GetPrefixe(), immortal: true);
-            state_changed = previous_state != current_status.state;
 
             // show error
             if (error != null)

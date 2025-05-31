@@ -69,7 +69,7 @@ namespace _COBRA_
                         if (do_exe.error != null)
                             exe.error = do_exe.error;
                         else
-                            exe.janitor.AddExecutor(exe.line, do_exe);
+                            exe.janitor.AddExecutor(do_exe);
                     }
                 }
             );

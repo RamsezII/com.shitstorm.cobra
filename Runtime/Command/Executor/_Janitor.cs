@@ -14,7 +14,7 @@ namespace _COBRA_
             internal class Janitor : IDisposable
             {
                 internal readonly List<Executor> _executors = new();
-                bool disposed;
+                internal bool disposed;
 
                 static ushort id_counter;
                 public readonly ushort pipeline_ID = ++id_counter;
@@ -23,11 +23,14 @@ namespace _COBRA_
 
                 public readonly VarDict temp_vars = new();
 
+                internal CMD_STATUS exe_status;
+                internal ushort current_eid;
+
                 //--------------------------------------------------------------------------------------------------------------
 
                 internal Janitor(in Line line, in Executor exe)
                 {
-                    AddExecutor(line, exe);
+                    AddExecutor(exe);
                 }
 
                 //--------------------------------------------------------------------------------------------------------------
@@ -46,7 +49,7 @@ namespace _COBRA_
                     return err;
                 }
 
-                internal void AddExecutor(in Line line, in Executor exe)
+                internal void AddExecutor(in Executor exe)
                 {
                     if (disposed)
                         Debug.LogError($"adding {exe.GetType().FullName} '{exe.command.name}' ({exe.cmd_longname}) to disposed pipeline[{pipeline_ID}].");
@@ -57,7 +60,6 @@ namespace _COBRA_
                         Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) already exists in pipeline[{pipeline_ID}]. Replacing it.");
 
                     _executors.Add(exe);
-                    TryExecute(line, exe);
                 }
 
                 internal bool TryGetCurrent(out Executor executor)
@@ -65,14 +67,19 @@ namespace _COBRA_
                     for (int i = _executors.Count - 1; i >= 0; i--)
                     {
                         executor = _executors[i];
+                        executor.janitor = this;
+
                         if (!executor.disposed)
                             return true;
-                        else if (executor.TryPullNext(out executor))
+
+                        if (executor.TryPullNext(out executor))
                         {
+                            executor.janitor = this;
                             _executors.Add(executor);
                             return true;
                         }
                     }
+
                     executor = null;
                     return false;
                 }
@@ -90,15 +97,17 @@ namespace _COBRA_
                         }
 
                         exe = _executors[i];
+                        exe.janitor = this;
 
                         if (!exe.disposed)
                             break;
-                        else if (exe.TryPullNext(out exe))
+
+                        if (exe.TryPullNext(out exe))
                         {
                             if (exe.background)
                                 Shell.background_janitors.Add(new Janitor(line, exe));
                             else
-                                AddExecutor(line, exe);
+                                AddExecutor(exe);
                             return true;
                         }
                     }
@@ -120,7 +129,11 @@ namespace _COBRA_
                         return false;
                     }
 
+                    exe_status = default;
+                    current_eid = exe.EID;
+
                     exe.line = line;
+                    exe.janitor = this;
 
                     if (exe.command.action != null)
                         if (line.flags.HasFlag(SIG_FLAGS.EXEC))
@@ -149,7 +162,7 @@ namespace _COBRA_
 
                     if (exe.routine != null)
                     {
-                        if (line.flags.HasFlag(SIG_FLAGS.TICK))
+                        if (line.flags.HasFlag(SIG_FLAGS.EXEC))
                         {
                             if (!exe.started && exe.background)
                                 exe.LogBackgroundStart();
@@ -159,9 +172,10 @@ namespace _COBRA_
                         try
                         {
                             bool has_next = exe.routine.MoveNext();
+                            exe_status = exe.routine.Current;
 
                             if (exe.error != null)
-                                if (exe.line.flags.HasFlag(SIG_FLAGS.TICK))
+                                if (exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
                                 {
                                     error = $"{this} {exe} {Util.PullValue(ref exe.error)}";
                                     Debug.LogWarning(error);

@@ -12,13 +12,10 @@ namespace _COBRA_
 
             static IEnumerator<CMD_STATUS> EStdinTest(Command.Executor exe)
             {
-                yield return new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, "balls:");
-                yield return new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, "balls:");
-
                 while (true)
                 {
                     exe.line.TryReadArgument(out string arg, out _);
-                    if (exe.line.flags.HasFlag(SIG_FLAGS.TICK))
+                    if (exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                     {
                         exe.Stdout(arg, line: exe.line);
                         yield break;

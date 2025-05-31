@@ -9,8 +9,7 @@ namespace _COBRA_
     {
         internal static readonly HashSet<Shell> instances = new();
 
-        readonly Queue<Command.Executor> pending_executors = new();
-        readonly List<Command.Executor.Janitor> front_janitors = new();
+        readonly Queue<Command.Executor.Janitor> front_janitors = new();
         internal static readonly List<Command.Executor.Janitor> background_janitors = new();
 
         static byte id_counter = 0;
@@ -19,9 +18,7 @@ namespace _COBRA_
         public static readonly VarDict global_vars = new();
         public readonly VarDict shell_vars = new();
 
-        public CMD_STATUS current_status;
-        public CMD_STATES previous_state;
-        public bool state_changed;
+        public bool stdin_change, stdin_change_flag;
         public bool IsIdle => front_janitors.Count == 0;
         public bool IsBusy => front_janitors.Count > 0;
         public ITerminal terminal;
@@ -70,12 +67,9 @@ namespace _COBRA_
                 sb.AppendLine($" {exe.shell.SID,5} {exe.PEID,5} {exe.EID,5} {exe.cmd_longname,35} {exe.routine?.Current.state ?? CMD_STATES._unknown_,15} {exe.background,15} {exe.disposed,15}");
 
             foreach (Shell shell in instances)
-                for (int i = 0; i < shell.front_janitors.Count; ++i)
-                {
-                    var janitor = shell.front_janitors[i];
+                foreach (var janitor in shell.front_janitors)
                     for (int j = 0; j < janitor._executors.Count; ++j)
                         LogExe(janitor._executors[j]);
-                }
 
             for (int i = 0; i < background_janitors.Count; ++i)
             {
@@ -94,12 +88,8 @@ namespace _COBRA_
             NUCLEOR.delegates.shell_tick -= PropagateTick;
             instances.Remove(this);
 
-            foreach (Command.Executor executor in pending_executors)
-                executor.Dispose();
-            pending_executors.Clear();
-
-            for (int i = 0; i < front_janitors.Count; i++)
-                front_janitors[i].Dispose();
+            foreach (var janitor in front_janitors)
+                janitor.Dispose();
             front_janitors.Clear();
 
             Debug.Log($"destroyed {GetType().FullName} ({transform.GetPath(true)})".ToSubLog());
