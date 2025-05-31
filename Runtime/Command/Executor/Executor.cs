@@ -198,6 +198,7 @@ namespace _COBRA_
             public void Stdout(in object data, string lint = null, Line line = null)
             {
                 line ??= this.line;
+                line ??= new(string.Empty, SIG_FLAGS.EXEC, shell);
 
                 if (data == null)
                     lint = null;

@@ -8,6 +8,9 @@ namespace _COBRA_
     {
         partial class Executor
         {
+            /// <summary>
+            /// handles lifetime of one command injection (terminal or script)
+            /// </summary>
             internal class Janitor : IDisposable
             {
                 internal readonly List<Executor> _executors = new();
