@@ -126,7 +126,7 @@ namespace _COBRA_
                     exe.line = line;
 
                     if (exe.command.action != null)
-                        if (line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                        if (line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                         {
                             if (exe.started)
                                 Debug.LogWarning($"'{exe.GetType().FullName}' '{exe.command.name}' ({exe.cmd_longname}) has already been started.");
@@ -140,8 +140,7 @@ namespace _COBRA_
                                 exe.command.action(exe);
 
                                 if (exe.error != null)
-                                    if (exe.line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
-                                        error = $"{this} {exe} {exe.error}";
+                                    error = $"{this} {exe} {exe.error}";
                             }
                             catch (Exception e)
                             {
@@ -153,7 +152,7 @@ namespace _COBRA_
 
                     if (exe.routine != null)
                     {
-                        if (line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                        if (line.flags.HasFlag(SIG_FLAGS.TICK))
                         {
                             if (!exe.started && exe.background)
                                 exe.LogBackgroundStart();
@@ -165,7 +164,7 @@ namespace _COBRA_
                             bool has_next = exe.routine.MoveNext();
 
                             if (exe.error != null)
-                                if (exe.line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                                if (exe.line.flags.HasFlag(SIG_FLAGS.TICK))
                                 {
                                     error = $"{this} {exe} {Util.PullValue(ref exe.error)}";
                                     Debug.LogWarning(error);

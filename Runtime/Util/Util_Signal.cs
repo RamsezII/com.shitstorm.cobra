@@ -33,6 +33,7 @@ namespace _COBRA_
         CHECK = 1 << SIG_ENUM._check,
         EXEC = 1 << SIG_ENUM._exec,
         TICK = 1 << SIG_ENUM._tick,
+        SUBMIT = EXEC | TICK,
         DOUBLE = 1 << SIG_ENUM._double,
         CPL = 1 << SIG_ENUM._cpl,
         TAB = CPL | 1 << SIG_ENUM._tab,
@@ -43,6 +44,9 @@ namespace _COBRA_
         RIGHT = 1 << SIG_ENUM._right,
         DOWN = 1 << SIG_ENUM._down,
         LEFT = 1 << SIG_ENUM._left,
+
+        UP_DOWN = UP | DOWN,
+        LEFT_RIGHT = LEFT | RIGHT,
 
         ALT_UP = ALT | UP,
         ALT_RIGHT = ALT | RIGHT,

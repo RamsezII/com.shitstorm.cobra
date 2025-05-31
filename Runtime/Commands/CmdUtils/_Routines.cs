@@ -22,7 +22,7 @@ namespace _COBRA_
                 CMD_STATUS status = new(CMD_STATES.BLOCKING, progress: (float)i / datas.Length);
 
                 do yield return status;
-                while (!exe.line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK));
+                while (!exe.line.flags.HasFlag(SIG_FLAGS.TICK));
 
                 exe.Stdout(datas[i]);
             }
@@ -92,7 +92,7 @@ namespace _COBRA_
                         ++frames;
                     yield return new CMD_STATUS(CMD_STATES.BLOCKING, progress: Mathf.InverseLerp(0, wait_amount, frames));
                 }
-                while (frames < wait_amount || !exe.line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK));
+                while (frames < wait_amount || !exe.line.flags.HasFlag(SIG_FLAGS.TICK));
 
                 exe.Stdout(null);
             }

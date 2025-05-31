@@ -44,7 +44,7 @@ namespace _COBRA_
                 this.path = path;
                 command = path[^1];
 
-                if (line.flags.HasFlag(SIG_FLAGS.EXEC))
+                if (line.flags.HasFlag(SIG_FLAGS.TICK))
                     EID = ++PID_counter;
 
                 switch (path.Count)
@@ -160,7 +160,7 @@ namespace _COBRA_
 
                 if (error == null)
                     if (command.routine != null)
-                        if (line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                        if (line.flags.HasFlag(SIG_FLAGS.TICK))
                             routine = command.routine(this);
             }
 
@@ -198,7 +198,7 @@ namespace _COBRA_
             public void Stdout(in object data, string lint = null, Line line = null)
             {
                 line ??= this.line;
-                line ??= new(string.Empty, SIG_FLAGS.EXEC, shell);
+                line ??= new(string.Empty, SIG_FLAGS.SUBMIT, shell);
 
                 if (data == null)
                     lint = null;

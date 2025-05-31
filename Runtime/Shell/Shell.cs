@@ -53,7 +53,7 @@ namespace _COBRA_
         private void Awake()
         {
             terminal = GetComponentInParent<ITerminal>();
-            NUCLEOR.delegates.shell_tick += UpdateUpdateJanitors;
+            NUCLEOR.delegates.shell_tick += PropagateTick;
             instances.Add(this);
             AwakeWorkDir();
         }
@@ -91,7 +91,7 @@ namespace _COBRA_
 
         private void OnDestroy()
         {
-            NUCLEOR.delegates.shell_tick -= UpdateUpdateJanitors;
+            NUCLEOR.delegates.shell_tick -= PropagateTick;
             instances.Remove(this);
 
             foreach (Command.Executor executor in pending_executors)

@@ -162,7 +162,7 @@ namespace _COBRA_
                     else
                     {
                         var_value_str = string.Empty;
-                        if (HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                        if (flags.HasFlag(SIG_FLAGS.TICK))
                             Debug.LogWarning($"no var named: '{var_name}'");
                     }
 
@@ -233,7 +233,7 @@ namespace _COBRA_
                                             PathCompletion_alt(var_value_str, path_mode, out completions);
                                         else
                                             ComputeCompletion_alt(var_value_str, completions);
-                                    else if (HasFlags_any(SIG_FLAGS.CPL))
+                                    else if (flags.HasFlag(SIG_FLAGS.CPL))
                                     {
                                         if (path_mode.HasFlags_any(FS_TYPES.BOTH))
                                             PathCompletion_tab(var_value_str, path_mode, out completions);

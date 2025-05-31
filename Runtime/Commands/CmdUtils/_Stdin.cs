@@ -18,7 +18,7 @@ namespace _COBRA_
                 while (true)
                 {
                     exe.line.TryReadArgument(out string arg, out _);
-                    if (exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
+                    if (exe.line.flags.HasFlag(SIG_FLAGS.TICK))
                     {
                         exe.Stdout(arg, line: exe.line);
                         yield break;

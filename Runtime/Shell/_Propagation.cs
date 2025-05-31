@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using _ARK_;
+using UnityEngine;
 
 namespace _COBRA_
 {
@@ -28,15 +29,26 @@ namespace _COBRA_
                 }
         }
 
-        void UpdateUpdateJanitors() => PropagateSignal(new Command.Line(string.Empty, SIG_FLAGS.TICK, this));
+        void PropagateTick()
+        {
+            if (Time.frameCount == last_tick)
+                Debug.LogWarning($"avoided {SIG_FLAGS.TICK} redundancy ({nameof(Time.frameCount)}: {Time.frameCount})", this);
+            else
+                PropagateSignal(new Command.Line(string.Empty, SIG_FLAGS.TICK, this));
+        }
+
         public string PropagateSignal(in Command.Line line)
         {
             string error = null;
 
             if (line.flags.HasFlag(SIG_FLAGS.TICK))
             {
+                if (NUCLEOR.delegates.shell_tick != NUCLEOR.delegate_current)
+                    Debug.LogWarning($"{SIG_FLAGS.TICK} flag propagated outside of {nameof(NUCLEOR)}.{nameof(NUCLEOR.delegates.shell_tick)} ({nameof(Time.frameCount)}: {Time.frameCount}, mask: {line.flags})", this);
+
                 if (Time.frameCount == last_tick)
-                    error = $"tick redundancy ({nameof(Time.frameCount)}: {Time.frameCount})";
+                    Debug.LogWarning($"tick redundancy ({nameof(Time.frameCount)}: {Time.frameCount}, {line.flags.GetType()}: {line.flags})", this);
+
                 last_tick = Time.frameCount;
             }
 
@@ -86,7 +98,7 @@ namespace _COBRA_
             // pull pending queue
             before_pending_queue:
             if (error == null)
-                if (line.HasFlags_any(SIG_FLAGS.EXEC | SIG_FLAGS.TICK))
+                if (line.flags.HasFlag(SIG_FLAGS.TICK))
                     if (front_janitors.Count == 0 && pending_executors.Count > 0)
                     {
                         var exe = pending_executors.Dequeue();
@@ -114,7 +126,7 @@ namespace _COBRA_
                         error = exe.error;
                         exe.Dispose();
                     }
-                    else if (line.flags.HasFlag(SIG_FLAGS.EXEC))
+                    else if (line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                         if (exe.background)
                         {
                             exe.PropagateBackground();
@@ -125,6 +137,8 @@ namespace _COBRA_
                             pending_executors.Enqueue(exe);
                             goto before_pending_queue;
                         }
+                    else if (line.flags.HasFlag(SIG_FLAGS.TICK))
+                        error = $"{typeof(SIG_FLAGS)}.{SIG_FLAGS.TICK} not intercepted ('{line.text[line.start_i..]}')";
                 }
                 else if (!string.IsNullOrWhiteSpace(line.arg_last))
                     error = $"'{line.arg_last}' not found in '{Command.static_domain.name}'";
@@ -141,7 +155,7 @@ namespace _COBRA_
             if (error != null)
                 if (line.flags.HasFlag(SIG_FLAGS.CHECK))
                     Debug.LogWarning($"[WARN {this}] signal[{line.flags}] -> {error}");
-                else if (line.flags.HasFlag(SIG_FLAGS.EXEC))
+                else if (line.flags.HasFlag(SIG_FLAGS.TICK))
                     Debug.LogError($"[ERROR {this} signal[{line.flags}] -> {error}");
 
             // null if everything good
