@@ -34,6 +34,7 @@ namespace _COBRA_
                 public Color var_unknown = Color.gray;
                 public Color literal = Color.gray;
                 public Color value = Color.gray;
+                public Color boa_symbol = Color.gray;
                 public Color type = Color.gray;
                 public Color directory = Color.gray;
                 public Color file = Color.gray;

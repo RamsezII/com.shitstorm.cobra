@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using _UTIL_;
 using UnityEngine;
 
@@ -45,56 +46,75 @@ namespace _COBRA_
                     string script_line = script_lines[line_i];
                     if (!string.IsNullOrWhiteSpace(script_line))
                     {
+                        Command.Line line = new(script_line, exe.line.flags, exe.shell, cursor_i: int.MaxValue);
                         int read_i = 0;
-
-                        if (Util_cobra.TryReadArgument(script_line, out int start_i, ref read_i, out string arg0, true))
-                            if (arg0.StartsWith(':'))
+                        if (script_line.TryReadChar(ref read_i, out char ch) && ch == ':')
+                        {
+                            if (line.TryReadArgument(out string symbol, out _, strict: true, lint: false, completions: Enum.GetNames(typeof(BoaSymbols)).Select(x => ":" + x)))
                             {
-                                string symbol = arg0[1..];
+                                line.LintToThisPosition(line.linter.boa_symbol);
+                                symbol = symbol[1..];
+
                                 if (Enum.TryParse(symbol, true, out BoaSymbols code))
                                     switch (code)
                                     {
                                         case BoaSymbols.label:
-                                            if (Util_cobra.TryReadArgument(script_line, out start_i, ref read_i, out string label, true))
+                                            if (line.TryReadArgument(out string label, out _))
                                                 labels[label] = line_i;
                                             break;
 
                                         case BoaSymbols.jump_if:
-                                            if (Util_cobra.TryReadArgument(script_line, out start_i, ref read_i, out label, true))
-                                                //if(Util_cobra)
-                                                ;
+                                            if (line.TryReadArgument(out label, out _))
+                                                if (line.TryReadArgument(out string literal, out _))
+                                                    if (literal.ToBool())
+                                                    {
+                                                        line_i = labels[label];
+                                                        continue;
+                                                    }
                                             break;
 
                                         case BoaSymbols.jump_else:
+                                            if (line.TryReadArgument(out label, out _))
+                                                if (line.TryReadArgument(out string literal, out _))
+                                                    if (!literal.ToBool())
+                                                    {
+                                                        line_i = labels[label];
+                                                        continue;
+                                                    }
                                             break;
 
                                         case BoaSymbols.jump_to:
+                                            if (line.TryReadArgument(out label, out _))
+                                            {
+                                                line_i = labels[label];
+                                                continue;
+                                            }
                                             break;
                                     }
                             }
-                            else
+                        }
+                        else
+                        {
+                            if (Command.static_domain.TryReadCommand_path(line, out var path))
                             {
-                                Command.Line line = new(script_line, exe.line.flags, exe.shell, cursor_i: int.MaxValue);
-                                if (Command.static_domain.TryReadCommand_path(line, out var path))
+                                Command.Executor exe2 = new(exe.shell, exe, line, path);
+                                if (exe2.error != null)
                                 {
-                                    Command.Executor exe2 = new(exe.shell, exe, line, path);
-                                    if (exe2.error != null)
-                                    {
-                                        exe.error = exe2.error;
-                                        yield break;
-                                    }
-
-                                    exe.janitor.AddExecutor(exe2);
-
-                                    while (!exe2.disposed)
-                                        yield return exe.janitor.exe_status;
-                                }
-                                else
-                                {
-                                    exe.error = $"could not find command ({nameof(line)}.{nameof(line.arg_last)}: '{line.arg_last}')";
+                                    exe.error = exe2.error;
                                     yield break;
                                 }
+
+                                exe.janitor.AddExecutor(exe2);
+
+                                while (!exe2.disposed)
+                                    yield return exe.janitor.exe_status;
                             }
+                            else
+                            {
+                                exe.error = $"could not find command ({nameof(line)}.{nameof(line.arg_last)}: '{line.arg_last}')";
+                                yield break;
+                            }
+                        }
                     }
                 }
             }
