@@ -27,7 +27,7 @@ namespace _COBRA_
                         exe.Stdout(arg, line: exe.line);
                         yield break;
                     }
-                    yield return new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, "balls:");
+                    yield return new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe);
                 }
             }
         }
