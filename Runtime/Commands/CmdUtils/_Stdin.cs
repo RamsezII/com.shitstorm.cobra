@@ -8,10 +8,17 @@ namespace _COBRA_
         {
             Command.static_domain.AddRoutine(
                 "read-stdin",
+                max_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadArgument(out string arg, out _))
+                        exe.args.Add(arg);
+                },
                 routine: EStdinTest);
 
             static IEnumerator<CMD_STATUS> EStdinTest(Command.Executor exe)
             {
+                string prefixe = exe.args.Count == 0 ? exe.command.name + ":" : (string)exe.args[0];
                 while (true)
                 {
                     exe.line.TryReadArgument(out string arg, out _);
