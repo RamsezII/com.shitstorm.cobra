@@ -58,7 +58,7 @@ namespace _COBRA_
                 });
 
             Command.static_domain.AddPipe(
-                "null",
+                "void",
                 on_pipe: static (exe, data) =>
                 {
                 });

@@ -8,7 +8,7 @@ namespace _COBRA_
         static void OnAfterSceneLoad()
         {
             Init_Vars();
-            Init_Equals();
+            Init_Compare();
             Init_For();
             Init_Range();
         }

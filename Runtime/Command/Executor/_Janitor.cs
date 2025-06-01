@@ -178,7 +178,6 @@ namespace _COBRA_
                                 if (exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
                                 {
                                     error = $"{this} {exe} {Util.PullValue(ref exe.error)}";
-                                    Debug.LogWarning(error);
                                     exe.Dispose();
                                 }
                                 else

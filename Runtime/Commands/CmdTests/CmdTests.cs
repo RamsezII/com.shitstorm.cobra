@@ -1,7 +1,6 @@
-using _COBRA_;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace _COBRA_et
+namespace _COBRA_
 {
     internal static partial class CmdTests
     {
@@ -18,10 +17,7 @@ namespace _COBRA_et
                     else
                         exe.error = $"invalid arg ('{exe.line.arg_last}')";
                 },
-                action: static exe =>
-                {
-                    exe.Stdout(exe.args[0]);
-                });
+                action: static exe => { });
         }
     }
 }
