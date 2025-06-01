@@ -48,9 +48,19 @@ namespace _COBRA_
                     exe.janitor.AddExecutor(exe2);
                 });
 
+
             Command.static_domain.AddRoutine(
                 "tick",
                 routine: ETick);
+
+            static IEnumerator<CMD_STATUS> ETick(Command.Executor exe)
+            {
+                do yield return new CMD_STATUS(CMD_STATES.BLOCKING);
+                while (!exe.line.flags.HasFlag(SIG_FLAGS.TICK));
+
+                exe.Stdout(null);
+            }
+
 
             Command.static_domain.AddRoutine(
                 "wait-frames",
@@ -61,25 +71,6 @@ namespace _COBRA_
                         exe.args.Add(value);
                 },
                 routine: EWaitFrames);
-
-            Command.static_domain.AddRoutine(
-                "wait-seconds",
-                min_args: 1,
-                args: static exe =>
-                {
-                    if (exe.line.TryReadFloat(out float value))
-                        exe.args.Add(value);
-                },
-                routine: EWaitSeconds,
-                aliases: "wsec");
-
-            static IEnumerator<CMD_STATUS> ETick(Command.Executor exe)
-            {
-                do yield return new CMD_STATUS(CMD_STATES.BLOCKING);
-                while (!exe.line.flags.HasFlag(SIG_FLAGS.TICK));
-
-                exe.Stdout(null);
-            }
 
             static IEnumerator<CMD_STATUS> EWaitFrames(Command.Executor exe)
             {
@@ -96,6 +87,18 @@ namespace _COBRA_
 
                 exe.Stdout(null);
             }
+
+
+            Command.static_domain.AddRoutine(
+                "wait-seconds",
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.line.TryReadFloat(out float value))
+                        exe.args.Add(value);
+                },
+                routine: EWaitSeconds,
+                aliases: "wsec");
 
             static IEnumerator<CMD_STATUS> EWaitSeconds(Command.Executor exe)
             {
