@@ -38,6 +38,12 @@ namespace _COBRA_
                 string script_path = (string)exe.args[0];
                 script_path = exe.shell.PathCheck(script_path, PathModes.ForceFull);
 
+                if (!File.Exists(script_path))
+                {
+                    exe.error = $"file '{script_path}' does not exist";
+                    yield break;
+                }
+
                 Dictionary<string, int> labels = new(StringComparer.Ordinal);
                 string[] script_lines = File.ReadAllLines(script_path);
 
