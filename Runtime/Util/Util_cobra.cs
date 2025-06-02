@@ -19,7 +19,7 @@
             while (read_i < text.Length)
                 if (text[read_i] switch
                 {
-                    ' ' or '\t' or '\n' => true,
+                    ' ' or '\t' or '\n' or '\r' => true,
                     _ => false,
                 })
                     ++read_i;

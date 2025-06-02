@@ -5,7 +5,6 @@ namespace _COBRA_
 {
     public enum CMD_STATES : byte
     {
-        _unknown_,
         BLOCKING,
         WAIT_FOR_STDIN,
     }
@@ -20,7 +19,8 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public CMD_STATUS(in CMD_STATES state,
+        public CMD_STATUS(
+            in CMD_STATES state = 0,
             in string prefixe = null,
             in bool immortal = false,
             in float progress = 0,
