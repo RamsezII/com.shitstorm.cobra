@@ -109,9 +109,9 @@ namespace _COBRA_
                     }
                     else
                     {
-                        if (!Util.TryParse(s1, out float f1))
+                        if (!Util.TryParseFloat(s1, out float f1))
                             exe.error = $"could not parse '{s1}' to {typeof(float)}";
-                        else if (!Util.TryParse(s2, out float f2))
+                        else if (!Util.TryParseFloat(s2, out float f2))
                             exe.error = $"could not parse '{s2}' to {typeof(float)}";
                         else
                             exe.Stdout(code switch

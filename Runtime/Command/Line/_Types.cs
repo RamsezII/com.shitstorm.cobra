@@ -21,7 +21,7 @@
             public bool TryReadFloat(out float value)
             {
                 if (TryReadArgument(out string arg, out _, lint: false))
-                    if (arg.TryParse(out value))
+                    if (arg.TryParseFloat(out value))
                     {
                         LintToThisPosition(linter.literal);
                         return true;
