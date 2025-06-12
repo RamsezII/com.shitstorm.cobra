@@ -1,6 +1,4 @@
-﻿using System;
-
-public static partial class Util_cobra
+﻿public static partial class Util_cobra
 {
     public static int SkipSpaces(this string text, ref int read_i)
     {
@@ -15,10 +13,11 @@ public static partial class Util_cobra
         return read_i - start_i;
     }
 
-    public static bool HasNext(this string text, ref int read_i, in string skippables = " \t\n\r", in bool ignore_case = true)
+    public static bool HasNext(this string text, ref int read_i, in bool ignore_case = true, in string skippables = " \t\n\r")
     {
+        var ordinal = ignore_case.ToOrdinal();
         while (read_i < text.Length)
-            if (skippables.Contains(text[read_i], ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+            if (skippables.Contains(text[read_i], ordinal))
                 ++read_i;
             else
                 return read_i < text.Length;
