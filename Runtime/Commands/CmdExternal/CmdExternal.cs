@@ -43,8 +43,41 @@ namespace _COBRA_
                     }
                 });
 
+            Command.static_domain.AddAction(
+                "run-external-command--main-thread",
+                min_args: 1,
+                opts: static exe =>
+                {
+                    if (exe.line.TryRead_one_of_the_flags(exe, out string flag, flag_read_all, flag_r))
+                        exe.opts.Add(flag_r, null);
+                    exe.line.TryReadOption_workdir(exe);
+                },
+                args: static exe =>
+                {
+                    if (exe.opts.ContainsKey(flag_r))
+                    {
+                        if (exe.line.TryReadArguments(out string command_line))
+                            exe.args.Add(command_line);
+                    }
+                    else
+                    {
+                        if (exe.line.TryReadArgument(out string command_line, out _, lint: false))
+                        {
+                            exe.line.LintToThisPosition(exe.line.linter.external);
+                            exe.args.Add(command_line);
+                        }
+                    }
+                },
+                action: static exe =>
+                {
+                    string command_line = (string)exe.args[0];
+                    string workdir = exe.GetWorkdir();
+                    Util.RunExternalCommand(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout));
+                },
+                aliases: ".");
+
             Command.static_domain.AddRoutine(
-                "run-external-command",
+                "run-external-command--routinized",
                 min_args: 1,
                 opts: static exe =>
                 {
@@ -69,21 +102,16 @@ namespace _COBRA_
                     }
                 },
                 routine: ERunExt,
-                aliases: ".");
+                aliases: "..");
 
             static IEnumerator<CMD_STATUS> ERunExt(Command.Executor exe)
             {
                 string command_line = (string)exe.args[0];
                 string workdir = exe.GetWorkdir();
 
-                if (false)
-                    Util.RunExternalCommand(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout));
-                else
-                {
-                    var task = Task.Run(() => Util.RunExternalCommandBlockingStreaming(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout)));
-                    while (!task.IsCompleted)
-                        yield return default;
-                }
+                var task = Task.Run(() => Util.RunExternalCommandBlockingStreaming(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout)));
+                while (!task.IsCompleted)
+                    yield return default;
             }
         }
     }
