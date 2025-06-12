@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace _COBRA_
@@ -37,11 +39,11 @@ namespace _COBRA_
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                             return "open -a Terminal";
 
-                        throw new PlatformNotSupportedException("Unsupported OS platform.");
+                        throw new PlatformNotSupportedException($"Unsupported OS platform.");
                     }
                 });
 
-            Command.static_domain.AddAction(
+            Command.static_domain.AddRoutine(
                 "run-external-command",
                 min_args: 1,
                 opts: static exe =>
@@ -66,14 +68,23 @@ namespace _COBRA_
                         }
                     }
                 },
-                action: static exe =>
-                {
-                    string command_line = (string)exe.args[0];
-                    string workdir = exe.GetWorkdir();
+                routine: ERunExt,
+                aliases: ".");
+
+            static IEnumerator<CMD_STATUS> ERunExt(Command.Executor exe)
+            {
+                string command_line = (string)exe.args[0];
+                string workdir = exe.GetWorkdir();
+
+                if (false)
                     Util.RunExternalCommand(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout));
-                },
-                aliases: "."
-            );
+                else
+                {
+                    var task = Task.Run(() => Util.RunExternalCommandBlockingStreaming(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout)));
+                    while (!task.IsCompleted)
+                        yield return default;
+                }
+            }
         }
     }
 }
