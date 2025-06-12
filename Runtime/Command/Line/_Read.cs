@@ -109,6 +109,17 @@ namespace _COBRA_
                     cpl_start_i = start_i;
             }
 
+            public bool TryReadAll(out string value)
+            {
+                value = null;
+                if (text == null || text.Length == 0)
+                    return false;
+                value = text[read_i..];
+                read_i = text.Length;
+                LintToThisPosition(Color.white);
+                return true;
+            }
+
             public bool TryReadArgument(
                 out string argument,
                 out bool seems_valid,
