@@ -17,7 +17,7 @@
     {
         var ordinal = ignore_case.ToOrdinal();
         while (read_i < text.Length)
-            if (skippables.Contains(text[read_i], ordinal))
+            if (skippables != null && skippables.Contains(text[read_i], ordinal))
                 ++read_i;
             else
                 return read_i < text.Length;
