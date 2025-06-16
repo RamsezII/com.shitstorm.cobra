@@ -174,14 +174,9 @@ namespace _COBRA_
                             bool has_next = exe.routine.MoveNext();
                             exe_status = exe.routine.Current;
 
-                            if (exe.error != null)
+                            if (Util.TryPullValue(ref exe.error, out error))
                                 if (exe.line.flags.HasFlag(SIG_FLAGS.EXEC))
-                                {
-                                    error = $"{this} {exe} {Util.PullValue(ref exe.error)}";
                                     exe.Dispose();
-                                }
-                                else
-                                    exe.error = null;
 
                             if (!has_next)
                                 exe.Dispose();
