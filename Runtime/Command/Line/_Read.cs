@@ -109,14 +109,15 @@ namespace _COBRA_
                     cpl_start_i = start_i;
             }
 
-            public bool TryReadAll(out string value)
+            public bool TryReadAll(out string value, in bool lint = true)
             {
                 value = null;
                 if (text == null || text.Length == 0)
                     return false;
                 value = text[read_i..];
                 read_i = text.Length;
-                LintToThisPosition(Color.white);
+                if (lint)
+                    LintToThisPosition(Color.white);
                 return true;
             }
 

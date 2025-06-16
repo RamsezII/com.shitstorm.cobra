@@ -134,6 +134,12 @@ namespace _COBRA_
                     linter.last_i = read_i;
                 }
             }
+
+            public void LintToThisPosition(in int length, in string text_linted)
+            {
+                linter.last_i += length;
+                linter.sb.Append(text_linted);
+            }
         }
     }
 }
