@@ -109,7 +109,7 @@ namespace _COBRA_
                 string command_line = (string)exe.args[0];
                 string workdir = exe.GetWorkdir();
 
-                var task = Task.Run(() => Util.RunExternalCommandBlockingStreaming(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout)));
+                var task = Task.Run(() => Util.RunExternalCommand_streaming(workdir, command_line, on_stdout: stdout => exe.Stdout(stdout)));
                 while (!task.IsCompleted)
                     yield return default;
             }
