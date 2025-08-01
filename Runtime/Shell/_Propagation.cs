@@ -44,12 +44,8 @@ namespace _COBRA_
 
             if (line.flags.HasFlag(SIG_FLAGS.TICK))
             {
-                if (NUCLEOR.delegates.shell_tick != NUCLEOR.delegate_current)
-                    Debug.LogWarning($"{SIG_FLAGS.TICK} flag propagated outside of {nameof(NUCLEOR)}.{nameof(NUCLEOR.delegates.shell_tick)} ({nameof(Time.frameCount)}: {Time.frameCount}, mask: {line.flags})", this);
-
                 if (Time.frameCount == last_tick)
                     Debug.LogWarning($"tick redundancy ({nameof(Time.frameCount)}: {Time.frameCount}, {line.flags.GetType()}: {line.flags})", this);
-
                 last_tick = Time.frameCount;
             }
 
@@ -73,8 +69,8 @@ namespace _COBRA_
                                     exe.Dispose();
                                 }
 
-                    // executate top janitor
-                    before_top_janitor:
+                            // executate top janitor
+                            before_top_janitor:
             if (error == null)
                 if (front_janitors.TryPeek(out var janitor))
                 {

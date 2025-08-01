@@ -39,10 +39,10 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            NUCLEOR.delegates.onApplicationQuit -= OnNucleorQuit;
-            NUCLEOR.delegates.onApplicationQuit += OnNucleorQuit;
-            NUCLEOR.delegates.shell_tick -= UpdateBackgroundJanitors;
-            NUCLEOR.delegates.shell_tick += UpdateBackgroundJanitors;
+            NUCLEOR.delegates.OnApplicationQuit -= OnNucleorQuit;
+            NUCLEOR.delegates.OnApplicationQuit += OnNucleorQuit;
+            NUCLEOR.delegates.Update_OnShellTick -= UpdateBackgroundJanitors;
+            NUCLEOR.delegates.Update_OnShellTick += UpdateBackgroundJanitors;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ namespace _COBRA_
         private void Awake()
         {
             terminal = GetComponentInParent<ITerminal>();
-            NUCLEOR.delegates.shell_tick += PropagateTick;
+            NUCLEOR.delegates.Update_OnShellTick += PropagateTick;
             instances.Add(this);
             AwakeWorkDir();
         }
@@ -85,7 +85,7 @@ namespace _COBRA_
 
         private void OnDestroy()
         {
-            NUCLEOR.delegates.shell_tick -= PropagateTick;
+            NUCLEOR.delegates.Update_OnShellTick -= PropagateTick;
             instances.Remove(this);
 
             foreach (var janitor in front_janitors)
@@ -97,7 +97,7 @@ namespace _COBRA_
 
         static void OnNucleorQuit()
         {
-            NUCLEOR.delegates.shell_tick -= UpdateBackgroundJanitors;
+            NUCLEOR.delegates.Update_OnShellTick -= UpdateBackgroundJanitors;
             for (int i = 0; i < background_janitors.Count; i++)
                 background_janitors[i].Dispose();
             background_janitors.Clear();

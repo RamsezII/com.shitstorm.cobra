@@ -43,7 +43,7 @@ namespace _COBRA_
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
             static void OnAfterSceneLoad()
             {
-                NUCLEOR.delegates.onApplicationQuit += SaveHistory;
+                NUCLEOR.delegates.OnApplicationQuit += SaveHistory;
             }
 
             //--------------------------------------------------------------------------------------------------------------

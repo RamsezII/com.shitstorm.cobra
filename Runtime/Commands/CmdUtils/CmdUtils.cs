@@ -78,7 +78,7 @@ namespace _COBRA_
             Command.static_domain.AddAction(
                 "clear-history",
                 manual: new("clear all previous entries"),
-                action: exe => NUCLEOR.delegates.onStartOfFrame_once += Command.Line.ClearHistory
+                action: exe => NUCLEOR.delegates.Update_OnStartOfFrame_once += Command.Line.ClearHistory
                 );
 
             Command.static_domain.AddAction(
