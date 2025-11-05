@@ -34,15 +34,10 @@ namespace _COBRA_
 
             //--------------------------------------------------------------------------------------------------------------
 
-            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-            static void OnBeforeSceneLoad()
-            {
-                LoadHistory();
-            }
-
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
             static void OnAfterSceneLoad()
             {
+                LoadHistory();
                 NUCLEOR.delegates.OnApplicationQuit += SaveHistory;
             }
 

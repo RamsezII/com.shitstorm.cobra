@@ -23,7 +23,7 @@ namespace _COBRA_
             if (Application.isEditor)
                 working_dir = Directory.GetParent(Application.dataPath).FullName;
             else
-                working_dir = NUCLEOR.home_path;
+                working_dir = ArkPaths.instance.Value.dpath_home;
             working_dir = PathCheck(working_dir, PathModes.ForceFull);
         }
 

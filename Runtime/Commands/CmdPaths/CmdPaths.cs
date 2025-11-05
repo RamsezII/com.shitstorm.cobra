@@ -34,7 +34,7 @@ namespace _COBRA_
 
             Command.static_domain.AddAction(
                 "reset-working-dir",
-                action: static exe => exe.shell.working_dir = NUCLEOR.home_path
+                action: static exe => exe.shell.working_dir = ArkPaths.instance.Value.dpath_home
                 );
 
             Command.static_domain.AddAction(
