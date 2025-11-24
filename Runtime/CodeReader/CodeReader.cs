@@ -36,8 +36,9 @@ namespace _COBRA_
             this.script_path = script_path;
             this.cursor_i = cursor_i;
             this.text = text;
+
 #if UNITY_EDITOR
-            _text_length = text.Length;
+            _text_length = text?.Length ?? 0;
 #endif
             if (Util.TryIndexOf_min(text, out int index_of, 0, true, '\n', '\r'))
                 multiline = index_of < text.Length - 1;
