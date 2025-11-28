@@ -20,6 +20,8 @@ namespace _COBRA_
             functions = Color.deepSkyBlue,
             variables = Color.mediumPurple,
             paths = Color.ivory,
+            fpaths = Color.ivory,
+            dpaths = Color.ivory,
             comments = Color.darkOliveGreen,
             command_separators = Color.softYellow,
             keywords = Color.magenta,
