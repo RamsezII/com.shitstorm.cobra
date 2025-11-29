@@ -26,11 +26,10 @@ namespace _COBRA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void OnBeforeSceneLoad()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
         {
             id_counter = 0;
-            OnNucleorQuit();
             global_vars.Clear();
         }
 
@@ -39,9 +38,7 @@ namespace _COBRA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            NUCLEOR.delegates.OnApplicationQuit -= OnNucleorQuit;
             NUCLEOR.delegates.OnApplicationQuit += OnNucleorQuit;
-            NUCLEOR.delegates.Update_OnShellTick -= UpdateBackgroundJanitors;
             NUCLEOR.delegates.Update_OnShellTick += UpdateBackgroundJanitors;
         }
 

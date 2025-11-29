@@ -4,12 +4,14 @@ namespace _COBRA_
 {
     partial class CodeReader
     {
+        public int sig_error_lineNumber;
+
         public void LocalizeError()
         {
             if (sig_long_error != null)
                 return;
 
-            int line_count = 1;
+            sig_error_lineNumber = 1;
             int column_count = 0;
             int start_line = 0;
             string line = null;
@@ -24,12 +26,12 @@ namespace _COBRA_
                     switch (text[i])
                     {
                         case '\n':
-                            ++line_count;
+                            ++sig_error_lineNumber;
                             column_count = 0;
                             break;
 
                         case '\r':
-                            ++line_count;
+                            ++sig_error_lineNumber;
                             ++i;
                             column_count = 0;
                             break;
@@ -50,9 +52,9 @@ namespace _COBRA_
 
                 StringBuilder sb = new();
 
-                sb.AppendLine($"at {script_path ?? "line"}:{line_count}");
-                sb.AppendLine($"({nameof(last_arg)}: '{last_arg}', {line_count}, {column_count})");
-                sb.AppendLine($" {line_count + ".",-4} {line}");
+                sb.AppendLine($"at {script_path ?? "line"}:{sig_error_lineNumber}");
+                sb.AppendLine($"({nameof(last_arg)}: '{last_arg}', {sig_error_lineNumber}, {column_count})");
+                sb.AppendLine($" {sig_error_lineNumber + ".",-4} {line}");
                 sb.Append($"{new string(' ', 6 + column_count)}└──> {sig_error}");
 
                 sig_long_error = sb.ToString();
