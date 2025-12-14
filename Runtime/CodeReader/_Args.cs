@@ -74,7 +74,7 @@ namespace _COBRA_
                     if (TryPeekChar_match(')', out _))
                         goto success;
 
-                    Stderr($"expected ',' or ')' after argument '{argument}'.");
+                    Error($"expected ',' or ')' after argument '{argument}'.");
                 }
 
                 if (start_i <= cursor_i)

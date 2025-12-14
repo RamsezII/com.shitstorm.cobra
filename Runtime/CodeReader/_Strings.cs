@@ -20,7 +20,7 @@ namespace _COBRA_
                     sep = '"';
                 else
                 {
-                    Stderr($"string error: expected opening quote (\' or \").");
+                    Error($"string error: expected opening quote (\' or \").");
                     value = null;
                     read_i = read_old;
                     return false;
@@ -53,7 +53,7 @@ namespace _COBRA_
                                     if (read_as_argument && !TryReadChar_match(',', lint: lint_theme.argument_coma) && !TryPeekChar_match(')', out _))
                                         if (strict_syntax)
                                         {
-                                            Stderr($"expected ',' or ')' after expression.");
+                                            Error($"expected ',' or ')' after expression.");
                                             goto failure;
                                         }
                                 }
@@ -73,7 +73,7 @@ namespace _COBRA_
                         read_i = start_i + err_index;
                     }
 
-                    Stderr($"string error: expected closing quote '{sep}'.");
+                    Error($"string error: expected closing quote '{sep}'.");
                     return false;
                 }
             }

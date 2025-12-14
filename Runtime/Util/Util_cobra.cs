@@ -1,5 +1,33 @@
-﻿public static partial class Util_cobra
+﻿using _COBRA_;
+using System;
+
+public static partial class Util_cobra
 {
+    public static readonly Type
+        T_object = typeof(object),
+        T_bool = typeof(bool),
+        T_int = typeof(int),
+        T_float = typeof(float),
+        T_string = typeof(string),
+        T_path = typeof(CobraPath),
+        T_fpath = typeof(CobraFPath),
+        T_dpath = typeof(CobraDPath);
+
+    //----------------------------------------------------------------------------------------------------------
+
+    public static Type EnglobingType(in Type a, in Type b)
+    {
+        if (a == null || b == null)
+            return null;
+
+        if (a.IsAssignableFrom(b))
+            return a;
+        if (b.IsAssignableFrom(a))
+            return b;
+
+        return typeof(object);
+    }
+
     public static int SkipSpaces(this string text, ref int read_i)
     {
         int start_i = read_i;
