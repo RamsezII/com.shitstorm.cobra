@@ -99,6 +99,7 @@ namespace _COBRA_
         {
             StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
+            value = null;
 
             if (HasNext(ignore_case: ignore_case, skippables: skippables) && TryReadArgument(out value, as_function_argument: as_function_argument, lint: lint, skippables: skippables, stoppers: stoppers))
             {
@@ -133,7 +134,6 @@ namespace _COBRA_
                     completions_v.UnionWith(matches);
 
             read_i = read_old;
-            value = null;
             return false;
 
         success:
