@@ -4,9 +4,35 @@ using System.Collections.Generic;
 
 namespace _COBRA_
 {
+    enum SIG_ENUM : byte
+    {
+        _NONE_,
+        Cmd,
+        Sript,
+        Change,
+        Lint,
+        Check,
+        Stdin,
+        Tick,
+    }
+
+    [Flags]
+    public enum SIG_FLAGS : byte
+    {
+        CMD = 1 << SIG_ENUM.Cmd,
+        SCRIPT = 1 << SIG_ENUM.Sript,
+        CHANGE = 1 << SIG_ENUM.Change,
+        LINT = 1 << SIG_ENUM.Lint,
+        CHECK = 1 << SIG_ENUM.Check,
+        SUBMIT = 1 << SIG_ENUM.Stdin,
+        TICK = 1 << SIG_ENUM.Tick,
+    }
+
     [Serializable]
     public sealed partial class CodeReader
     {
+        public readonly SIG_FLAGS sig_flags;
+        public readonly string workdir;
         public readonly bool strict_syntax;
         public readonly string script_path;
         public readonly string text;
@@ -17,7 +43,7 @@ namespace _COBRA_
 
 #if UNITY_EDITOR
         readonly int _text_length;
-        string toLog => text[..read_i] + "°" + text[read_i..];
+        string _toLog => text[..read_i] + "°" + text[read_i..];
 #endif
 
         public string sig_error, err_trace, sig_long_error;
@@ -30,8 +56,10 @@ namespace _COBRA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public CodeReader(in LintTheme lint_theme, in bool strict_syntax, in string text, in string script_path, in int cursor_i = int.MaxValue)
+        public CodeReader(in SIG_FLAGS sig_flags, in string workdir, in LintTheme lint_theme, in bool strict_syntax, in string text, in string script_path, in int cursor_i = int.MaxValue)
         {
+            this.sig_flags = sig_flags;
+            this.workdir = workdir;
             this.lint_theme = lint_theme ?? LintTheme.theme_dark;
             this.strict_syntax = strict_syntax;
             this.script_path = script_path;
