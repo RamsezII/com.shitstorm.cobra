@@ -18,6 +18,7 @@
             base.OnExecutionStack(janitor);
 
             janitor.executors.Enqueue(new(
+                name: $"literal({value})",
                 action_SIG_EXE: janitor =>
                 {
                     janitor.vstack.Add(new(typeof(T), value));

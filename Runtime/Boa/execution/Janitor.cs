@@ -6,7 +6,7 @@ namespace _COBRA_.Boa
     public sealed class Janitor : Disposable
     {
         public readonly Shell shell;
-        readonly List<AstAbstract> asts;
+        readonly Queue<AstAbstract> asts;
 
         public readonly MScope<MemCell> vscope = new(parent: null);
         public readonly List<MemCell> vstack = new();
@@ -18,7 +18,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal Janitor(in Shell shell, in List<AstAbstract> asts)
+        internal Janitor(in Shell shell, in Queue<AstAbstract> asts)
         {
             this.shell = shell;
             this.asts = asts;
@@ -29,9 +29,9 @@ namespace _COBRA_.Boa
 
         IEnumerator<ExecutionOutput> ERoutine()
         {
-            for (int i = 0; i < asts.Count; i++)
+            while (asts.TryDequeue(out var ast))
             {
-                asts[i].OnExecutionStack(this);
+                ast.OnExecutionStack(this);
                 while (executors.TryDequeue(out var executor))
                 {
                     if (executor.routine_SIG_READER != null)
@@ -113,6 +113,8 @@ namespace _COBRA_.Boa
             base.OnDispose();
             routine?.Dispose();
             executors.Clear();
+            vscope._vars.Clear();
+            vstack.Clear();
         }
     }
 }

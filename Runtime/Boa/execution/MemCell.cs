@@ -7,6 +7,7 @@ namespace _COBRA_.Boa
     {
         public readonly Type type;
         public object value;
+        public override readonly string ToString() => $"cell[{value}({type})]";
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -20,7 +21,7 @@ namespace _COBRA_.Boa
         {
         }
 
-        public MemCell(in object value) : this(value.GetType(), null)
+        public MemCell(in object value) : this(value.GetType(), value)
         {
         }
     }

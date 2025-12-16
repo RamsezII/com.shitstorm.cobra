@@ -15,7 +15,6 @@ namespace _COBRA_.Boa.contracts
                 {
                     bool val = (bool)prms.arguments[0].value;
                     janitor.vstack.Add(new(val));
-                    janitor.shell.on_output(val, null);
                 }
             ));
         }

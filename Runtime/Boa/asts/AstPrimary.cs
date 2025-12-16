@@ -35,7 +35,7 @@ namespace _COBRA_.Boa
                 if (reader.TryReadChar_match('('))
                 {
                     reader.LintOpeningBraquet();
-                    if (!AstExpression.TryExpr(reader, tscope, false, typeof(object), out var expression))
+                    if (!AstExpression.TryExpr(reader, tscope, false, typeof(object), out ast_factor))
                     {
                         reader.Error("expected expression inside factor parenthesis.");
                         goto failure;
@@ -47,10 +47,7 @@ namespace _COBRA_.Boa
                         goto failure;
                     }
                     else
-                    {
-                        ast_factor = expression;
                         return true;
-                    }
                 }
 
             if (reader.sig_error == null)

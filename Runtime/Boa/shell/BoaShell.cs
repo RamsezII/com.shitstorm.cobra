@@ -101,13 +101,13 @@ namespace _COBRA_
                         front_janitor.Dispose();
                     }
 
-                    if (!front_janitor.Disposed)
-                        status.Value = output.status;
-                    else
+                    if (front_janitor.Disposed)
                     {
                         front_janitor = null;
                         status.Value = CMD_STATUS.WAIT_FOR_STDIN;
                     }
+                    else
+                        status.Value = output.status;
                 }
         }
     }

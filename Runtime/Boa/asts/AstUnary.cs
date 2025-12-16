@@ -76,10 +76,11 @@ namespace _COBRA_.Boa
                     }
                 }
 
-                if (AstAccessor.TryAccessor(reader, ast_unary, out var ast_accessor))
-                    ast_unary = ast_accessor;
-                else if (reader.sig_error != null)
-                    goto failure;
+                if (ast_unary.output_type != null)
+                    if (AstAccessor.TryAccessor(reader, ast_unary, out var ast_accessor))
+                        ast_unary = ast_accessor;
+                    else if (reader.sig_error != null)
+                        goto failure;
 
                 return true;
             }

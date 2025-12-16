@@ -82,8 +82,12 @@
 
             if (expression.output_type != null)
                 janitor.executors.Enqueue(new(
-                    action_SIG_EXE: static janitor => janitor.vstack.PopLast()
-                ));
+                    name: "expression-statement",
+                    action_SIG_EXE: static janitor =>
+                    {
+                        var cell = janitor.vstack.PopLast();
+                        janitor.shell.on_output(cell.value, null);
+                    }));
         }
     }
 }
