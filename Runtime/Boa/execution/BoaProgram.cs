@@ -6,7 +6,7 @@ namespace _COBRA_.Boa
     {
         public readonly TScope tscope = new(parent: null);
 
-        public readonly List<AstStatement> asts = new();
+        public readonly List<AstAbstract> asts = new();
 
         public readonly bool execute_in_background;
 
@@ -22,7 +22,8 @@ namespace _COBRA_.Boa
 #endif
 
             while (reader.HasNext() && AstStatement.TryStatement(reader, tscope, out var ast))
-                asts.Add(ast);
+                if (ast != null)
+                    asts.Add(ast);
 
             if (reader.sig_error != null)
                 return;

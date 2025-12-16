@@ -6,9 +6,11 @@ namespace _COBRA_.Boa
     public sealed class Janitor : Disposable
     {
         public readonly Shell shell;
-        public readonly MScope<MemCell> mem_scope = new(parent: null);
-        public readonly List<MemCell> mem_stack = new();
-        internal readonly Queue<Executor> exe_stack = new();
+        readonly List<AstAbstract> asts;
+
+        public readonly MScope<MemCell> vscope = new(parent: null);
+        public readonly List<MemCell> vstack = new();
+        internal readonly Queue<Executor> executors = new();
 
         internal CodeReader reader;
 
@@ -16,11 +18,10 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal Janitor(in Shell shell, in BoaProgram program)
+        internal Janitor(in Shell shell, in List<AstAbstract> asts)
         {
             this.shell = shell;
-            for (int i = program.asts.Count - 1; i >= 0; i--)
-                program.asts[i].OnExecutionStack(this);
+            this.asts = asts;
             routine = ERoutine();
         }
 
@@ -28,47 +29,52 @@ namespace _COBRA_.Boa
 
         IEnumerator<ExecutionOutput> ERoutine()
         {
-            while (exe_stack.TryDequeue(out var exe_cell))
+            for (int i = 0; i < asts.Count; i++)
             {
-                if (exe_cell.routine_SIG_READER != null)
+                asts[i].OnExecutionStack(this);
+                while (executors.TryDequeue(out var executor))
                 {
-                    while (reader == null)
-                        yield return default;
-
-                    using var routine = exe_cell.routine_SIG_READER(this);
-
-                    while (true)
-                        if (reader == null)
+                    if (executor.routine_SIG_READER != null)
+                    {
+                        while (reader == null)
                             yield return default;
-                        else if (routine.MoveNext())
-                            yield return routine.Current;
-                        else
-                            break;
-                }
 
-                if (exe_cell.action_SIG_EXE != null)
-                {
-                    while (reader != null)
-                        yield return default;
-                    exe_cell.action_SIG_EXE(this);
-                }
+                        using var routine = executor.routine_SIG_READER(this);
 
-                if (exe_cell.routine_SIG_EXE != null)
-                {
-                    while (reader != null)
-                        yield return default;
+                        while (true)
+                            if (reader == null)
+                                yield return default;
+                            else if (routine.MoveNext())
+                                yield return routine.Current;
+                            else
+                                break;
+                    }
 
-                    using var routine = exe_cell.routine_SIG_EXE(this);
-
-                    while (true)
-                        if (reader != null)
+                    if (executor.action_SIG_EXE != null)
+                    {
+                        while (reader != null)
                             yield return default;
-                        else if (routine.MoveNext())
-                            yield return routine.Current;
-                        else
-                            break;
+                        executor.action_SIG_EXE(this);
+                    }
+
+                    if (executor.routine_SIG_EXE != null)
+                    {
+                        while (reader != null)
+                            yield return default;
+
+                        using var routine = executor.routine_SIG_EXE(this);
+
+                        while (true)
+                            if (reader != null)
+                                yield return default;
+                            else if (routine.MoveNext())
+                                yield return routine.Current;
+                            else
+                                break;
+                    }
                 }
             }
+            Dispose();
         }
 
         public bool OnReader(in CodeReader reader, out ExecutionOutput output)
@@ -83,8 +89,14 @@ namespace _COBRA_.Boa
         {
             if (!Disposed)
             {
+                int loops = 0;
+            again:
                 if (routine.MoveNext())
                 {
+                    if (routine.Current.status == CMD_STATUS.RETURN)
+                        if (++loops < 100)
+                            goto again;
+
                     output = routine.Current;
                     return true;
                 }
@@ -100,7 +112,7 @@ namespace _COBRA_.Boa
         {
             base.OnDispose();
             routine?.Dispose();
-            exe_stack.Clear();
+            executors.Clear();
         }
     }
 }

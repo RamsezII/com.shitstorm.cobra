@@ -10,7 +10,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal virtual void OnExecutionStack(in Janitor janitor)
+        internal virtual void OnExecutionStack(Janitor janitor)
         {
         }
     }

@@ -34,7 +34,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(in Janitor janitor)
+        internal override void OnExecutionStack(Janitor janitor)
         {
             base.OnExecutionStack(janitor);
         }
@@ -58,26 +58,32 @@
             if (AstExpression.TryExpr(reader, tscope, false, null, out var expression))
             {
                 ast_statement = new AstExprStatement(expression);
+                if (!reader.TryReadChar_match(';', lint: reader.lint_theme.command_separators))
+                    if (reader.strict_syntax)
+                    {
+                        reader.Error($"Expected ';' at the end of statement");
+                        goto failure;
+                    }
                 return true;
             }
 
-            if (!reader.TryReadChar_match(';', lint: reader.lint_theme.command_separators))
-                if (reader.strict_syntax)
-                {
-                    reader.Error($"Expected ';' at the end of statement");
-                    goto failure;
-                }
-
-            failure:
+        failure:
             ast_statement = null;
             return false;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(in Janitor janitor)
+        internal override void OnExecutionStack(Janitor janitor)
         {
             base.OnExecutionStack(janitor);
+
+            expression.OnExecutionStack(janitor);
+
+            if (expression.output_type != null)
+                janitor.executors.Enqueue(new(
+                    action_SIG_EXE: static janitor => janitor.vstack.PopLast()
+                ));
         }
     }
 }

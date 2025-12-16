@@ -12,14 +12,14 @@ namespace _COBRA_
         //----------------------------------------------------------------------------------------------------------
 
         public Executor(
-            in Action<Janitor> action_SIG_EXE,
-            in Func<Janitor, IEnumerator<ExecutionOutput>> routine_SIG_EXE,
-            in Func<Janitor, IEnumerator<ExecutionOutput>> routine_SIG_ALL
+            in Action<Janitor> action_SIG_EXE = null,
+            in Func<Janitor, IEnumerator<ExecutionOutput>> routine_SIG_EXE = null,
+            in Func<Janitor, IEnumerator<ExecutionOutput>> routine_SIG_READER = null
         )
         {
             this.action_SIG_EXE = action_SIG_EXE;
             this.routine_SIG_EXE = routine_SIG_EXE;
-            this.routine_SIG_READER = routine_SIG_ALL;
+            this.routine_SIG_READER = routine_SIG_READER;
         }
     }
 }

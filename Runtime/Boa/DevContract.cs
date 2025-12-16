@@ -32,15 +32,23 @@ namespace _COBRA_.Boa
             }
         }
 
+        public class VOptions : Dictionary<OptionKey, MemCell>
+        {
+        }
+
+        public class VArguments : List<MemCell>
+        {
+        }
+
         public struct Parameters
         {
             public Janitor janitor;
-            public Dictionary<string, object> options;
-            public List<object> arguments;
+            public VOptions options;
+            public VArguments arguments;
 
             //----------------------------------------------------------------------------------------------------------
 
-            public Parameters(in Janitor janitor, in Dictionary<string, object> options, in List<object> arguments)
+            public Parameters(in Janitor janitor, in VOptions options, in VArguments arguments)
             {
                 this.janitor = janitor;
                 this.options = options;
@@ -51,9 +59,9 @@ namespace _COBRA_.Boa
         public readonly string name;
         public readonly Type output_type;
         internal readonly Dictionary<OptionKey, Type> options;
-        internal readonly List<Type> targs;
+        internal readonly List<Type> arguments;
         internal readonly Action<Janitor, Parameters> action_SIG_EXE;
-        internal readonly Func<Janitor, Parameters, IEnumerator<ExecutionOutput>> routine_SIG_EXE, routine_SIG_ALL;
+        internal readonly Func<Janitor, Parameters, IEnumerator<ExecutionOutput>> routine_SIG_EXE, routine_SIG_READER;
 
         internal static readonly Dictionary<string, DevContract> contracts = new(StringComparer.OrdinalIgnoreCase);
 
@@ -80,19 +88,19 @@ namespace _COBRA_.Boa
             in string name,
             in Type output_type,
             in Dictionary<OptionKey, Type> options = null,
-            in List<Type> targs = null,
+            in List<Type> arguments = null,
             in Action<Janitor, Parameters> action_SIG_EXE = null,
             in Func<Janitor, Parameters, IEnumerator<ExecutionOutput>> routine_SIG_EXE = null,
-            in Func<Janitor, Parameters, IEnumerator<ExecutionOutput>> routine_SIG_ALL = null
+            in Func<Janitor, Parameters, IEnumerator<ExecutionOutput>> routine_SIG_READER = null
             )
         {
             this.name = name;
             this.output_type = output_type;
             this.options = options;
-            this.targs = targs;
+            this.arguments = arguments;
             this.action_SIG_EXE = action_SIG_EXE;
             this.routine_SIG_EXE = routine_SIG_EXE;
-            this.routine_SIG_ALL = routine_SIG_ALL;
+            this.routine_SIG_READER = routine_SIG_READER;
         }
     }
 }

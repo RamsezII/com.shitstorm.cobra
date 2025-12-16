@@ -6,13 +6,25 @@ namespace _COBRA_.Boa
 {
     internal class AstContract : AstExpression
     {
+        class TOptions : List<(DevContract.OptionKey name, AstExpression ast)>
+        {
+        }
+
+        class TArgs : List<AstExpression>
+        {
+        }
+
         readonly DevContract contract;
+        readonly TOptions topts;
+        readonly TArgs targs;
 
         //----------------------------------------------------------------------------------------------------------
 
-        AstContract(in DevContract contract) : base(contract.output_type)
+        AstContract(in DevContract contract, in TOptions topts, in TArgs targs) : base(contract.output_type)
         {
             this.contract = contract;
+            this.topts = topts;
+            this.targs = targs;
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -32,8 +44,8 @@ namespace _COBRA_.Boa
                 }
                 else
                 {
-                    Dictionary<DevContract.OptionKey, AstExpression> topts = null;
-                    List<AstExpression> targs = null;
+                    TOptions topts = null;
+                    TArgs targs = null;
 
                     if (contract.options != null)
                     {
@@ -41,7 +53,7 @@ namespace _COBRA_.Boa
                         foreach (var pair in contract.options)
                             if (pair.Value != null)
                                 if (TryExpr(reader, tscope, false, pair.Value, out var ast_expr))
-                                    topts.Add(pair.Key, ast_expr);
+                                    topts.Add((pair.Key, ast_expr));
                                 else
                                 {
                                     reader.Error($"could not parse expression for option {pair.Key}");
@@ -61,12 +73,12 @@ namespace _COBRA_.Boa
                         goto failure;
                     }
 
-                    if (contract.targs != null)
+                    if (contract.arguments != null)
                     {
                         targs = new();
-                        for (int i = 0; i < contract.targs.Count; i++)
+                        for (int i = 0; i < contract.arguments.Count; i++)
                         {
-                            Type arg_type = contract.targs[i];
+                            Type arg_type = contract.arguments[i];
                             if (TryExpr(reader, tscope, true, arg_type, out var ast_expr))
                                 targs.Add(ast_expr);
                             else
@@ -86,7 +98,7 @@ namespace _COBRA_.Boa
                         goto failure;
                     }
 
-                    ast_contract = new AstContract(contract);
+                    ast_contract = new AstContract(contract, topts, targs);
                     return true;
                 }
 
@@ -97,9 +109,56 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(in Janitor janitor)
+        internal override void OnExecutionStack(Janitor janitor)
         {
             base.OnExecutionStack(janitor);
+
+            DevContract.VOptions vopts = null;
+            DevContract.VArguments vargs = null;
+
+            if (topts != null)
+            {
+                vopts = new();
+                for (int i = 0; i < topts.Count; i++)
+                    topts[i].ast.OnExecutionStack(janitor);
+            }
+
+            if (targs != null)
+            {
+                vargs = new();
+                for (int i = 0; i < targs.Count; i++)
+                    targs[i].OnExecutionStack(janitor);
+            }
+
+            janitor.executors.Enqueue(new(
+                action_SIG_EXE: janitor =>
+                {
+                    if (targs != null)
+                        for (int i = targs.Count - 1; i >= 0; i--)
+                            vargs.Add(janitor.vstack.PopLast());
+
+                    if (topts != null)
+                        for (int i = topts.Count - 1; i >= 0; i--)
+                            vopts.Add(topts[i].name, janitor.vstack.PopLast());
+                }
+            ));
+
+            DevContract.Parameters prms = new(janitor, vopts, vargs);
+
+            if (contract.action_SIG_EXE != null)
+                janitor.executors.Enqueue(new(
+                    action_SIG_EXE: janitor => contract.action_SIG_EXE(janitor, prms)
+                ));
+
+            if (contract.routine_SIG_EXE != null)
+                janitor.executors.Enqueue(new(
+                    routine_SIG_EXE: janitor => contract.routine_SIG_EXE(janitor, prms)
+                ));
+
+            if (contract.routine_SIG_READER != null)
+                janitor.executors.Enqueue(new(
+                    routine_SIG_READER: janitor => contract.routine_SIG_READER(janitor, prms)
+                ));
         }
     }
 }

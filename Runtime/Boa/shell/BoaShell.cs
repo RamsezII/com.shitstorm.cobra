@@ -67,7 +67,7 @@ namespace _COBRA_
                     }
                     else
                     {
-                        front_janitor = new(this, program);
+                        front_janitor = new(this, program.asts);
                         status.Value = CMD_STATUS.BLOCKED;
                     }
             }
@@ -90,24 +90,25 @@ namespace _COBRA_
                     janitors.RemoveAt(i--);
             }
 
-            if (front_janitor != null && !front_janitor.Disposed)
-            {
-                front_janitor.OnTick(out ExecutionOutput output);
-
-                if (output.status == CMD_STATUS.ERROR)
-                {
-                    Debug.LogError($"{this} TICK_ERROR_bg: \"{output.error}\"");
-                    front_janitor.Dispose();
-                }
-
+            if (front_janitor != null)
                 if (!front_janitor.Disposed)
-                    status.Value = output.status;
-                else
                 {
-                    front_janitor = null;
-                    status.Value = CMD_STATUS.WAIT_FOR_STDIN;
+                    front_janitor.OnTick(out ExecutionOutput output);
+
+                    if (output.status == CMD_STATUS.ERROR)
+                    {
+                        Debug.LogError($"{this} TICK_ERROR_bg: \"{output.error}\"");
+                        front_janitor.Dispose();
+                    }
+
+                    if (!front_janitor.Disposed)
+                        status.Value = output.status;
+                    else
+                    {
+                        front_janitor = null;
+                        status.Value = CMD_STATUS.WAIT_FOR_STDIN;
+                    }
                 }
-            }
         }
     }
 }

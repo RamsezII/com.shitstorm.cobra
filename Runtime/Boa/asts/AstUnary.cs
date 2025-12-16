@@ -98,7 +98,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(in Janitor janitor)
+        internal override void OnExecutionStack(Janitor janitor)
         {
             base.OnExecutionStack(janitor);
 

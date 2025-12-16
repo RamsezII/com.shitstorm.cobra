@@ -102,8 +102,7 @@ namespace _COBRA_.Boa
                             reader.Error($"expected expression after '{match}' operator");
                             goto failure;
                         }
-                else
-                    return true;
+                return true;
             }
             else
             {
@@ -120,8 +119,7 @@ namespace _COBRA_.Boa
                             reader.Error($"expected expression after '{match}' operator");
                             goto failure;
                         }
-                else
-                    return true;
+                return true;
             }
 
         failure:
