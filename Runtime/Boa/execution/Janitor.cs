@@ -8,7 +8,7 @@ namespace _COBRA_.Boa
         public readonly Shell shell;
         readonly Queue<AstAbstract> asts;
 
-        public readonly MScope<MemCell> vscope = new(parent: null);
+        public readonly VScope vscope;
         public readonly List<MemCell> vstack = new();
         internal readonly Queue<Executor> executors = new();
 
@@ -18,9 +18,10 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal Janitor(in Shell shell, in Queue<AstAbstract> asts)
+        internal Janitor(in Shell shell, in VScope vscope, in Queue<AstAbstract> asts)
         {
             this.shell = shell;
+            this.vscope = vscope;
             this.asts = asts;
             routine = ERoutine();
         }

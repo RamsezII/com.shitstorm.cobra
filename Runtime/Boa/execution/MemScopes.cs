@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace _COBRA_.Boa
 {
-    public class MScope<T>
+    public abstract class MScope<T>
     {
         internal readonly MScope<T> parent;
         internal readonly Dictionary<string, T> _vars = new(StringComparer.Ordinal);
@@ -32,6 +32,26 @@ namespace _COBRA_.Boa
             else if (parent != null)
                 return parent.TryGet(name, out value);
             return false;
+        }
+    }
+
+    public sealed class TScope : MScope<Type>
+    {
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal TScope(in TScope parent) : base(parent)
+        {
+        }
+    }
+
+    public sealed class VScope : MScope<MemCell>
+    {
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal VScope(in VScope parent) : base(parent)
+        {
         }
     }
 }

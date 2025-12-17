@@ -86,7 +86,7 @@ namespace _COBRA_.Boa
 
         public DevContract(
             in string name,
-            in Type output_type,
+            in Type output_type = null,
             in Dictionary<OptionKey, Type> options = null,
             in List<Type> arguments = null,
             in Action<Janitor, Parameters> action_SIG_EXE = null,
@@ -95,7 +95,7 @@ namespace _COBRA_.Boa
             )
         {
             this.name = name;
-            this.output_type = output_type == typeof(int) || output_type == typeof(float) ? typeof(BoaNumber) : output_type;
+            this.output_type = output_type;
             this.options = options;
             this.arguments = arguments;
             this.action_SIG_EXE = action_SIG_EXE;
