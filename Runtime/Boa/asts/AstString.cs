@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace _COBRA_.Boa
@@ -12,6 +13,31 @@ namespace _COBRA_.Boa
         AstString(in List<AstExpression> asts) : base(typeof(string))
         {
             this.asts = asts;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal override void OnExecutionStack(Janitor janitor)
+        {
+            base.OnExecutionStack(janitor);
+
+            for (int i = 0; i < asts.Count; i++)
+                asts[i].OnExecutionStack(janitor);
+
+            janitor.executors.Enqueue(new(
+                name: $"string({asts.Count})",
+                action_SIG_EXE: janitor =>
+                {
+                    StringBuilder sb = new();
+                    for (int i = asts.Count; i > 0; i--)
+                    {
+                        string s = janitor.vstack[^i].value.ToString();
+                        sb.Append(s);
+                    }
+                    janitor.vstack.RemoveRange(janitor.vstack.Count - asts.Count, asts.Count);
+                    janitor.vstack.Add(new(sb.ToString()));
+                }
+            ));
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -64,13 +90,13 @@ namespace _COBRA_.Boa
                                 asts.Add(expression);
                             else
                             {
-                                reader.Error($"expected expression after '{{'.");
+                                reader.CompilationError($"expected expression after '{{'.");
                                 goto failure;
                             }
 
                             if (!reader.TryReadChar_match('}'))
                             {
-                                reader.Error($"expected closing braquet '}}'.");
+                                reader.CompilationError($"expected closing braquet '}}'.");
                                 goto failure;
                             }
 
@@ -110,7 +136,7 @@ namespace _COBRA_.Boa
             reader.LintToThisPosition(reader.lint_theme.quotes, false);
 
         failure:
-            reader.Error($"string error: expected closing quote '{sep}'.");
+            reader.CompilationError($"string error: expected closing quote '{sep}'.");
             ast_string = null;
             return false;
         }

@@ -74,7 +74,7 @@ namespace _COBRA_
                     if (TryPeekChar_match(')', out _))
                         goto success;
 
-                    Error($"expected ',' or ')' after argument '{argument}'.");
+                    CompilationError($"expected ',' or ')' after argument '{argument}'.");
                 }
 
                 if (start_i <= cursor_i)
@@ -138,6 +138,29 @@ namespace _COBRA_
 
         success:
             return true;
+        }
+
+        public bool TryReadPrefixeString_matches_out(out string match, in Color lint, in IEnumerable<string> matches, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
+        {
+            foreach (string m in matches)
+            {
+                int read_old = read_i;
+
+                for (int i = 0; i <= m.Length; i++)
+                    if (i == m.Length)
+                    {
+                        match = m;
+                        LintToThisPosition(lint, true);
+                        return true;
+                    }
+                    else if (!TryReadChar_match(m[i], add_to_completions: add_to_completions, ignore_case: ignore_case, skippables: skippables))
+                        break;
+
+                read_i = read_old;
+            }
+
+            match = null;
+            return false;
         }
     }
 }

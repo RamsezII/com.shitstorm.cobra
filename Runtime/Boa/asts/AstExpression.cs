@@ -28,7 +28,7 @@ namespace _COBRA_.Boa
                     if (!reader.TryReadChar_match(',', lint: reader.lint_theme.argument_coma) && !reader.TryPeekChar_match(')', out _))
                         if (reader.strict_syntax)
                         {
-                            reader.Error($"expected ',' or ')' after expression");
+                            reader.CompilationError($"expected ',' or ')' after expression");
                             goto failure;
                         }
                 return true;

@@ -90,7 +90,7 @@ namespace _COBRA_
 
         failure:
             path = null;
-            Error($"could not parse path '{path}'.");
+            CompilationError($"could not parse path '{path}'.");
             return false;
         }
     }

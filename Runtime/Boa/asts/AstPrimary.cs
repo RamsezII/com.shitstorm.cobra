@@ -37,12 +37,12 @@ namespace _COBRA_.Boa
                     reader.LintOpeningBraquet();
                     if (!AstExpression.TryExpr(reader, tscope, false, typeof(object), out ast_factor))
                     {
-                        reader.Error("expected expression inside factor parenthesis.");
+                        reader.CompilationError("expected expression inside factor parenthesis.");
                         goto failure;
                     }
                     else if (!reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
-                        reader.Error($"expected closing parenthesis ')' after factor.");
+                        reader.CompilationError($"expected closing parenthesis ')' after factor.");
                         --reader.read_i;
                         goto failure;
                     }
@@ -51,7 +51,7 @@ namespace _COBRA_.Boa
                 }
 
             if (reader.sig_error == null)
-                if (expected_type == null || typeof(string).IsAssignableFrom(expected_type))
+                if (expected_type == null || expected_type.IsAssignableFrom(typeof(string)))
                     if (AstString.TryParseString(reader, tscope, out var ast_string))
                     {
                         ast_factor = ast_string;
@@ -75,7 +75,7 @@ namespace _COBRA_.Boa
                 }
                 else if (reader.sig_error != null)
                     goto failure;
-                else if (reader.TryReadArgument(out string arg, lint: reader.lint_theme.fallback_default, as_function_argument: false, stoppers: CodeReader._stoppers_factors_))
+                else if (reader.TryReadArgument(out string arg, lint: reader.lint_theme.fallback_default, as_function_argument: false))
                     switch (arg.ToLower())
                     {
                         case "true":
@@ -97,7 +97,7 @@ namespace _COBRA_.Boa
                                 ast_factor = new AstLiteral<float>(_float);
                             else
                             {
-                                reader.Error($"unrecognized literal : '{arg}'.");
+                                reader.CompilationError($"unrecognized literal : '{arg}'.");
                                 goto failure;
                             }
                             reader.LintToThisPosition(reader.lint_theme.literal, true);

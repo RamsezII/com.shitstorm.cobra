@@ -77,7 +77,7 @@ namespace _COBRA_
 
         public bool HasNext(in bool ignore_case = true, in string skippables = _empties_) => text.HasNext(ref read_i, ignore_case: ignore_case, skippables: skippables);
 
-        public void Error(in string error)
+        public void CompilationError(in string error)
         {
             sig_error ??= error;
             err_trace ??= Util.GetStackTrace().GetFrame(1).ToString();

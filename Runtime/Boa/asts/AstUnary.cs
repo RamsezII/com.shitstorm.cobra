@@ -48,7 +48,7 @@ namespace _COBRA_.Boa
                 }
                 else
                 {
-                    reader.Error($"expected expression after unary operator '{match}'.");
+                    reader.CompilationError($"expected expression after unary operator '{match}'.");
                     goto failure;
                 }
             }
@@ -66,12 +66,12 @@ namespace _COBRA_.Boa
                         }
                         else
                         {
-                            reader.Error($"expected ']' after indexer");
+                            reader.CompilationError($"expected ']' after indexer");
                             goto failure;
                         }
                     else
                     {
-                        reader.Error($"expected expression after '['");
+                        reader.CompilationError($"expected expression after '['");
                         goto failure;
                     }
                 }
@@ -86,7 +86,7 @@ namespace _COBRA_.Boa
             }
             else
             {
-                reader.Error($"could not parse factor");
+                reader.CompilationError($"could not parse factor");
                 read_old = reader.read_i;
                 goto failure;
             }

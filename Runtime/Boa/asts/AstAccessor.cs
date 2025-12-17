@@ -30,12 +30,12 @@ namespace _COBRA_.Boa
                     }
                     else
                     {
-                        reader.Error($"{type} has no attribute named \"{match}\"");
+                        reader.CompilationError($"{type} has no attribute named \"{match}\"");
                         goto failure;
                     }
                 else
                 {
-                    reader.Error($"{type} has no attributes");
+                    reader.CompilationError($"{type} has no attributes");
                     goto failure;
                 }
 

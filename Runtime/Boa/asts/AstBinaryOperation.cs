@@ -68,18 +68,60 @@ namespace _COBRA_.Boa
             },
         };
 
-        readonly Depths depth;
         readonly Codes code;
         readonly AstExpression astL, astR;
 
         //----------------------------------------------------------------------------------------------------------
 
-        AstBinaryOperation(in Depths depth, in Codes code, in AstExpression astL, in AstExpression astR) : base(typeof(bool))
+        AstBinaryOperation(in Codes code, in AstExpression astL, in AstExpression astR, in Type output_type) : base(output_type)
         {
-            this.depth = depth;
             this.code = code;
             this.astL = astL;
             this.astR = astR;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal override void OnExecutionStack(Janitor janitor)
+        {
+            base.OnExecutionStack(janitor);
+
+            astL.OnExecutionStack(janitor);
+            astR.OnExecutionStack(janitor);
+
+            janitor.executors.Enqueue(new(
+                name: $"op({code})",
+                action_SIG_EXE: janitor =>
+                {
+                    var exc = new Exception($"wrong operation: {code}");
+
+                    var cellR = janitor.vstack.PopLast();
+                    var cellL = janitor.vstack.PopLast();
+
+                    dynamic cl = cellL.value;
+                    dynamic cr = cellR.value;
+
+                    object res = code switch
+                    {
+                        Codes.Or => cl || cr,
+                        Codes.And => cl && cr,
+                        Codes.Add => cl + cr,
+                        Codes.Sub => cl - cr,
+                        Codes.Equal => cl == cr,
+                        Codes.NotEqual => cl != cr,
+                        Codes.Lesser => cl < cr,
+                        Codes.LesserOrEqual => cl <= cr,
+                        Codes.Greater => cl > cr,
+                        Codes.GreaterOrEqual => cl >= cr,
+                        Codes.Multiply => cl * cr,
+                        Codes.Divide => cl / cr,
+                        Codes.Modulus => cl % cr,
+                        _ => throw exc,
+                    };
+
+                    janitor.vstack.Add(new(res));
+                }
+            ));
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -90,35 +132,65 @@ namespace _COBRA_.Boa
             if (depth == Depths.Term)
             {
                 if (AstUnary.TryUnary(reader, tscope, expected_type, out ast_expr))
-                    while (reader.TryReadString_matches_out(out string match, false, reader.lint_theme.operators, codes[(int)depth].Keys))
+                {
+                    while (reader.TryReadPrefixeString_matches_out(out string match, reader.lint_theme.operators, codes[(int)depth].Keys))
                         if (AstUnary.TryUnary(reader, tscope, expected_type, out var astR))
                         {
                             Codes code = codes[(int)depth][match];
-                            ast_expr = new AstBinaryOperation(depth, code, ast_expr, astR);
-                            return true;
+
+                            Type output_type;
+                            if (typeof(int).IsAssignableFrom(ast_expr.output_type) && (typeof(int).IsAssignableFrom(astR.output_type)))
+                                output_type = typeof(int);
+                            else
+                                output_type = typeof(float);
+
+                            ast_expr = new AstBinaryOperation(code, ast_expr, astR, output_type);
                         }
                         else
                         {
-                            reader.Error($"expected expression after '{match}' operator");
+                            reader.CompilationError($"expected expression after '{match}' operator");
                             goto failure;
                         }
-                return true;
+                    return true;
+                }
             }
-            else
+            else if (TryBinOp(reader, tscope, depth + 1, expected_type, out ast_expr))
             {
-                if (TryBinOp(reader, tscope, depth + 1, expected_type, out ast_expr))
-                    while (reader.TryReadString_matches_out(out string match, false, reader.lint_theme.operators, codes[(int)depth].Keys))
-                        if (TryBinOp(reader, tscope, depth + 1, expected_type, out var astR))
+                while (reader.TryReadPrefixeString_matches_out(out string match, reader.lint_theme.operators, codes[(int)depth].Keys))
+                    if (TryBinOp(reader, tscope, depth + 1, expected_type, out var astR))
+                    {
+                        Codes code = codes[(int)depth][match];
+
+                        Type output_type;
+                        switch (depth)
                         {
-                            Codes code = codes[(int)depth][match];
-                            ast_expr = new AstBinaryOperation(depth, code, ast_expr, astR);
-                            return true;
+                            case Depths.Or:
+                            case Depths.And:
+                            case Depths.Equality:
+                            case Depths.Comparison:
+                                output_type = typeof(bool);
+                                break;
+
+                            case Depths.Addition:
+                            case Depths.Term:
+                                if (typeof(int).IsAssignableFrom(ast_expr.output_type) && (typeof(int).IsAssignableFrom(astR.output_type)))
+                                    output_type = typeof(int);
+                                else
+                                    output_type = typeof(float);
+                                break;
+
+                            default:
+                                output_type = typeof(object);
+                                break;
                         }
-                        else
-                        {
-                            reader.Error($"expected expression after '{match}' operator");
-                            goto failure;
-                        }
+
+                        ast_expr = new AstBinaryOperation(code, ast_expr, astR, output_type);
+                    }
+                    else
+                    {
+                        reader.CompilationError($"expected expression after '{match}' operator");
+                        goto failure;
+                    }
                 return true;
             }
 

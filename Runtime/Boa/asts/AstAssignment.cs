@@ -62,12 +62,12 @@ namespace _COBRA_.Boa
             )
                 if (!tscope.TryGet(var_name, out Type var_type))
                 {
-                    reader.Error($"no variable named '{var_name}' declared");
+                    reader.CompilationError($"no variable named '{var_name}' declared");
                     goto failure;
                 }
                 else if (expected_type != null && !expected_type.IsAssignableFrom(var_type))
                 {
-                    reader.Error($"excepted {expected_type}, got {var_type}");
+                    reader.CompilationError($"excepted {expected_type}, got {var_type}");
                     goto failure;
                 }
                 else
@@ -96,7 +96,7 @@ namespace _COBRA_.Boa
                         }
                         else
                         {
-                            reader.Error($"expected expression after '{op_name}' operator.");
+                            reader.CompilationError($"expected expression after '{op_name}' operator.");
                             goto failure;
                         }
                     }

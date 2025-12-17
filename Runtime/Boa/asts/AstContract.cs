@@ -34,12 +34,12 @@ namespace _COBRA_.Boa
             if (reader.TryReadString_matches_out(out string cont_name, as_function_argument: false, lint: reader.lint_theme.contracts, matches: DevContract.contracts.Keys.ToArray()))
                 if (!DevContract.contracts.TryGetValue(cont_name, out var contract))
                 {
-                    reader.Error($"no contract named '{cont_name}'.");
+                    reader.CompilationError($"no contract named '{cont_name}'.");
                     goto failure;
                 }
                 else if (expected_type != null && (contract.output_type == null || !expected_type.IsAssignableFrom(contract.output_type)))
                 {
-                    reader.Error($"expected contract of type {expected_type}, got {contract.output_type}");
+                    reader.CompilationError($"expected contract of type {expected_type}, got {contract.output_type}");
                     goto failure;
                 }
                 else
@@ -56,7 +56,7 @@ namespace _COBRA_.Boa
                                     topts.Add((pair.Key, ast_expr));
                                 else
                                 {
-                                    reader.Error($"could not parse expression for option {pair.Key}");
+                                    reader.CompilationError($"could not parse expression for option {pair.Key}");
                                     goto failure;
                                 }
                     }
@@ -69,7 +69,7 @@ namespace _COBRA_.Boa
 
                     if (expects_parenthesis && !found_parenthesis)
                     {
-                        reader.Error($"'{contract.name}' expected opening parenthesis '('");
+                        reader.CompilationError($"'{contract.name}' expected opening parenthesis '('");
                         goto failure;
                     }
 
@@ -83,7 +83,7 @@ namespace _COBRA_.Boa
                                 targs.Add(ast_expr);
                             else
                             {
-                                reader.Error($"could not parse argument[{i}] ({arg_type})");
+                                reader.CompilationError($"could not parse argument[{i}] ({arg_type})");
                                 goto failure;
                             }
                         }
@@ -94,7 +94,7 @@ namespace _COBRA_.Boa
 
                     if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
-                        reader.Error($"'{contract.name}' expected closing parenthesis ')'");
+                        reader.CompilationError($"'{contract.name}' expected closing parenthesis ')'");
                         goto failure;
                     }
 

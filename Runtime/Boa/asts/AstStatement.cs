@@ -61,7 +61,7 @@
                 if (!reader.TryReadChar_match(';', lint: reader.lint_theme.command_separators))
                     if (reader.strict_syntax)
                     {
-                        reader.Error($"Expected ';' at the end of statement");
+                        reader.CompilationError($"Expected ';' at the end of statement");
                         goto failure;
                     }
                 return true;

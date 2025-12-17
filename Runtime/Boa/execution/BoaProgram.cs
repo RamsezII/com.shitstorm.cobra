@@ -31,7 +31,7 @@ namespace _COBRA_.Boa
             execute_in_background = reader.TryReadChar_match('&', lint: reader.lint_theme.command_separators);
 
             if (reader.TryPeekChar_out(out char peek, out _))
-                reader.Error($"could not parse everything ({nameof(peek)}: '{peek}').");
+                reader.CompilationError($"could not parse everything ({nameof(peek)}: '{peek}').");
         }
     }
 }

@@ -26,26 +26,26 @@ namespace _COBRA_.Boa
                 {
                     if (ast_expr.output_type != typeof(bool))
                     {
-                        reader.Error($"expected {typeof(bool)} after ternary operator '?', got {ast_expr.output_type}");
+                        reader.CompilationError($"expected {typeof(bool)} after ternary operator '?', got {ast_expr.output_type}");
                         goto failure;
                     }
 
                     if (!TryExpr(reader, tscope, false, expected_type ?? typeof(object), out var expr_yes))
-                        reader.Error($"expected expression after ternary operator '?'");
+                        reader.CompilationError($"expected expression after ternary operator '?'");
                     else
                     {
                         if (!reader.TryReadChar_match(':', lint: reader.lint_theme.operators))
-                            reader.Error($"expected ternary operator delimiter ':'");
+                            reader.CompilationError($"expected ternary operator delimiter ':'");
                         else
                         {
                             if (!TryConditional(reader, tscope, expected_type ?? typeof(object), out var expr_no))
-                                reader.Error($"expected second expression after ternary operator ':'");
+                                reader.CompilationError($"expected second expression after ternary operator ':'");
                             else
                             {
                                 Type output_type = Util_cobra.EnglobingType(expr_yes.output_type, expr_no.output_type);
                                 if (output_type == null)
                                 {
-                                    reader.Error($"both expression after '?' operator must return something");
+                                    reader.CompilationError($"both expression after '?' operator must return something");
                                     goto failure;
                                 }
 

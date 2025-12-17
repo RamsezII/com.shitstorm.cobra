@@ -37,7 +37,7 @@ namespace _COBRA_.Boa
                 }
                 else
                 {
-                    reader.Error($"expected closing bracket '}}'.");
+                    reader.CompilationError($"expected closing bracket '}}'.");
                     goto failure;
                 }
             }

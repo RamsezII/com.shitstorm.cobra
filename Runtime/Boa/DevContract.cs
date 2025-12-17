@@ -95,7 +95,7 @@ namespace _COBRA_.Boa
             )
         {
             this.name = name;
-            this.output_type = output_type;
+            this.output_type = output_type == typeof(int) || output_type == typeof(float) ? typeof(BoaNumber) : output_type;
             this.options = options;
             this.arguments = arguments;
             this.action_SIG_EXE = action_SIG_EXE;
