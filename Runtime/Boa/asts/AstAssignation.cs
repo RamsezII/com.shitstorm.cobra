@@ -59,27 +59,25 @@ namespace _COBRA_.Boa
                 name: $"var({var_name})",
                 action_SIG_EXE: janitor =>
                 {
-                    MemCell stack_cell = janitor.vstack.PopLast();
-                    if (!janitor.shell.scope.TryGet(var_name, out var mem_cell))
-                        janitor.shell.scope._vars.Add(var_name, stack_cell);
+                    MemCell popped = janitor.vstack.PopLast();
+                    if (!janitor.shell.scope.TryGet(var_name, out var existant))
+                        janitor.shell.scope._vars.Add(var_name, popped);
                     else
                     {
-                        BoaObject _cur = mem_cell.AsBoa;
-                        BoaObject _new = stack_cell.AsBoa;
-                        _cur = code switch
+                        MemCell assigned = code switch
                         {
-                            Codes.Incr => _cur + _new,
-                            Codes.Decr => _cur - _new,
-                            Codes.Mult => _cur * _new,
-                            Codes.Divide => _cur / _new,
-                            Codes.Modulo => _cur % _new,
-                            Codes.And => _cur && _new,
-                            Codes.Or => _cur || _new,
-                            Codes.Xor => _cur ^= _new,
-                            Codes.No => !_new,
-                            _ => _new,
+                            Codes.Incr => existant + popped,
+                            Codes.Decr => existant - popped,
+                            Codes.Mult => existant * popped,
+                            Codes.Divide => existant / popped,
+                            Codes.Modulo => existant % popped,
+                            Codes.And => existant && popped,
+                            Codes.Or => existant || popped,
+                            Codes.Xor => existant ^= popped,
+                            Codes.No => !popped,
+                            _ => popped,
                         };
-                        mem_cell._value = _cur._value;
+                        janitor.shell.scope.TrySet(var_name, assigned);
                     }
                 }
             ));

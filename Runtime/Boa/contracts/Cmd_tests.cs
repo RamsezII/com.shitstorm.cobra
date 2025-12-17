@@ -5,8 +5,8 @@ namespace _COBRA_.Boa.contracts
 {
     static class Cmd_tests
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void OnAfterSceneLoad()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void Init()
         {
             DevContract.AddContract(new(
                 name: "echo",
@@ -39,12 +39,23 @@ namespace _COBRA_.Boa.contracts
             ));
 
             DevContract.AddContract(new(
+                name: "path",
+                arguments: new() { typeof(BoaPath), },
+                output_type: typeof(string),
+                action: static (janitor, prms) =>
+                {
+                    MemCell cell = prms.arguments[0];
+                    janitor.vstack.Add(cell);
+                }
+            ));
+
+            DevContract.AddContract(new(
                 name: "wait_scaled",
                 arguments: new() { typeof(float), },
                 routine: static (janitor, args) =>
                 {
-                    var cell = args.arguments[0];
-                    float delay = cell.AsBoa;
+                    MemCell cell = args.arguments[0];
+                    float delay = cell;
 
                     return ERoutine(delay);
 
@@ -63,8 +74,8 @@ namespace _COBRA_.Boa.contracts
                 arguments: new() { typeof(float), },
                 routine: static (janitor, args) =>
                 {
-                    var cell = args.arguments[0];
-                    float delay = cell.AsBoa;
+                    MemCell cell = args.arguments[0];
+                    float delay = cell;
 
                     return ERoutine(delay);
 

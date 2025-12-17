@@ -1,20 +1,7 @@
-﻿using _COBRA_;
-using System;
+﻿using System;
 
 public static partial class Util_cobra
 {
-    public static readonly Type
-        T_object = typeof(object),
-        T_bool = typeof(bool),
-        T_int = typeof(int),
-        T_float = typeof(float),
-        T_string = typeof(string),
-        T_path = typeof(CobraPath),
-        T_fpath = typeof(CobraFPath),
-        T_dpath = typeof(CobraDPath);
-
-    //----------------------------------------------------------------------------------------------------------
-
     public static Type EnglobingType(in Type a, in Type b)
     {
         if (a == null || b == null)

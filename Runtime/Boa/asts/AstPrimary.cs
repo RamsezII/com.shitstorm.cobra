@@ -8,7 +8,7 @@ namespace _COBRA_.Boa
         public static bool TryPrimary(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_factor)
         {
             if (reader.sig_error == null)
-                if (expected_type == Util_cobra.T_path)
+                if (expected_type == typeof(BoaPath))
                     if (reader.TryParsePath(FS_TYPES.BOTH, false, out string path))
                     {
                         ast_factor = new AstLiteral(path);
@@ -16,7 +16,7 @@ namespace _COBRA_.Boa
                     }
 
             if (reader.sig_error == null)
-                if (expected_type == Util_cobra.T_fpath)
+                if (expected_type == typeof(BoaFPath))
                     if (reader.TryParsePath(FS_TYPES.FILE, false, out string fpath))
                     {
                         ast_factor = new AstLiteral(fpath);
@@ -24,7 +24,7 @@ namespace _COBRA_.Boa
                     }
 
             if (reader.sig_error == null)
-                if (expected_type == Util_cobra.T_dpath)
+                if (expected_type == typeof(BoaDPath))
                     if (reader.TryParsePath(FS_TYPES.DIRECTORY, false, out string dpath))
                     {
                         ast_factor = new AstLiteral(dpath);

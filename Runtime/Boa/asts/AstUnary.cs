@@ -44,16 +44,16 @@ namespace _COBRA_.Boa
                 name: $"unary({code})",
                 action_SIG_EXE: janitor =>
                 {
-                    var cell = janitor.vstack.PopLast();
-                    BoaObject boa = code switch
+                    MemCell popped = janitor.vstack.PopLast();
+                    MemCell assigned = code switch
                     {
-                        Codes.Positive => +cell.AsBoa,
-                        Codes.Negative => -cell.AsBoa,
-                        Codes.Not => !cell.AsBoa,
-                        Codes.Anti => ~cell.AsBoa,
+                        Codes.Positive => +popped,
+                        Codes.Negative => -popped,
+                        Codes.Not => !popped,
+                        Codes.Anti => ~popped,
                         _ => throw new NotImplementedException($"(unary) unimplemented code \"{code}\""),
                     };
-                    janitor.vstack.Add(item: new MemCell(boa._value));
+                    janitor.vstack.Add(assigned);
                 }
             ));
         }

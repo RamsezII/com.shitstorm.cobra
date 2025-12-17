@@ -95,31 +95,28 @@ namespace _COBRA_.Boa
                 {
                     var exc = new Exception($"wrong operation: {code}");
 
-                    var cellR = janitor.vstack.PopLast();
-                    var cellL = janitor.vstack.PopLast();
+                    MemCell poppedR = janitor.vstack.PopLast();
+                    MemCell poppedL = janitor.vstack.PopLast();
 
-                    BoaObject boaL = new(cellL._value);
-                    BoaObject boaR = new(cellR._value);
-
-                    BoaObject boa = code switch
+                    MemCell assigned = code switch
                     {
-                        Codes.Or => boaL || boaR,
-                        Codes.And => boaL && boaR,
-                        Codes.Add => boaL + boaR,
-                        Codes.Sub => boaL - boaR,
-                        Codes.Equal => boaL == boaR,
-                        Codes.NotEqual => boaL != boaR,
-                        Codes.Lesser => boaL < boaR,
-                        Codes.LesserOrEqual => boaL <= boaR,
-                        Codes.Greater => boaL > boaR,
-                        Codes.GreaterOrEqual => boaL >= boaR,
-                        Codes.Multiply => boaL * boaR,
-                        Codes.Divide => boaL / boaR,
-                        Codes.Modulus => boaL % boaR,
+                        Codes.Or => poppedL || poppedR,
+                        Codes.And => poppedL && poppedR,
+                        Codes.Add => poppedL + poppedR,
+                        Codes.Sub => poppedL - poppedR,
+                        Codes.Equal => poppedL == poppedR,
+                        Codes.NotEqual => poppedL != poppedR,
+                        Codes.Lesser => poppedL < poppedR,
+                        Codes.LesserOrEqual => poppedL <= poppedR,
+                        Codes.Greater => poppedL > poppedR,
+                        Codes.GreaterOrEqual => poppedL >= poppedR,
+                        Codes.Multiply => poppedL * poppedR,
+                        Codes.Divide => poppedL / poppedR,
+                        Codes.Modulus => poppedL % poppedR,
                         _ => throw exc,
                     };
 
-                    janitor.vstack.Add(new MemCell(boa._value));
+                    janitor.vstack.Add(assigned);
                 }
             ));
         }

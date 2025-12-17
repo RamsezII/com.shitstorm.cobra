@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace _COBRA_.Boa
 {
@@ -20,7 +21,7 @@ namespace _COBRA_.Boa
         {
             base.OnExecutorsQueue(janitor);
 
-            MemCell cell_index = null;
+            MemCell cell_index = default;
 
             ast_expr.OnExecutorsQueue(janitor);
 
@@ -38,8 +39,8 @@ namespace _COBRA_.Boa
                 name: $"indexer(retreive and apply index)",
                 action_SIG_EXE: janitor =>
                 {
-                    MemCell indexable = janitor.vstack.PopLast();
-                    object value = indexable.AsBoa.AsList[cell_index.AsBoa];
+                    MemCell popped = janitor.vstack.PopLast();
+                    object value = ((IList)popped._value)[cell_index];
                     janitor.vstack.Add(new MemCell(value));
                 }
             ));

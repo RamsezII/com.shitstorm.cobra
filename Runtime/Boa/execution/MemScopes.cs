@@ -33,5 +33,17 @@ namespace _COBRA_.Boa
                 return parent.TryGet(name, out value);
             return false;
         }
+
+        public bool TrySet(in string name, in MemCell cell)
+        {
+            if (_vars.ContainsKey(name))
+            {
+                _vars[name] = new(cell);
+                return true;
+            }
+            else if (parent != null)
+                return parent.TrySet(name, cell);
+            return false;
+        }
     }
 }
