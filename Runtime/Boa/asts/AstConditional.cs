@@ -17,7 +17,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryConditional(in CodeReader reader, in TScope tscope, in Type expected_type, out AstExpression ast_expr)
+        public static bool TryConditional(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_expr)
         {
             if (AstBinaryOperation.TryOr(reader, tscope, expected_type, out ast_expr))
                 if (!reader.TryReadChar_match('?', lint: reader.lint_theme.operators))

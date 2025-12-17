@@ -3,11 +3,11 @@
 namespace _COBRA_.Boa
 {
     [Serializable]
-    public struct MemCell
+    public class MemCell
     {
         public readonly Type type;
         public dynamic value;
-        public override readonly string ToString() => $"cell[{value}({type})]";
+        public override string ToString() => $"cell[{value}({type})]";
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -15,6 +15,10 @@ namespace _COBRA_.Boa
         {
             this.type = type;
             this.value = value;
+        }
+
+        public MemCell(in Type type) : this(null, type)
+        {
         }
 
         public MemCell(in object value) : this(value.GetType(), value)

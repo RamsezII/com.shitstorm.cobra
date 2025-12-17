@@ -2,7 +2,7 @@
 {
     internal abstract class AstStatement : AstAbstract
     {
-        public static bool TryStatement(in CodeReader reader, in TScope tscope, out AstStatement ast_statement)
+        public static bool TryStatement(in CodeReader reader, in MemScope tscope, out AstStatement ast_statement)
         {
         skipped_comments:
             if (reader.TryReadChar_match('#', lint: reader.lint_theme.comments))
@@ -20,6 +20,11 @@
             if (AstBlock.TryBlock(reader, tscope, out var ast_block))
             {
                 ast_statement = ast_block;
+                return true;
+            }
+            else if (AstAssignation.TryDeclaration(reader, tscope, out var ast_decl))
+            {
+                ast_statement = ast_decl;
                 return true;
             }
             else if (AstExprStatement.TryExprStatement(reader, tscope, out var ast_expr))
@@ -53,7 +58,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryExprStatement(in CodeReader reader, in TScope tscope, out AstExprStatement ast_statement)
+        public static bool TryExprStatement(in CodeReader reader, in MemScope tscope, out AstExprStatement ast_statement)
         {
             if (AstExpression.TryExpr(reader, tscope, false, null, out var expression))
             {
@@ -82,7 +87,7 @@
 
             if (expression.output_type != null)
                 janitor.executors.Enqueue(new(
-                    name: "expression-statement",
+                    name: "expr_statement(pop vstack last)",
                     action_SIG_EXE: static janitor =>
                     {
                         var cell = janitor.vstack.PopLast();

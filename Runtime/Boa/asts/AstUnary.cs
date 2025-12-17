@@ -34,7 +34,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryUnary(in CodeReader reader, in TScope tscope, in Type expected_type, out AstExpression ast_unary)
+        public static bool TryUnary(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_unary)
         {
             int read_old = reader.read_i;
 

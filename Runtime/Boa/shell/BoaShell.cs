@@ -24,8 +24,7 @@ namespace _COBRA_
 
         readonly List<Janitor> janitors = new();
         Janitor front_janitor;
-        readonly TScope tscope = new(parent: null);
-        readonly VScope vscope = new(parent: null);
+        internal readonly MemScope scope = new();
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -61,7 +60,9 @@ namespace _COBRA_
             {
                 Queue<AstAbstract> asts = new();
 
-                while (reader.HasNext() && AstStatement.TryStatement(reader, tscope, out var ast))
+                MemScope scope = new(this.scope);
+
+                while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
                     if (ast != null)
                         asts.Enqueue(ast);
 
@@ -78,10 +79,10 @@ namespace _COBRA_
                         status.Value = CMD_STATUS.WAIT_FOR_STDIN;
                     }
                     else if (execute_in_background)
-                        janitors.Add(new(this, vscope, asts));
+                        janitors.Add(new(this, asts));
                     else
                     {
-                        front_janitor = new(this, vscope, asts);
+                        front_janitor = new(this, asts);
                         status.Value = CMD_STATUS.BLOCKED;
                     }
             }

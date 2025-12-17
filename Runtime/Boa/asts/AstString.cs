@@ -42,7 +42,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryParseString(in CodeReader reader, in TScope tscope, out AstString ast_string)
+        public static bool TryParseString(in CodeReader reader, in MemScope tscope, out AstString ast_string)
         {
             int read_old = reader.read_i;
 

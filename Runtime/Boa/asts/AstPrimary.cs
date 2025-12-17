@@ -5,7 +5,7 @@ namespace _COBRA_.Boa
 {
     static class AstPrimary
     {
-        public static bool TryPrimary(in CodeReader reader, in TScope tscope, in Type expected_type, out AstExpression ast_factor)
+        public static bool TryPrimary(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_factor)
         {
             if (reader.sig_error == null)
                 if (expected_type == Util_cobra.T_path)

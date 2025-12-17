@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace _COBRA_.Boa
 {
-    public abstract class MScope<T>
+    public sealed class MemScope
     {
-        internal readonly MScope<T> parent;
-        internal readonly Dictionary<string, T> _vars = new(StringComparer.Ordinal);
+        internal readonly MemScope parent;
+        internal readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal MScope(in MScope<T> parent)
+        internal MemScope(in MemScope parent = null)
         {
             this.parent = parent;
         }
@@ -25,33 +25,13 @@ namespace _COBRA_.Boa
             return _vars.Keys;
         }
 
-        public bool TryGet(in string name, out T value)
+        public bool TryGet(in string name, out MemCell value)
         {
             if (_vars.TryGetValue(name, out value))
                 return true;
             else if (parent != null)
                 return parent.TryGet(name, out value);
             return false;
-        }
-    }
-
-    public sealed class TScope : MScope<Type>
-    {
-
-        //----------------------------------------------------------------------------------------------------------
-
-        internal TScope(in TScope parent) : base(parent)
-        {
-        }
-    }
-
-    public sealed class VScope : MScope<MemCell>
-    {
-
-        //----------------------------------------------------------------------------------------------------------
-
-        internal VScope(in VScope parent) : base(parent)
-        {
         }
     }
 }

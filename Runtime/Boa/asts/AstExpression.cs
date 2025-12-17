@@ -15,13 +15,8 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryExpr(in CodeReader reader, in TScope tscope, in bool read_as_argument, in Type expected_type, out AstExpression ast_expression)
+        public static bool TryExpr(in CodeReader reader, in MemScope tscope, in bool read_as_argument, in Type expected_type, out AstExpression ast_expression)
         {
-            if (AstAssignment.TryParseAssignment(reader, tscope, expected_type, out ast_expression))
-                return true;
-            else if (reader.sig_error != null)
-                goto failure;
-
             if (AstConditional.TryConditional(reader, tscope, expected_type, out ast_expression))
             {
                 if (read_as_argument)

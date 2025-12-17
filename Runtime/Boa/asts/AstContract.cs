@@ -29,7 +29,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryParseContract(in CodeReader reader, in TScope tscope, in Type expected_type, out AstContract ast_contract)
+        public static bool TryParseContract(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstContract ast_contract)
         {
             if (reader.TryReadString_matches_out(out string cont_name, as_function_argument: false, lint: reader.lint_theme.contracts, matches: DevContract.contracts.Keys.ToArray()))
                 if (!DevContract.contracts.TryGetValue(cont_name, out var contract))

@@ -126,8 +126,8 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryOr(in CodeReader reader, in TScope tscope, in Type expected_type, out AstExpression ast_expr) => TryBinOp(reader, tscope, Depths.Or, expected_type, out ast_expr);
-        static bool TryBinOp(in CodeReader reader, in TScope tscope, in Depths depth, in Type expected_type, out AstExpression ast_expr)
+        public static bool TryOr(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_expr) => TryBinOp(reader, tscope, Depths.Or, expected_type, out ast_expr);
+        static bool TryBinOp(in CodeReader reader, in MemScope tscope, in Depths depth, in Type expected_type, out AstExpression ast_expr)
         {
             if (depth == Depths.Term)
             {

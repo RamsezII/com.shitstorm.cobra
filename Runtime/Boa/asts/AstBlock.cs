@@ -15,13 +15,13 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryBlock(in CodeReader reader, in TScope tscope, out AstBlock ast_block)
+        public static bool TryBlock(in CodeReader reader, in MemScope scope, out AstBlock ast_block)
         {
             if (reader.TryReadChar_match('{'))
             {
                 reader.LintOpeningBraquet();
 
-                var sub_scope = new TScope(tscope);
+                var sub_scope = new MemScope(scope);
                 var asts = new List<AstStatement>();
 
                 while (TryStatement(reader, sub_scope, out var ast_statement))
