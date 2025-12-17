@@ -1,12 +1,12 @@
 ﻿namespace _COBRA_.Boa
 {
-    internal class AstLiteral<T> : AstExpression
+    internal class AstLiteral : AstExpression
     {
-        public T value;
+        public object value;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public AstLiteral(in T value) : base(typeof(T))
+        public AstLiteral(in object value) : base(value.GetType())
         {
             this.value = value;
         }
@@ -21,7 +21,7 @@
                 name: $"literal({value})",
                 action_SIG_EXE: janitor =>
                 {
-                    janitor.vstack.Add(new(type: typeof(T), value: value));
+                    janitor.vstack.Add(item: new MemCell(value));
                 }
             ));
         }

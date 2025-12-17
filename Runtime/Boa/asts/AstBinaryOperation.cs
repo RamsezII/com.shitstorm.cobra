@@ -98,28 +98,28 @@ namespace _COBRA_.Boa
                     var cellR = janitor.vstack.PopLast();
                     var cellL = janitor.vstack.PopLast();
 
-                    dynamic cl = cellL.value;
-                    dynamic cr = cellR.value;
+                    BoaObject boaL = new(cellL._value);
+                    BoaObject boaR = new(cellR._value);
 
-                    object res = code switch
+                    BoaObject boa = code switch
                     {
-                        Codes.Or => cl || cr,
-                        Codes.And => cl && cr,
-                        Codes.Add => cl + cr,
-                        Codes.Sub => cl - cr,
-                        Codes.Equal => cl == cr,
-                        Codes.NotEqual => cl != cr,
-                        Codes.Lesser => cl < cr,
-                        Codes.LesserOrEqual => cl <= cr,
-                        Codes.Greater => cl > cr,
-                        Codes.GreaterOrEqual => cl >= cr,
-                        Codes.Multiply => cl * cr,
-                        Codes.Divide => cl / cr,
-                        Codes.Modulus => cl % cr,
+                        Codes.Or => boaL || boaR,
+                        Codes.And => boaL && boaR,
+                        Codes.Add => boaL + boaR,
+                        Codes.Sub => boaL - boaR,
+                        Codes.Equal => boaL == boaR,
+                        Codes.NotEqual => boaL != boaR,
+                        Codes.Lesser => boaL < boaR,
+                        Codes.LesserOrEqual => boaL <= boaR,
+                        Codes.Greater => boaL > boaR,
+                        Codes.GreaterOrEqual => boaL >= boaR,
+                        Codes.Multiply => boaL * boaR,
+                        Codes.Divide => boaL / boaR,
+                        Codes.Modulus => boaL % boaR,
                         _ => throw exc,
                     };
 
-                    janitor.vstack.Add(new(value: res));
+                    janitor.vstack.Add(new MemCell(boa._value));
                 }
             ));
         }

@@ -63,19 +63,24 @@ namespace _COBRA_.Boa
                     if (!janitor.shell.scope.TryGet(var_name, out var mem_cell))
                         janitor.shell.scope._vars.Add(var_name, stack_cell);
                     else
-                        mem_cell.value = code switch
+                    {
+                        BoaObject _cur = mem_cell.AsBoa;
+                        BoaObject _new = stack_cell.AsBoa;
+                        _cur = code switch
                         {
-                            Codes.Incr => mem_cell.value + stack_cell.value,
-                            Codes.Decr => mem_cell.value - stack_cell.value,
-                            Codes.Mult => mem_cell.value * stack_cell.value,
-                            Codes.Divide => mem_cell.value / stack_cell.value,
-                            Codes.Modulo => mem_cell.value % stack_cell.value,
-                            Codes.And => mem_cell.value && stack_cell.value,
-                            Codes.Or => mem_cell.value || stack_cell.value,
-                            Codes.Xor => mem_cell.value ^= stack_cell.value,
-                            Codes.No => !stack_cell.value,
-                            _ => stack_cell.value,
+                            Codes.Incr => _cur + _new,
+                            Codes.Decr => _cur - _new,
+                            Codes.Mult => _cur * _new,
+                            Codes.Divide => _cur / _new,
+                            Codes.Modulo => _cur % _new,
+                            Codes.And => _cur && _new,
+                            Codes.Or => _cur || _new,
+                            Codes.Xor => _cur ^= _new,
+                            Codes.No => !_new,
+                            _ => _new,
                         };
+                        mem_cell._value = _cur._value;
+                    }
                 }
             ));
         }
@@ -104,7 +109,7 @@ namespace _COBRA_.Boa
                     Codes code = codes[op_name];
                     scope.TryGet(var_name, out var cell);
 
-                    if (AstExpression.TryExpr(reader, scope, false, cell.type, out AstExpression expr))
+                    if (AstExpression.TryExpr(reader, scope, false, cell._type, out AstExpression expr))
                     {
                         ast_assign = new AstAssignation(var_name, expr, code);
                         return true;
@@ -117,7 +122,7 @@ namespace _COBRA_.Boa
                 if (reader.TryReadChar_match('=', reader.lint_theme.operators))
                     if (AstExpression.TryExpr(reader, scope, false, typeof(object), out var ast_expr))
                     {
-                        scope._vars.Add(var_name, new(type: ast_expr.output_type));
+                        scope._vars.Add(var_name, new MemCell(ast_expr.output_type, null));
                         ast_assign = new AstAssignation(var_name, ast_expr, Codes.Assign);
                         return true;
                     }

@@ -25,7 +25,7 @@ namespace _COBRA_.Boa.contracts
                 arguments: new() { typeof(string), },
                 routine_READER: static (janitor, prms) =>
                 {
-                    string entry = prms.arguments[0].value;
+                    string entry = prms.arguments[0]._value.ToString();
                     return ERoutine(janitor, entry);
                     static IEnumerator<ExecutionStatus> ERoutine(Janitor janitor, string entry)
                     {
@@ -33,7 +33,7 @@ namespace _COBRA_.Boa.contracts
                             yield return new(CMD_STATUS.WAIT_FOR_STDIN, prefixe: new(entry));
 
                         string read = janitor.reader.ReadAll();
-                        janitor.vstack.Add(new(value: read));
+                        janitor.vstack.Add(new MemCell(read));
                     }
                 }
             ));
@@ -44,7 +44,7 @@ namespace _COBRA_.Boa.contracts
                 routine: static (janitor, args) =>
                 {
                     var cell = args.arguments[0];
-                    float delay = cell.value;
+                    float delay = cell.AsBoa;
 
                     return ERoutine(delay);
 
@@ -64,7 +64,7 @@ namespace _COBRA_.Boa.contracts
                 routine: static (janitor, args) =>
                 {
                     var cell = args.arguments[0];
-                    float delay = cell.value;
+                    float delay = cell.AsBoa;
 
                     return ERoutine(delay);
 

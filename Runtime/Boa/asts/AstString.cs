@@ -31,11 +31,11 @@ namespace _COBRA_.Boa
                     StringBuilder sb = new();
                     for (int i = asts.Count; i > 0; i--)
                     {
-                        string s = janitor.vstack[^i].value.ToString();
+                        string s = janitor.vstack[^i]._value.ToString();
                         sb.Append(s);
                     }
                     janitor.vstack.RemoveRange(janitor.vstack.Count - asts.Count, asts.Count);
-                    janitor.vstack.Add(new(value: sb.ToString()));
+                    janitor.vstack.Add(new MemCell(sb.ToString()));
                 }
             ));
         }
@@ -84,7 +84,7 @@ namespace _COBRA_.Boa
                             reader.LintToThisPosition(reader.lint_theme.quotes, false);
 
                             if (current_fragment.Length > 0)
-                                asts.Add(new AstLiteral<string>(current_fragment));
+                                asts.Add(new AstLiteral(current_fragment));
 
                             if (TryExpr(reader, tscope, false, typeof(object), out AstExpression expression))
                                 asts.Add(expression);
@@ -115,7 +115,7 @@ namespace _COBRA_.Boa
                             reader.cpl_end = reader.read_i - 1;
 
                             if (current_fragment.Length > 0)
-                                asts.Add(new AstLiteral<string>(current_fragment));
+                                asts.Add(new AstLiteral(current_fragment));
 
                             ast_string = new AstString(asts);
                         }

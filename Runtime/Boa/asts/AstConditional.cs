@@ -33,7 +33,7 @@ namespace _COBRA_.Boa
                 action_SIG_EXE: janitor =>
                 {
                     var cell = janitor.vstack.PopLast();
-                    cond = cell.value;
+                    cond = (bool)cell._value;
                 }
             ));
 

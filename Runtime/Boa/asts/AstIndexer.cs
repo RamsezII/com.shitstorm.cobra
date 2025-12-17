@@ -38,9 +38,9 @@ namespace _COBRA_.Boa
                 name: $"indexer(retreive and apply index)",
                 action_SIG_EXE: janitor =>
                 {
-                    MemCell cell_col = janitor.vstack.PopLast();
-                    dynamic val = cell_col.value[cell_index.value];
-                    janitor.vstack.Add(new(value: val));
+                    MemCell indexable = janitor.vstack.PopLast();
+                    object value = indexable.AsBoa.AsList[cell_index.AsBoa];
+                    janitor.vstack.Add(new MemCell(value));
                 }
             ));
         }

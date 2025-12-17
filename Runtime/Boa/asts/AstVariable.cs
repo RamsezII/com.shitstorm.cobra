@@ -32,7 +32,7 @@ namespace _COBRA_.Boa
             if (reader.TryReadString_matches_out(out string var_name, false, reader.lint_theme.variables, tscope.EVarNames()))
                 if (tscope.TryGet(var_name, out var cell))
                 {
-                    ast_variable = new AstVariable(var_name, cell.type);
+                    ast_variable = new AstVariable(var_name, cell._type);
                     return true;
                 }
 

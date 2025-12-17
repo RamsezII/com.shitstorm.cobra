@@ -11,7 +11,7 @@ namespace _COBRA_.Boa
                 if (expected_type == Util_cobra.T_path)
                     if (reader.TryParsePath(FS_TYPES.BOTH, false, out string path))
                     {
-                        ast_factor = new AstLiteral<string>(path);
+                        ast_factor = new AstLiteral(path);
                         return true;
                     }
 
@@ -19,7 +19,7 @@ namespace _COBRA_.Boa
                 if (expected_type == Util_cobra.T_fpath)
                     if (reader.TryParsePath(FS_TYPES.FILE, false, out string fpath))
                     {
-                        ast_factor = new AstLiteral<string>(fpath);
+                        ast_factor = new AstLiteral(fpath);
                         return true;
                     }
 
@@ -27,7 +27,7 @@ namespace _COBRA_.Boa
                 if (expected_type == Util_cobra.T_dpath)
                     if (reader.TryParsePath(FS_TYPES.DIRECTORY, false, out string dpath))
                     {
-                        ast_factor = new AstLiteral<string>(dpath);
+                        ast_factor = new AstLiteral(dpath);
                         return true;
                     }
 
@@ -80,21 +80,21 @@ namespace _COBRA_.Boa
                     {
                         case "true":
                             reader.LintToThisPosition(reader.lint_theme.constants, true);
-                            ast_factor = new AstLiteral<bool>(true);
+                            ast_factor = new AstLiteral(true);
                             return true;
 
                         case "false":
                             reader.LintToThisPosition(reader.lint_theme.constants, true);
-                            ast_factor = new AstLiteral<bool>(false);
+                            ast_factor = new AstLiteral(false);
                             return true;
 
                         default:
                             if (arg[^1] == 'f' && Util.TryParseFloat(arg[..^1], out float _float))
-                                ast_factor = new AstLiteral<float>(_float);
+                                ast_factor = new AstLiteral(_float);
                             else if (int.TryParse(arg, out int _int))
-                                ast_factor = new AstLiteral<int>(_int);
+                                ast_factor = new AstLiteral(_int);
                             else if (Util.TryParseFloat(arg, out _float))
-                                ast_factor = new AstLiteral<float>(_float);
+                                ast_factor = new AstLiteral(_float);
                             else
                             {
                                 reader.CompilationError($"unrecognized literal : '{arg}'.");

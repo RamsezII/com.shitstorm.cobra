@@ -45,15 +45,15 @@ namespace _COBRA_.Boa
                 action_SIG_EXE: janitor =>
                 {
                     var cell = janitor.vstack.PopLast();
-                    object res = code switch
+                    BoaObject boa = code switch
                     {
-                        Codes.Positive => +cell.value,
-                        Codes.Negative => -cell.value,
-                        Codes.Not => !cell.value,
-                        Codes.Anti => ~cell.value,
+                        Codes.Positive => +cell.AsBoa,
+                        Codes.Negative => -cell.AsBoa,
+                        Codes.Not => !cell.AsBoa,
+                        Codes.Anti => ~cell.AsBoa,
                         _ => throw new NotImplementedException($"(unary) unimplemented code \"{code}\""),
                     };
-                    janitor.vstack.Add(new(value: res));
+                    janitor.vstack.Add(item: new MemCell(boa._value));
                 }
             ));
         }

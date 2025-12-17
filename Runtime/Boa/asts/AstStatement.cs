@@ -86,7 +86,7 @@ namespace _COBRA_.Boa
                     action_SIG_EXE: static janitor =>
                     {
                         var cell = janitor.vstack.PopLast();
-                        janitor.shell.on_output(cell.value, null);
+                        janitor.shell.on_output(cell._value, null);
                     }));
         }
     }
