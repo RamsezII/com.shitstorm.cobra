@@ -74,11 +74,11 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
+        protected internal override void OnExecutorsQueue(in Janitor janitor)
         {
-            base.OnExecutionQueue(janitor, executors);
+            base.OnExecutorsQueue(janitor);
 
-            expression.EnqueueExecutors(janitor);
+            expression.OnExecutorsQueue(janitor);
 
             if (expression.output_type != null)
                 janitor.executors.Enqueue(new(

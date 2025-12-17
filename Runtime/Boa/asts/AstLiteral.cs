@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace _COBRA_.Boa
+﻿namespace _COBRA_.Boa
 {
     internal class AstLiteral<T> : AstExpression
     {
@@ -15,9 +13,9 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
+        protected internal override void OnExecutorsQueue(in Janitor janitor)
         {
-            base.OnExecutionQueue(janitor, executors);
+            base.OnExecutorsQueue(janitor);
 
             janitor.executors.Enqueue(new(
                 name: $"literal({value})",

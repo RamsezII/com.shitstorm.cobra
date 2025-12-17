@@ -17,12 +17,12 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
+        protected internal override void OnExecutorsQueue(in Janitor janitor)
         {
-            base.OnExecutionQueue(janitor, executors);
+            base.OnExecutorsQueue(janitor);
 
             for (int i = 0; i < asts.Count; i++)
-                asts[i].EnqueueExecutors(janitor);
+                asts[i].OnExecutorsQueue(janitor);
 
             janitor.executors.Enqueue(new(
                 name: $"string({asts.Count})",

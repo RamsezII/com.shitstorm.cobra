@@ -109,9 +109,9 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
+        protected internal override void OnExecutorsQueue(in Janitor janitor)
         {
-            base.OnExecutionQueue(janitor, executors);
+            base.OnExecutorsQueue(janitor);
 
             DevContract.VOptions vopts = null;
             DevContract.VArguments vargs = null;
@@ -120,14 +120,14 @@ namespace _COBRA_.Boa
             {
                 vopts = new();
                 for (int i = 0; i < topts.Count; i++)
-                    topts[i].ast.EnqueueExecutors(janitor);
+                    topts[i].ast.OnExecutorsQueue(janitor);
             }
 
             if (targs != null)
             {
                 vargs = new();
                 for (int i = 0; i < targs.Count; i++)
-                    targs[i].EnqueueExecutors(janitor);
+                    targs[i].OnExecutorsQueue(janitor);
             }
 
             janitor.executors.Enqueue(new(

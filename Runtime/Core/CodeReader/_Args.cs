@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace _COBRA_
@@ -142,22 +143,23 @@ namespace _COBRA_
 
         public bool TryReadPrefixeString_matches_out(out string match, in Color lint, in IEnumerable<string> matches, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
-            foreach (string m in matches)
-            {
-                int read_old = read_i;
+            if (HasNext(ignore_case: ignore_case, skippables: skippables))
+                foreach (string m in matches.OrderByDescending(x => x.Length))
+                {
+                    int read_old = read_i;
 
-                for (int i = 0; i <= m.Length; i++)
-                    if (i == m.Length)
-                    {
-                        match = m;
-                        LintToThisPosition(lint, true);
-                        return true;
-                    }
-                    else if (!TryReadChar_match(m[i], add_to_completions: add_to_completions, ignore_case: ignore_case, skippables: skippables))
-                        break;
+                    for (int i = 0; i <= m.Length; i++)
+                        if (i == m.Length)
+                        {
+                            match = m;
+                            LintToThisPosition(lint, true);
+                            return true;
+                        }
+                        else if (!TryReadChar_match(m[i], add_to_completions: add_to_completions, ignore_case: ignore_case, skippables: null))
+                            break;
 
-                read_i = read_old;
-            }
+                    read_i = read_old;
+                }
 
             match = null;
             return false;
