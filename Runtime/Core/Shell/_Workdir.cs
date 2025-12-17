@@ -7,9 +7,12 @@ namespace _COBRA_
     {
         public readonly ValueHandler<string> workdir = new(ArkPaths.instance.Value.dpath_home);
 
-        public LintedString RegularPrefixe() => new(
-            text: $"{ArkMachine.user_name.Value}:{workdir._value}$ ",
-            lint: $"{ArkMachine.user_name.Value.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
+        public ExecutionStatus RegularStatus() => new(
+            code: CMD_STATUS.WAIT_FOR_STDIN,
+            prefixe: new(
+                text: $"{ArkMachine.user_name.Value}:{workdir._value}$ ",
+                lint: $"{ArkMachine.user_name.Value.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
+                )
         );
 
         //--------------------------------------------------------------------------------------------------------------

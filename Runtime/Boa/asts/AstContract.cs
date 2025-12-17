@@ -146,22 +146,22 @@ namespace _COBRA_.Boa
 
             DevContract.Parameters prms = new(janitor, vopts, vargs);
 
-            if (contract.action_SIG_EXE != null)
+            if (contract.action != null)
                 janitor.executors.Enqueue(new(
                     name: $"action(tick) for contract({contract.name})",
-                    action_SIG_EXE: janitor => contract.action_SIG_EXE(janitor, prms)
+                    action_SIG_EXE: janitor => contract.action(janitor, prms)
                 ));
 
-            if (contract.routine_SIG_EXE != null)
+            if (contract.routine != null)
                 janitor.executors.Enqueue(new(
                     name: $"routine(tick) for contract({contract.name})",
-                    routine_SIG_EXE: janitor => contract.routine_SIG_EXE(janitor, prms)
+                    routine_SIG_EXE: janitor => contract.routine(janitor, prms)
                 ));
 
-            if (contract.routine_SIG_READER != null)
+            if (contract.routine_READER != null)
                 janitor.executors.Enqueue(new(
                     name: $"routine(reader) for contract({contract.name})",
-                    routine_SIG_READER: janitor => contract.routine_SIG_READER(janitor, prms)
+                    routine_SIG_READER: janitor => contract.routine_READER(janitor, prms)
                 ));
         }
     }

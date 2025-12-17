@@ -6,21 +6,14 @@ namespace _COBRA_
 {
     public abstract partial class Shell : Disposable
     {
-        public readonly ValueHandler<CMD_STATUS> status = new();
-        public readonly ValueHandler<LintedString> prefixe = new();
+        public readonly ValueHandler<ExecutionStatus> status = new();
         public Action<object, string> on_output;
-
-        //----------------------------------------------------------------------------------------------------------
-
-        protected Shell()
-        {
-            prefixe.Value = RegularPrefixe();
-        }
 
         //----------------------------------------------------------------------------------------------------------
 
         public virtual void Init()
         {
+            status.Value = RegularStatus();
             Util.AddAction(ref NUCLEOR.delegates.Update_OnShellTick, OnTick);
         }
 
@@ -39,7 +32,6 @@ namespace _COBRA_
             base.OnDispose();
 
             status.Dispose();
-            prefixe.Dispose();
         }
     }
 }

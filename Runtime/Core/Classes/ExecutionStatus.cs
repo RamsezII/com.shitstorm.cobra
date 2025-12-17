@@ -12,19 +12,19 @@ namespace _COBRA_
     }
 
     [Serializable]
-    public readonly struct ExecutionOutput
+    public readonly struct ExecutionStatus
     {
-        public readonly CMD_STATUS status;
+        public readonly CMD_STATUS code;
         public readonly LintedString prefixe;
         public readonly float progress;
         public readonly string error;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public ExecutionOutput(in CMD_STATUS status = 0, in LintedString prefixe = default, in float progress = 0, in string error = null)
+        public ExecutionStatus(in CMD_STATUS code = 0, in LintedString prefixe = default, in float progress = 0, in string error = null)
         {
-            this.status = status;
-            this.prefixe = prefixe.text == null ? LintedString.EMPTY : prefixe;
+            this.code = code;
+            this.prefixe = prefixe;
             this.progress = progress;
             this.error = error;
         }

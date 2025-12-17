@@ -12,7 +12,7 @@ namespace _COBRA_.Boa.contracts
                 name: "echo",
                 output_type: typeof(object),
                 arguments: new() { typeof(object), },
-                action_SIG_EXE: static (janitor, args) =>
+                action: static (janitor, args) =>
                 {
                     var cell = args.arguments[0];
                     janitor.vstack.Add(cell);
@@ -20,16 +20,35 @@ namespace _COBRA_.Boa.contracts
             ));
 
             DevContract.AddContract(new(
+                name: "read_entry",
+                output_type: typeof(string),
+                arguments: new() { typeof(string), },
+                routine_READER: static (janitor, prms) =>
+                {
+                    string entry = prms.arguments[0].value;
+                    return ERoutine(janitor, entry);
+                    static IEnumerator<ExecutionStatus> ERoutine(Janitor janitor, string entry)
+                    {
+                        while (janitor.reader == null || !janitor.reader.sig_flags.HasFlag(SIG_FLAGS.SUBMIT))
+                            yield return new(CMD_STATUS.WAIT_FOR_STDIN, prefixe: new(entry));
+
+                        string read = janitor.reader.ReadAll();
+                        janitor.vstack.Add(new(value: read));
+                    }
+                }
+            ));
+
+            DevContract.AddContract(new(
                 name: "wait_scaled",
                 arguments: new() { typeof(float), },
-                routine_SIG_EXE: static (janitor, args) =>
+                routine: static (janitor, args) =>
                 {
                     var cell = args.arguments[0];
                     float delay = cell.value;
 
                     return ERoutine(delay);
 
-                    static IEnumerator<ExecutionOutput> ERoutine(float delay)
+                    static IEnumerator<ExecutionStatus> ERoutine(float delay)
                     {
                         float start = Time.time;
                         float end = start + delay;
@@ -42,14 +61,14 @@ namespace _COBRA_.Boa.contracts
             DevContract.AddContract(new(
                 name: "wait_unscaled",
                 arguments: new() { typeof(float), },
-                routine_SIG_EXE: static (janitor, args) =>
+                routine: static (janitor, args) =>
                 {
                     var cell = args.arguments[0];
                     float delay = cell.value;
 
                     return ERoutine(delay);
 
-                    static IEnumerator<ExecutionOutput> ERoutine(float delay)
+                    static IEnumerator<ExecutionStatus> ERoutine(float delay)
                     {
                         float start = Time.unscaledTime;
                         float end = start + delay;

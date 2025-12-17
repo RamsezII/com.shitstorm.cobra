@@ -28,32 +28,24 @@ namespace _COBRA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public override void Init()
-        {
-            base.Init();
-            status.Value = CMD_STATUS.WAIT_FOR_STDIN;
-        }
-
-        //----------------------------------------------------------------------------------------------------------
-
         public override void OnReader(in CodeReader reader)
         {
             if (front_janitor != null)
             {
-                front_janitor.OnReader(reader, out ExecutionOutput output);
+                front_janitor.OnReader(reader, out ExecutionStatus status);
 
-                if (output.status == CMD_STATUS.ERROR)
+                if (status.code == CMD_STATUS.ERROR)
                 {
-                    Debug.LogError($"{this} SIG_ERROR['{reader.sig_flags}']: \"{output.error}\"");
+                    Debug.LogError($"{this} SIG_ERROR['{reader.sig_flags}']: \"{status.error}\"");
                     front_janitor.Dispose();
                 }
 
                 if (!front_janitor.Disposed)
-                    status.Value = output.status;
+                    this.status.Value = status;
                 else
                 {
                     front_janitor = null;
-                    status.Value = CMD_STATUS.WAIT_FOR_STDIN;
+                    this.status.Value = RegularStatus();
                 }
             }
             else
@@ -76,14 +68,14 @@ namespace _COBRA_
                     {
                         reader.LocalizeError();
                         Debug.LogError(reader.sig_long_error);
-                        status.Value = CMD_STATUS.WAIT_FOR_STDIN;
+                        status.Value = RegularStatus();
                     }
                     else if (execute_in_background)
                         janitors.Add(new(this, asts));
                     else
                     {
                         front_janitor = new(this, asts);
-                        status.Value = CMD_STATUS.BLOCKED;
+                        status.Value = default;
                     }
             }
         }
@@ -95,9 +87,9 @@ namespace _COBRA_
             for (int i = 0; i < janitors.Count; i++)
             {
                 Janitor janitor = janitors[i];
-                janitor.OnTick(out ExecutionOutput output);
+                janitor.OnTick(out ExecutionStatus output);
 
-                if (output.status == CMD_STATUS.ERROR)
+                if (output.code == CMD_STATUS.ERROR)
                 {
                     Debug.LogError($"{this} TICK_ERROR_bg: \"{output.error}\"");
                     janitor.Dispose();
@@ -110,21 +102,21 @@ namespace _COBRA_
             if (front_janitor != null)
                 if (!front_janitor.Disposed)
                 {
-                    front_janitor.OnTick(out ExecutionOutput output);
+                    front_janitor.OnTick(out ExecutionStatus status);
 
-                    if (output.status == CMD_STATUS.ERROR)
+                    if (status.code == CMD_STATUS.ERROR)
                     {
-                        Debug.LogError($"{this} TICK_ERROR_bg: \"{output.error}\"");
+                        Debug.LogError($"{this} TICK_ERROR_bg: \"{status.error}\"");
                         front_janitor.Dispose();
                     }
 
-                    if (front_janitor.Disposed)
+                    if (!front_janitor.Disposed)
+                        this.status.Value = status;
+                    else
                     {
                         front_janitor = null;
-                        status.Value = CMD_STATUS.WAIT_FOR_STDIN;
+                        this.status.Value = RegularStatus();
                     }
-                    else
-                        status.Value = output.status;
                 }
         }
     }

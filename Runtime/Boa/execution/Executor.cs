@@ -9,7 +9,7 @@ namespace _COBRA_
     {
         internal readonly string name;
         internal readonly Action<Janitor> action_SIG_EXE;
-        internal readonly Func<Janitor, IEnumerator<ExecutionOutput>> routine_SIG_EXE, routine_SIG_READER;
+        internal readonly Func<Janitor, IEnumerator<ExecutionStatus>> routine_SIG_EXE, routine_SIG_READER;
 
         public override string ToString() => $"exec[{name}]";
 
@@ -18,8 +18,8 @@ namespace _COBRA_
         public Executor(
             in string name,
             in Action<Janitor> action_SIG_EXE = null,
-            in Func<Janitor, IEnumerator<ExecutionOutput>> routine_SIG_EXE = null,
-            in Func<Janitor, IEnumerator<ExecutionOutput>> routine_SIG_READER = null
+            in Func<Janitor, IEnumerator<ExecutionStatus>> routine_SIG_EXE = null,
+            in Func<Janitor, IEnumerator<ExecutionStatus>> routine_SIG_READER = null
         )
         {
             this.name = name;

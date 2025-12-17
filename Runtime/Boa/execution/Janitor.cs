@@ -13,7 +13,7 @@ namespace _COBRA_.Boa
 
         internal CodeReader reader;
 
-        readonly IEnumerator<ExecutionOutput> routine;
+        readonly IEnumerator<ExecutionStatus> routine;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        IEnumerator<ExecutionOutput> ERoutine()
+        IEnumerator<ExecutionStatus> ERoutine()
         {
             while (asts.TryDequeue(out var ast))
             {
@@ -40,8 +40,6 @@ namespace _COBRA_.Boa
                             while (true)
                                 if (executor.Disposed)
                                     goto before_executor;
-                                else if (reader == null)
-                                    yield return default;
                                 else
                                     break;
 
@@ -53,8 +51,6 @@ namespace _COBRA_.Boa
                             while (true)
                                 if (executor.Disposed)
                                     goto before_executor;
-                                else if (reader == null)
-                                    yield return default;
                                 else if (routine.MoveNext())
                                     yield return routine.Current;
                                 else
@@ -105,7 +101,7 @@ namespace _COBRA_.Boa
             Dispose();
         }
 
-        public bool OnReader(in CodeReader reader, out ExecutionOutput output)
+        public bool OnReader(in CodeReader reader, out ExecutionStatus output)
         {
             this.reader = reader;
             bool moveNext = OnTick(out output);
@@ -113,7 +109,7 @@ namespace _COBRA_.Boa
             return moveNext;
         }
 
-        public bool OnTick(out ExecutionOutput output)
+        public bool OnTick(out ExecutionStatus output)
         {
             if (!Disposed)
             {
@@ -121,14 +117,13 @@ namespace _COBRA_.Boa
             again:
                 if (routine.MoveNext())
                 {
-                    if (routine.Current.status == CMD_STATUS.RETURN)
+                    if (routine.Current.code == CMD_STATUS.RETURN)
                         if (++loops < 100)
                             goto again;
 
                     output = routine.Current;
                     return true;
                 }
-                Dispose();
             }
             output = default;
             return false;
