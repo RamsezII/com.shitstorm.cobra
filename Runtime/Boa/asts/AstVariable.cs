@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace _COBRA_.Boa
 {
@@ -15,9 +16,9 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(Janitor janitor)
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
         {
-            base.OnExecutionStack(janitor);
+            base.OnExecutionQueue(janitor, executors);
 
             janitor.shell.scope.TryGet(var_name, out var cell);
             janitor.vstack.Add(cell);

@@ -30,48 +30,77 @@ namespace _COBRA_.Boa
         {
             while (asts.TryDequeue(out var ast))
             {
-                ast.OnExecutionStack(this);
+                ast.EnqueueExecutors(this, out _);
+            before_executor:
                 while (executors.TryDequeue(out var executor))
-                {
-                    if (executor.routine_SIG_READER != null)
+                    if (!executor.Disposed)
                     {
-                        while (reader == null)
-                            yield return default;
+                        if (executor.routine_SIG_READER != null)
+                        {
+                            while (true)
+                                if (executor.Disposed)
+                                    goto before_executor;
+                                else if (reader == null)
+                                    yield return default;
+                                else
+                                    break;
 
-                        using var routine = executor.routine_SIG_READER(this);
+                            if (executor.Disposed)
+                                goto before_executor;
 
-                        while (true)
-                            if (reader == null)
-                                yield return default;
-                            else if (routine.MoveNext())
-                                yield return routine.Current;
-                            else
-                                break;
+                            using var routine = executor.routine_SIG_READER(this);
+
+                            while (true)
+                                if (executor.Disposed)
+                                    goto before_executor;
+                                else if (reader == null)
+                                    yield return default;
+                                else if (routine.MoveNext())
+                                    yield return routine.Current;
+                                else
+                                    break;
+                        }
+
+                        if (executor.action_SIG_EXE != null)
+                        {
+                            while (true)
+                                if (executor.Disposed)
+                                    goto before_executor;
+                                else if (reader != null)
+                                    yield return default;
+                                else
+                                    break;
+
+                            if (!executor.Disposed)
+                                executor.action_SIG_EXE(this);
+                        }
+
+                        if (executor.routine_SIG_EXE != null)
+                        {
+                            while (true)
+                                if (executor.Disposed)
+                                    goto before_executor;
+                                else if (reader != null)
+                                    yield return default;
+                                else
+                                    break;
+
+                            if (executor.Disposed)
+                                goto before_executor;
+
+                            using var routine = executor.routine_SIG_EXE(this);
+
+                            while (true)
+                                if (executor.Disposed)
+                                    goto before_executor;
+                                else if (reader != null)
+                                    yield return default;
+                                else if (routine.MoveNext())
+                                    yield return routine.Current;
+                                else
+                                    break;
+                        }
                     }
-
-                    if (executor.action_SIG_EXE != null)
-                    {
-                        while (reader != null)
-                            yield return default;
-                        executor.action_SIG_EXE(this);
-                    }
-
-                    if (executor.routine_SIG_EXE != null)
-                    {
-                        while (reader != null)
-                            yield return default;
-
-                        using var routine = executor.routine_SIG_EXE(this);
-
-                        while (true)
-                            if (reader != null)
-                                yield return default;
-                            else if (routine.MoveNext())
-                                yield return routine.Current;
-                            else
-                                break;
-                    }
-                }
             }
             Dispose();
         }

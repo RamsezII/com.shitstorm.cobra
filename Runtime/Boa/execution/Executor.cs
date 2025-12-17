@@ -1,10 +1,11 @@
 ﻿using _COBRA_.Boa;
+using _UTIL_;
 using System;
 using System.Collections.Generic;
 
 namespace _COBRA_
 {
-    internal sealed class Executor
+    internal sealed class Executor : Disposable
     {
         internal readonly string name;
         internal readonly Action<Janitor> action_SIG_EXE;

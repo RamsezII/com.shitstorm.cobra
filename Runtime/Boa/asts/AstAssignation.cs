@@ -49,11 +49,11 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(Janitor janitor)
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
         {
-            base.OnExecutionStack(janitor);
+            base.OnExecutionQueue(janitor, executors);
 
-            ast_expr.OnExecutionStack(janitor);
+            ast_expr.EnqueueExecutors(janitor);
 
             janitor.executors.Enqueue(new(
                 name: $"var({var_name})",
@@ -117,7 +117,7 @@ namespace _COBRA_.Boa
                 if (reader.TryReadChar_match('=', reader.lint_theme.operators))
                     if (AstExpression.TryExpr(reader, scope, false, typeof(object), out var ast_expr))
                     {
-                        scope._vars.Add(var_name, new(ast_expr.output_type));
+                        scope._vars.Add(var_name, new(type: ast_expr.output_type));
                         ast_assign = new AstAssignation(var_name, ast_expr, Codes.Assign);
                         return true;
                     }

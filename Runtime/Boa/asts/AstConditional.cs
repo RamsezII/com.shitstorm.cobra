@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace _COBRA_.Boa
 {
@@ -13,6 +14,29 @@ namespace _COBRA_.Boa
             this.ast_cond = ast_cond;
             this.ast_yes = ast_yes;
             this.ast_no = ast_no;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
+        {
+            base.OnExecutionQueue(janitor, executors);
+
+            ast_cond.EnqueueExecutors(janitor, out var cond_list);
+            ast_yes.EnqueueExecutors(janitor, out var yes_list);
+            ast_no.EnqueueExecutors(janitor, out var no_list);
+
+            janitor.executors.Enqueue(new(
+                name: $"ternary(retreive cond)",
+                action_SIG_EXE: janitor =>
+                {
+                    var cell = janitor.vstack.PopLast();
+                    bool cond = cell.value;
+
+                    foreach (var exe in cond ? no_list : yes_list)
+                        exe.Dispose();
+                }
+            ));
         }
 
         //----------------------------------------------------------------------------------------------------------

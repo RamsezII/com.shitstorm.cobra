@@ -49,12 +49,12 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(Janitor janitor)
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
         {
-            base.OnExecutionStack(janitor);
+            base.OnExecutionQueue(janitor, executors);
 
             for (int i = asts.Count - 1; i >= 0; i--)
-                asts[i].OnExecutionStack(null);
+                asts[i].EnqueueExecutors(janitor);
         }
     }
 }

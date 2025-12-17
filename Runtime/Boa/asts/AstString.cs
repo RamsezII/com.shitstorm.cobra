@@ -17,12 +17,12 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(Janitor janitor)
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
         {
-            base.OnExecutionStack(janitor);
+            base.OnExecutionQueue(janitor, executors);
 
             for (int i = 0; i < asts.Count; i++)
-                asts[i].OnExecutionStack(janitor);
+                asts[i].EnqueueExecutors(janitor);
 
             janitor.executors.Enqueue(new(
                 name: $"string({asts.Count})",
@@ -35,7 +35,7 @@ namespace _COBRA_.Boa
                         sb.Append(s);
                     }
                     janitor.vstack.RemoveRange(janitor.vstack.Count - asts.Count, asts.Count);
-                    janitor.vstack.Add(new(sb.ToString()));
+                    janitor.vstack.Add(new(value: sb.ToString()));
                 }
             ));
         }

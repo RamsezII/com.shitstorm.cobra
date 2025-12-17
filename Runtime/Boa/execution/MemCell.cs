@@ -11,18 +11,10 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public MemCell(in Type type, in dynamic value)
+        public MemCell(in Type type = null, in object value = null)
         {
-            this.type = type;
+            this.type = type ?? value.GetType();
             this.value = value;
-        }
-
-        public MemCell(in Type type) : this(null, type)
-        {
-        }
-
-        public MemCell(in object value) : this(value.GetType(), value)
-        {
         }
     }
 }

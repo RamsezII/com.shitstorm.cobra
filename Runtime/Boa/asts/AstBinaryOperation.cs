@@ -82,12 +82,12 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(Janitor janitor)
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
         {
-            base.OnExecutionStack(janitor);
+            base.OnExecutionQueue(janitor, executors);
 
-            astL.OnExecutionStack(janitor);
-            astR.OnExecutionStack(janitor);
+            astL.EnqueueExecutors(janitor);
+            astR.EnqueueExecutors(janitor);
 
             janitor.executors.Enqueue(new(
                 name: $"op({code})",
@@ -101,7 +101,7 @@ namespace _COBRA_.Boa
                     dynamic cl = cellL.value;
                     dynamic cr = cellR.value;
 
-                    object res = code switch
+                    dynamic res = code switch
                     {
                         Codes.Or => cl || cr,
                         Codes.And => cl && cr,
@@ -119,7 +119,7 @@ namespace _COBRA_.Boa
                         _ => throw exc,
                     };
 
-                    janitor.vstack.Add(new(res));
+                    janitor.vstack.Add(new(value: res));
                 }
             ));
         }

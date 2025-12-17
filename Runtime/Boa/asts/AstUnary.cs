@@ -34,11 +34,37 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
+        {
+            base.OnExecutionQueue(janitor, executors);
+
+            ast_factor.EnqueueExecutors(janitor);
+
+            janitor.executors.Enqueue(new(
+                name: $"unary({code})",
+                action_SIG_EXE: janitor =>
+                {
+                    var cell = janitor.vstack.PopLast();
+                    object res = code switch
+                    {
+                        Codes.Positive => +cell.value,
+                        Codes.Negative => -cell.value,
+                        Codes.Not => !cell.value,
+                        Codes.Anti => ~cell.value,
+                        _ => throw new NotImplementedException($"(unary) unimplemented code \"{code}\""),
+                    };
+                    janitor.vstack.Add(new(value: res));
+                }
+            ));
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
         public static bool TryUnary(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_unary)
         {
             int read_old = reader.read_i;
 
-            if (reader.TryReadString_matches_out(out string match, false, reader.lint_theme.operators, codes.Keys))
+            if (reader.TryReadPrefixeString_matches_out(out string match, reader.lint_theme.operators, codes.Keys))
             {
                 Codes code = codes[match];
                 if (TryUnary(reader, tscope, expected_type, out ast_unary))
@@ -95,44 +121,6 @@ namespace _COBRA_.Boa
             reader.read_i = read_old;
             ast_unary = null;
             return false;
-        }
-
-        //----------------------------------------------------------------------------------------------------------
-
-        internal override void OnExecutionStack(Janitor janitor)
-        {
-            base.OnExecutionStack(janitor);
-
-            //var factor = exec_stack._stack[^1];
-
-            //Executor executor = new("unary", expected_type);
-            //exec_stack._stack.Add(executor);
-
-            //if (signal.arm_executors)
-            //    executor.action_SIG_EXE = exe =>
-            //    {
-            //        exe.output = factor.output switch
-            //        {
-            //            bool b => code switch
-            //            {
-            //                OP_CODES.NOT => !b,
-            //                _ => throw new Exception(),
-            //            },
-            //            int i => code switch
-            //            {
-            //                OP_CODES.ADD => i,
-            //                OP_CODES.SUBSTRACT => -i,
-            //                _ => throw new Exception(),
-            //            },
-            //            float f => code switch
-            //            {
-            //                OP_CODES.ADD => f,
-            //                OP_CODES.SUBSTRACT => -f,
-            //                _ => throw new Exception(),
-            //            },
-            //            _ => throw new NotImplementedException(),
-            //        };
-            //    };
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace _COBRA_.Boa
+﻿using System.Collections.Generic;
+
+namespace _COBRA_.Boa
 {
     internal abstract class AstStatement : AstAbstract
     {
@@ -36,13 +38,6 @@
             ast_statement = null;
             return false;
         }
-
-        //----------------------------------------------------------------------------------------------------------
-
-        internal override void OnExecutionStack(Janitor janitor)
-        {
-            base.OnExecutionStack(janitor);
-        }
     }
 
     internal sealed class AstExprStatement : AstStatement
@@ -79,11 +74,11 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override void OnExecutionStack(Janitor janitor)
+        protected override void OnExecutionQueue(in Janitor janitor, in List<Executor> executors)
         {
-            base.OnExecutionStack(janitor);
+            base.OnExecutionQueue(janitor, executors);
 
-            expression.OnExecutionStack(janitor);
+            expression.EnqueueExecutors(janitor);
 
             if (expression.output_type != null)
                 janitor.executors.Enqueue(new(
