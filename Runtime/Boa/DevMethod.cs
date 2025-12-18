@@ -4,45 +4,49 @@ using UnityEngine;
 
 namespace _COBRA_.Boa
 {
-    public abstract class DevField
+    public abstract class DevMethod
     {
         internal readonly string name;
         internal readonly Type output_type;
+        internal readonly List<Type> targs;
 
-        internal static readonly Dictionary<Type, Dictionary<string, DevField>> all_fields = new();
+        internal static readonly Dictionary<Type, Dictionary<string, DevMethod>> all_methods = new();
 
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
         {
-            all_fields.Clear();
+            all_methods.Clear();
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected DevField(in string name, in Type output_type)
+        protected DevMethod(in string name, in Type output_type, in List<Type> targs)
         {
             this.name = name;
             this.output_type = output_type;
+            this.targs = targs;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal protected abstract void OnExecution(in Janitor janitor, in object target);
+        internal protected abstract void OnExecution(in Janitor janitor, in List<MemCell> args, in object target);
     }
 
-    public sealed class DevField<TClass, TAttr> : DevField
+    public sealed class DevMethod<TClass, TAttr> : DevMethod
     {
-        internal readonly Action<Janitor, TClass> onExecution;
+        internal readonly Action<Janitor, List<MemCell>, TClass> onExecution;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public DevField(
+        public DevMethod(
             in string name,
-            in Action<Janitor, TClass> onExecution
+            in List<Type> targs,
+            in Action<Janitor, List<MemCell>, TClass> onExecution
             ) : base(
                 name: name,
+                targs: targs,
                 output_type: typeof(TAttr)
             )
         {
@@ -51,19 +55,19 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static void AddAttribute(in DevField<TClass, TAttr> attr)
+        public static void AddMethod(in DevMethod<TClass, TAttr> method)
         {
-            if (all_fields.TryGetValue(typeof(TClass), out var attributes))
-                attributes.Add(attr.name, attr);
+            if (all_methods.TryGetValue(typeof(TClass), out var methods))
+                methods.Add(method.name, method);
             else
-                all_fields.Add(typeof(TClass), new(StringComparer.Ordinal) { { attr.name, attr } });
+                all_methods.Add(typeof(TClass), new(StringComparer.Ordinal) { { method.name, method } });
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecution(in Janitor janitor, in object target)
+        protected internal override void OnExecution(in Janitor janitor, in List<MemCell> args, in object target)
         {
-            onExecution(janitor, (TClass)target);
+            onExecution(janitor, args, (TClass)target);
         }
     }
 }

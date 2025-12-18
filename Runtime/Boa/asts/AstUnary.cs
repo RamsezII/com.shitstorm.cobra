@@ -60,14 +60,14 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryUnary(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_unary)
+        public static bool TryUnary(in CodeReader reader, in MemScope scope, in Type expected_type, out AstExpression ast_unary)
         {
             int read_old = reader.read_i;
 
             if (reader.TryReadPrefixeString_matches_out(out string match, reader.lint_theme.operators, codes.Keys))
             {
                 Codes code = codes[match];
-                if (TryUnary(reader, tscope, expected_type, out ast_unary))
+                if (TryUnary(reader, scope, expected_type, out ast_unary))
                 {
                     ast_unary = new AstUnary(code, ast_unary);
                     return true;
@@ -79,12 +79,12 @@ namespace _COBRA_.Boa
                 }
             }
             // postfix
-            else if (AstPrimary.TryPrimary(reader, tscope, expected_type, out ast_unary))
+            else if (AstPrimary.TryPrimary(reader, scope, expected_type, out ast_unary))
             {
                 if (reader.TryReadChar_match('['))
                 {
                     reader.LintOpeningBraquet();
-                    if (TryExpr(reader, tscope, false, typeof(int), out var ast_index))
+                    if (TryExpr(reader, scope, false, typeof(int), out var ast_index))
                         if (reader.TryReadChar_match(']'))
                         {
                             reader.LintClosingBraquet();
@@ -103,7 +103,13 @@ namespace _COBRA_.Boa
                 }
 
                 if (ast_unary.output_type != null)
-                    if (AstAccessor.TryAccessor(reader, ast_unary, out var ast_accessor))
+                    if (AstField.TryField(reader, ast_unary, out var ast_accessor))
+                        ast_unary = ast_accessor;
+                    else if (reader.sig_error != null)
+                        goto failure;
+
+                if (ast_unary.output_type != null)
+                    if (AstMethod.TryMethod(reader, scope, ast_unary, out var ast_accessor))
                         ast_unary = ast_accessor;
                     else if (reader.sig_error != null)
                         goto failure;

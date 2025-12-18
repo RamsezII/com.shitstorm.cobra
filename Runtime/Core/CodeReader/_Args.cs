@@ -141,6 +141,26 @@ namespace _COBRA_
             return true;
         }
 
+        public bool TryReadPrefixeString_match(in Color lint, in string match, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
+        {
+            if (HasNext(ignore_case: ignore_case, skippables: skippables))
+            {
+                int read_old = read_i;
+
+                for (int i = 0; i <= match.Length; i++)
+                    if (i == match.Length)
+                    {
+                        LintToThisPosition(lint, true);
+                        return true;
+                    }
+                    else if (!TryReadChar_match(match[i], add_to_completions: add_to_completions, ignore_case: ignore_case, skippables: null))
+                        break;
+
+                read_i = read_old;
+            }
+            return false;
+        }
+
         public bool TryReadPrefixeString_matches_out(out string match, in Color lint, in IEnumerable<string> matches, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
             if (HasNext(ignore_case: ignore_case, skippables: skippables))

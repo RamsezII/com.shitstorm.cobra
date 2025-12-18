@@ -85,8 +85,9 @@ namespace _COBRA_.Boa
                     name: "expr_statement(pop vstack last)",
                     action_SIG_EXE: static janitor =>
                     {
-                        var cell = janitor.vstack.PopLast();
-                        janitor.shell.on_output(cell._value, null);
+                        MemCell cell = janitor.vstack.PopLast();
+                        if (cell._value is not BoaNull)
+                            janitor.shell.on_output(cell._value, null);
                     }));
         }
     }
