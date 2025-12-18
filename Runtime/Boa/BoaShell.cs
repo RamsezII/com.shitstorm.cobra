@@ -24,7 +24,7 @@ namespace _COBRA_
 
         readonly List<Janitor> janitors = new();
         Janitor front_janitor;
-        internal readonly MemScope scope = new();
+        public readonly MemScope scope = new();
 
         //----------------------------------------------------------------------------------------------------------
 

@@ -6,22 +6,22 @@ namespace _COBRA_.Boa
 {
     public sealed class MemScope
     {
-        internal readonly MemScope parent;
-        internal readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
+        public readonly MemScope _parent;
+        public readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
 
         //----------------------------------------------------------------------------------------------------------
 
         internal MemScope(in MemScope parent = null)
         {
-            this.parent = parent;
+            _parent = parent;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         public IEnumerable<string> EVarNames()
         {
-            if (parent != null)
-                return _vars.Keys.Union(parent.EVarNames());
+            if (_parent != null)
+                return _vars.Keys.Union(_parent.EVarNames());
             return _vars.Keys;
         }
 
@@ -29,8 +29,8 @@ namespace _COBRA_.Boa
         {
             if (_vars.TryGetValue(name, out value))
                 return true;
-            else if (parent != null)
-                return parent.TryGet(name, out value);
+            else if (_parent != null)
+                return _parent.TryGet(name, out value);
             return false;
         }
 
@@ -41,8 +41,8 @@ namespace _COBRA_.Boa
                 _vars[name] = new(cell);
                 return true;
             }
-            else if (parent != null)
-                return parent.TrySet(name, cell);
+            else if (_parent != null)
+                return _parent.TrySet(name, cell);
             return false;
         }
     }
