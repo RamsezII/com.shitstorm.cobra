@@ -134,13 +134,19 @@ namespace _COBRA_.Boa
                 name: $"pop options and arguments for contract({contract.name})",
                 action_SIG_EXE: janitor =>
                 {
-                    if (targs != null)
-                        for (int i = targs.Count - 1; i >= 0; i--)
-                            vargs.Add(janitor.vstack.PopLast());
-
                     if (topts != null)
-                        for (int i = topts.Count - 1; i >= 0; i--)
-                            vopts.Add(topts[i].name, janitor.vstack.PopLast());
+                    {
+                        for (int i = topts.Count; i > 0; i--)
+                            vopts.Add(topts[^i].name, janitor.vstack[^i]);
+                        janitor.vstack.RemoveRange(janitor.vstack.Count - topts.Count, topts.Count);
+                    }
+
+                    if (targs != null)
+                    {
+                        for (int i = targs.Count; i > 0; i--)
+                            vargs.Add(janitor.vstack[^i]);
+                        janitor.vstack.RemoveRange(janitor.vstack.Count - targs.Count, targs.Count);
+                    }
                 }
             ));
 

@@ -96,11 +96,17 @@ namespace _COBRA_
 
         public bool TryReadString_match(in string match, in bool as_function_argument, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out _, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: new string[] { match, });
         public bool TryReadString_match_out(out string value, in bool as_function_argument, in string match, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out value, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: new string[] { match });
-        public bool TryReadString_matches_out(out string value, in bool as_function_argument, in Color lint, in IEnumerable<string> matches, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
+        public bool TryReadString_matches_out(out string value, in bool as_function_argument, in Color lint, in IEnumerable<string> matches, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, string skippables = _empties_, string stoppers = _stoppers_)
         {
             StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
             value = null;
+
+            foreach (var match in matches)
+            {
+                skippables = skippables.RemoveChars(match);
+                stoppers = stoppers.RemoveChars(match);
+            }
 
             if (HasNext(ignore_case: ignore_case, skippables: skippables) && TryReadArgument(out value, as_function_argument: as_function_argument, lint: lint, skippables: skippables, stoppers: stoppers))
             {
@@ -141,7 +147,7 @@ namespace _COBRA_
             return true;
         }
 
-        public bool TryReadPrefixeString_match(in Color lint, in string match, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
+        public bool TryReadPrefixeString_match(in string match, in Color lint = default, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
             if (HasNext(ignore_case: ignore_case, skippables: skippables))
             {

@@ -101,27 +101,6 @@ namespace _COBRA_.Boa
                         goto failure;
                     }
                 }
-
-                int read_old_accessor = reader.read_i;
-                if (reader.TryReadChar_match('.'))
-                {
-                    if (ast_unary.output_type != null)
-                        if (AstField.TryField(reader, ast_unary, out var ast_accessor))
-                            ast_unary = ast_accessor;
-                        else if (reader.sig_error != null)
-                            goto failure;
-                        else
-                            reader.read_i = read_old_accessor;
-
-                    if (ast_unary.output_type != null)
-                        if (AstMethod.TryMethod(reader, scope, ast_unary, out var ast_accessor))
-                            ast_unary = ast_accessor;
-                        else if (reader.sig_error != null)
-                            goto failure;
-                        else
-                            reader.read_i = read_old_accessor;
-                }
-
                 return true;
             }
             else

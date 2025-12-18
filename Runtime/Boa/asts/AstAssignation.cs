@@ -85,7 +85,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryDeclaration(in CodeReader reader, in MemScope scope, out AstAssignation ast_assign)
+        public static bool TryAssign(in CodeReader reader, in MemScope scope, out AstAssignation ast_assign)
         {
             int read_old = reader.read_i;
 

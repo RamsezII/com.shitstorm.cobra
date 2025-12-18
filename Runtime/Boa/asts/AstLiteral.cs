@@ -1,4 +1,6 @@
-﻿namespace _COBRA_.Boa
+﻿using System;
+
+namespace _COBRA_.Boa
 {
     internal class AstLiteral : AstExpression
     {
@@ -6,7 +8,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        public AstLiteral(in object value) : base(value.GetType())
+        public AstLiteral(in object value, in Type output_type = null) : base(output_type ?? value.GetType())
         {
             this.value = value;
         }

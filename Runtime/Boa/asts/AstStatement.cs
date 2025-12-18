@@ -22,7 +22,7 @@
                 ast_statement = ast_block;
                 return true;
             }
-            else if (AstAssignation.TryDeclaration(reader, tscope, out var ast_decl))
+            else if (AstAssignation.TryAssign(reader, tscope, out var ast_decl))
             {
                 ast_statement = ast_decl;
                 return true;

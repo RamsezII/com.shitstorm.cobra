@@ -5,8 +5,13 @@ namespace _COBRA_.Boa
 {
     static class AstPrimary
     {
-        public static bool TryPrimary(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstExpression ast_factor)
+        public static bool TryPrimary(in CodeReader reader, in MemScope scope, in Type expected_type, out AstExpression ast_factor)
         {
+            ast_factor = null;
+
+            if (expected_type != null)
+                DevTypes.TryDevType(reader, expected_type, out ast_factor);
+
             if (reader.StopParsing())
                 goto failure;
 
@@ -37,13 +42,47 @@ namespace _COBRA_.Boa
                     return true;
                 }
 
+            if (reader.ContinueParsing())
+                if (ast_factor != null)
+                {
+                    int read_old_accessor = reader.read_i;
+                    if (reader.TryReadPrefixeString_match("->"))
+                    {
+                        reader.LintToThisPosition(reader.lint_theme.operators, true);
+                        var ast_old = ast_factor;
+
+                        if (ast_factor.output_type != null)
+                            if (AstField.TryField(reader, ast_factor, out var ast_accessor))
+                                ast_factor = ast_accessor;
+                            else if (reader.sig_error != null)
+                                goto failure;
+                            else
+                                reader.read_i = read_old_accessor;
+
+                        if (ast_factor.output_type != null)
+                            if (AstMethod.TryMethod(reader, scope, ast_factor, out var ast_accessor))
+                                ast_factor = ast_accessor;
+                            else if (reader.sig_error != null)
+                                goto failure;
+                            else
+                                reader.read_i = read_old_accessor;
+
+                        if (ast_old != ast_factor)
+                        {
+                            reader.CompilationError($"expected field or method name after operator '->'");
+                            ast_factor = null;
+                            goto failure;
+                        }
+                    }
+                }
+
             if (reader.StopParsing())
                 goto failure;
 
             if (reader.TryReadChar_match('('))
             {
                 reader.LintOpeningBraquet();
-                if (!AstExpression.TryExpr(reader, tscope, false, typeof(object), out ast_factor))
+                if (!AstExpression.TryExpr(reader, scope, false, typeof(object), out ast_factor))
                 {
                     reader.CompilationError("expected expression inside factor parenthesis.");
                     goto failure;
@@ -62,7 +101,7 @@ namespace _COBRA_.Boa
                 goto failure;
 
             if (expected_type == null || expected_type.IsAssignableFrom(typeof(string)))
-                if (AstString.TryParseString(reader, tscope, out var ast_string))
+                if (AstString.TryParseString(reader, scope, out var ast_string))
                 {
                     ast_factor = ast_string;
                     return true;
@@ -73,7 +112,7 @@ namespace _COBRA_.Boa
             if (reader.StopParsing())
                 goto failure;
 
-            if (AstContract.TryParseContract(reader, tscope, expected_type, out var ast_contract))
+            if (AstContract.TryParseContract(reader, scope, expected_type, out var ast_contract))
             {
                 ast_factor = ast_contract;
                 return true;
@@ -84,7 +123,7 @@ namespace _COBRA_.Boa
             if (reader.StopParsing())
                 goto failure;
 
-            if (AstVariable.TryParseVariable(reader, tscope, expected_type, out var ast_variable))
+            if (AstVariable.TryParseVariable(reader, scope, expected_type, out var ast_variable))
             {
                 ast_factor = ast_variable;
                 return true;
@@ -125,8 +164,7 @@ namespace _COBRA_.Boa
                 }
 
             failure:
-            ast_factor = null;
-            return false;
+            return reader.sig_error == null && ast_factor != null;
         }
     }
 }
