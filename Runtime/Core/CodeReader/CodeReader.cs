@@ -43,10 +43,13 @@ namespace _COBRA_
 
 #if UNITY_EDITOR
         readonly int _text_length;
-        string _toLog => text[..read_i] + "°" + text[read_i..];
+        string _showRead => text[..read_i] + "°" + text[read_i..];
+        string _showCpl => text[..cpl_start] + "°" + text[cpl_start..cpl_end] + "²" + text[cpl_end..];
 #endif
 
         public string sig_error, err_trace, sig_long_error;
+        public bool ContinueParsing() => sig_error == null && HasNext();
+        public bool StopParsing() => sig_error != null || !HasNext();
         public bool IsOnCursor(in int cursor_i) => cursor_i >= cpl_start && cursor_i <= read_i;
         public bool IsOnCursor() => IsOnCursor(cursor_i);
 

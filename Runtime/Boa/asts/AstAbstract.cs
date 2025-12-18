@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace _COBRA_.Boa
+﻿namespace _COBRA_.Boa
 {
     internal abstract class AstAbstract
     {

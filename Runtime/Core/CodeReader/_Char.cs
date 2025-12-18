@@ -11,27 +11,19 @@ namespace _COBRA_
             int read_old = read_i;
             var ordinal = ignore_case.ToOrdinal();
 
-            if (read_i < text.Length)
+            while (read_i < text.Length)
             {
-                while (read_i < text.Length)
-                {
-                    value = text[read_i];
+                value = text[read_i];
 
-                    if (skippables != null && skippables.Contains(value, ordinal))
-                        ++read_i;
-                    else
-                    {
-                        cpl_start = read_i;
-                        cpl_end = 1 + read_i;
-                        next_i = read_i;
-                        return true;
-                    }
+                if (skippables != null && skippables.Contains(value, ordinal))
+                    ++read_i;
+                else
+                {
+                    next_i = read_i;
+                    return true;
                 }
-                cpl_start = Mathf.Min(read_old + 1, read_i);
-                cpl_end = read_i;
             }
 
-        failure:
             next_i = read_i;
             read_i = read_old;
             return false;

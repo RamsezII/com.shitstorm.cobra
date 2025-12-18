@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using static UnityEngine.GraphicsBuffer;
 
 namespace _COBRA_.Boa
 {
@@ -58,62 +56,59 @@ namespace _COBRA_.Boa
             Type target_type = ast_target.output_type;
             int read_old = reader.read_i;
 
-            if (reader.TryReadPrefixeString_match(reader.lint_theme.point, "->"))
+            Dictionary<string, DevMethod> cands = new();
+
+            foreach (var methods in DevMethod.all_methods)
+                if (methods.Key.IsAssignableFrom(target_type))
+                    foreach (var method in methods.Value)
+                        cands.Add(method.Key, method.Value);
+
+            if (cands.Count == 0)
+                goto failure;
+            else if (reader.TryReadString_matches_out(out string match, false, reader.lint_theme.attributes, cands.Keys))
             {
-                Dictionary<string, DevMethod> cands = new();
+                var method = cands[match];
 
-                foreach (var methods in DevMethod.all_methods)
-                    if (methods.Key.IsAssignableFrom(target_type))
-                        foreach (var method in methods.Value)
-                            cands.Add(method.Key, method.Value);
+                bool expects_parenthesis = reader.strict_syntax;
+                bool found_parenthesis = reader.TryReadChar_match('(');
 
-                if (cands.Count == 0)
-                    goto failure;
-                else if (reader.TryReadString_matches_out(out string match, false, reader.lint_theme.attributes, cands.Keys))
+                if (found_parenthesis)
+                    reader.LintOpeningBraquet();
+
+                if (expects_parenthesis && !found_parenthesis)
                 {
-                    var method = cands[match];
+                    reader.CompilationError($"'{method.name}' expected opening parenthesis '('");
+                    goto failure;
+                }
 
-                    bool expects_parenthesis = reader.strict_syntax;
-                    bool found_parenthesis = reader.TryReadChar_match('(');
-
-                    if (found_parenthesis)
-                        reader.LintOpeningBraquet();
-
-                    if (expects_parenthesis && !found_parenthesis)
+                List<AstExpression> ast_args = null;
+                if (method.targs != null)
+                {
+                    ast_args = new();
+                    for (int i = 0; i < method.targs.Count; i++)
                     {
-                        reader.CompilationError($"'{method.name}' expected opening parenthesis '('");
-                        goto failure;
-                    }
-
-                    List<AstExpression> ast_args = null;
-                    if (method.targs != null)
-                    {
-                        ast_args = new();
-                        for (int i = 0; i < method.targs.Count; i++)
+                        Type arg_type = method.targs[i];
+                        if (TryExpr(reader, scope, true, arg_type, out var ast_expr))
+                            ast_args.Add(ast_expr);
+                        else
                         {
-                            Type arg_type = method.targs[i];
-                            if (TryExpr(reader, scope, true, arg_type, out var ast_expr))
-                                ast_args.Add(ast_expr);
-                            else
-                            {
-                                reader.CompilationError($"could not parse argument[{i}] ({arg_type})");
-                                goto failure;
-                            }
+                            reader.CompilationError($"could not parse argument[{i}] ({arg_type})");
+                            goto failure;
                         }
                     }
-
-                    if (reader.sig_error != null)
-                        goto failure;
-
-                    if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
-                    {
-                        reader.CompilationError($"'{method.name}' expected closing parenthesis ')'");
-                        goto failure;
-                    }
-
-                    ast_method = new AstMethod(ast_target, ast_args, method);
-                    return true;
                 }
+
+                if (reader.sig_error != null)
+                    goto failure;
+
+                if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
+                {
+                    reader.CompilationError($"'{method.name}' expected closing parenthesis ')'");
+                    goto failure;
+                }
+
+                ast_method = new AstMethod(ast_target, ast_args, method);
+                return true;
             }
 
         failure:

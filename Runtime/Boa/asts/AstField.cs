@@ -41,23 +41,20 @@ namespace _COBRA_.Boa
             Type target_type = ast_expr.output_type;
             int read_old = reader.read_i;
 
-            if (reader.TryReadPrefixeString_match(reader.lint_theme.point, "->"))
+            Dictionary<string, DevField> cands = new();
+
+            foreach (var fields in DevField.all_fields)
+                if (fields.Key.IsAssignableFrom(target_type))
+                    foreach (var field in fields.Value)
+                        cands.Add(field.Key, field.Value);
+
+            if (cands.Count == 0)
+                goto failure;
+            else if (reader.TryReadString_matches_out(out string match, false, reader.lint_theme.attributes, cands.Keys))
             {
-                Dictionary<string, DevField> cands = new();
-
-                foreach (var fields in DevField.all_fields)
-                    if (fields.Key.IsAssignableFrom(target_type))
-                        foreach (var field in fields.Value)
-                            cands.Add(field.Key, field.Value);
-
-                if (cands.Count == 0)
-                    goto failure;
-                else if (reader.TryReadString_matches_out(out string match, false, reader.lint_theme.attributes, cands.Keys))
-                {
-                    var field = cands[match];
-                    result = new AstField(ast_expr, field);
-                    return true;
-                }
+                var field = cands[match];
+                result = new AstField(ast_expr, field);
+                return true;
             }
 
         failure:
