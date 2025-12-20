@@ -54,10 +54,9 @@ namespace _COBRA_
             int read_old = read_i;
 
             if (read_i < text.Length)
-            {
                 if (TryReadArgument(text, out int start_i, ref read_i, out argument, skippables: skippables, stoppers: stoppers))
                 {
-                    if (start_i <= cursor_i)
+                    if (start_i <= cursor_i && read_i >= cursor_i)
                     {
                         cpl_start = start_i;
                         cpl_end = read_i;
@@ -77,13 +76,6 @@ namespace _COBRA_
 
                     CompilationError($"expected ',' or ')' after argument '{argument}'.");
                 }
-
-                if (start_i <= cursor_i)
-                {
-                    cpl_start = read_old + 1;
-                    cpl_end = read_i;
-                }
-            }
 
             read_i = read_old;
             argument = null;
