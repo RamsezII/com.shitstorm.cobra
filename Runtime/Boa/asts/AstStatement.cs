@@ -1,4 +1,6 @@
-﻿namespace _COBRA_.Boa
+﻿using System.Collections.Generic;
+
+namespace _COBRA_.Boa
 {
     internal abstract class AstStatement : AstAbstract
     {
@@ -72,14 +74,14 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Janitor janitor)
+        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(janitor);
+            base.OnExecutorsQueue(executors);
 
-            expression.OnExecutorsQueue(janitor);
+            expression.OnExecutorsQueue(executors);
 
             if (expression.output_type != null)
-                janitor.executors.Enqueue(new(
+                executors.Enqueue(new(
                     name: "expr_statement(pop vstack last)",
                     action_SIG_EXE: static janitor =>
                     {

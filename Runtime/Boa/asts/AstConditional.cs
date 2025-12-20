@@ -18,17 +18,17 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Janitor janitor)
+        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(janitor);
+            base.OnExecutorsQueue(executors);
 
             bool cond = false;
 
             List<Executor> exe_yes = new(), exe_no = new();
 
-            ast_cond.OnExecutorsQueue(janitor);
+            ast_cond.OnExecutorsQueue(executors);
 
-            janitor.executors.Enqueue(new(
+            executors.Enqueue(new(
                 name: $"ternary(retreive cond: {ast_cond} ? {ast_yes} : {ast_no})",
                 action_SIG_EXE: janitor =>
                 {
@@ -37,7 +37,7 @@ namespace _COBRA_.Boa
                 }
             ));
 
-            janitor.executors.Enqueue(new(
+            executors.Enqueue(new(
                 name: $"ternary({cond}:{(cond ? ast_yes : ast_no)})",
                 action_SIG_EXE: janitor =>
                 {
@@ -46,20 +46,20 @@ namespace _COBRA_.Boa
                 }
             ));
 
-            int idx1 = janitor.executors.Count;
-            ast_yes.OnExecutorsQueue(janitor);
-            int idx2 = janitor.executors.Count;
-            ast_no.OnExecutorsQueue(janitor);
-            int idx3 = janitor.executors.Count;
+            int index1 = executors.Count;
+            ast_yes.OnExecutorsQueue(executors);
+            int index2 = executors.Count;
+            ast_no.OnExecutorsQueue(executors);
+            int index3 = executors.Count;
 
-            int ordinal = 0;
-            foreach (var exe in janitor.executors)
+            int index = 0;
+            foreach (var exe in executors)
             {
-                if (ordinal >= idx1 && ordinal < idx2)
+                if (index >= index1 && index < index2)
                     exe_yes.Add(exe);
-                else if (ordinal >= idx2 && ordinal < idx3)
+                else if (index >= index2 && index < index3)
                     exe_no.Add(exe);
-                ++ordinal;
+                ++index;
             }
         }
 

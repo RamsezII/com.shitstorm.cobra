@@ -20,17 +20,17 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Janitor janitor)
+        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(janitor);
+            base.OnExecutorsQueue(executors);
 
-            ast_target.OnExecutorsQueue(janitor);
+            ast_target.OnExecutorsQueue(executors);
 
             if (ast_args != null)
                 for (int i = 0; i < ast_args.Count; i++)
-                    ast_args[i].OnExecutorsQueue(janitor);
+                    ast_args[i].OnExecutorsQueue(executors);
 
-            janitor.executors.Enqueue(new(
+            executors.Enqueue(new(
                 name: $"field({method})",
                 action_SIG_EXE: janitor =>
                 {

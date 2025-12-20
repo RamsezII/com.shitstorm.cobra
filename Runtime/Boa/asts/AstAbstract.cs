@@ -1,4 +1,6 @@
-﻿namespace _COBRA_.Boa
+﻿using System.Collections.Generic;
+
+namespace _COBRA_.Boa
 {
     internal abstract class AstAbstract
     {
@@ -10,7 +12,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal protected virtual void OnExecutorsQueue(in Janitor janitor)
+        internal protected virtual void OnExecutorsQueue(in Queue<Executor> executors)
         {
         }
     }

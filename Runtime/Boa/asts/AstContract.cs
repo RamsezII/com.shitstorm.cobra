@@ -109,9 +109,9 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Janitor janitor)
+        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(janitor);
+            base.OnExecutorsQueue(executors);
 
             DevContract.VOptions vopts = null;
             DevContract.VArguments vargs = null;
@@ -120,9 +120,9 @@ namespace _COBRA_.Boa
             {
                 vopts = new();
                 for (int i = 0; i < topts.Count; i++)
-                    topts[i].ast.OnExecutorsQueue(janitor);
+                    topts[i].ast.OnExecutorsQueue(executors);
 
-                janitor.executors.Enqueue(new(
+                executors.Enqueue(new(
                     name: $"pop options for contract({contract.name})",
                     action_SIG_EXE: janitor =>
                     {
@@ -137,9 +137,9 @@ namespace _COBRA_.Boa
             {
                 vargs = new();
                 for (int i = 0; i < targs.Count; i++)
-                    targs[i].OnExecutorsQueue(janitor);
+                    targs[i].OnExecutorsQueue(executors);
 
-                janitor.executors.Enqueue(new(
+                executors.Enqueue(new(
                     name: $"pop arguments for contract({contract.name})",
                     action_SIG_EXE: janitor =>
                     {
@@ -150,22 +150,22 @@ namespace _COBRA_.Boa
                 ));
             }
 
-            DevContract.Parameters prms = new(janitor, vopts, vargs);
+            DevContract.Parameters prms = new(vopts, vargs);
 
             if (contract.action != null)
-                janitor.executors.Enqueue(new(
+                executors.Enqueue(new(
                     name: $"action(tick) for contract({contract.name})",
                     action_SIG_EXE: janitor => contract.action(janitor, prms)
                 ));
 
             if (contract.routine != null)
-                janitor.executors.Enqueue(new(
+                executors.Enqueue(new(
                     name: $"routine(tick) for contract({contract.name})",
                     routine_SIG_EXE: janitor => contract.routine(janitor, prms)
                 ));
 
             if (contract.routine_READER != null)
-                janitor.executors.Enqueue(new(
+                executors.Enqueue(new(
                     name: $"routine(reader) for contract({contract.name})",
                     routine_SIG_READER: janitor => contract.routine_READER(janitor, prms)
                 ));

@@ -42,15 +42,13 @@ namespace _COBRA_.Boa
 
         public struct Parameters
         {
-            public Janitor janitor;
             public VOptions options;
             public VArguments arguments;
 
             //----------------------------------------------------------------------------------------------------------
 
-            public Parameters(in Janitor janitor, in VOptions options, in VArguments arguments)
+            public Parameters(in VOptions options, in VArguments arguments)
             {
-                this.janitor = janitor;
                 this.options = options;
                 this.arguments = arguments;
             }

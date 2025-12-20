@@ -31,7 +31,7 @@ namespace _COBRA_.Boa
         {
             while (asts.TryDequeue(out var ast))
             {
-                ast.OnExecutorsQueue(this);
+                ast.OnExecutorsQueue(executors);
             before_executor:
                 while (executors.TryDequeue(out var executor))
                     if (!executor.Disposed)

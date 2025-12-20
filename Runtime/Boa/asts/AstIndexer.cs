@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace _COBRA_.Boa
 {
@@ -17,15 +18,15 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Janitor janitor)
+        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(janitor);
+            base.OnExecutorsQueue(executors);
 
             MemCell cell_index = default;
 
-            ast_expr.OnExecutorsQueue(janitor);
+            ast_expr.OnExecutorsQueue(executors);
 
-            janitor.executors.Enqueue(new(
+            executors.Enqueue(new(
                 name: $"indexer(retreive indexable)",
                 action_SIG_EXE: janitor =>
                 {
@@ -33,9 +34,9 @@ namespace _COBRA_.Boa
                 }
             ));
 
-            ast_idx.OnExecutorsQueue(janitor);
+            ast_idx.OnExecutorsQueue(executors);
 
-            janitor.executors.Enqueue(new(
+            executors.Enqueue(new(
                 name: $"indexer(retreive and apply index)",
                 action_SIG_EXE: janitor =>
                 {
