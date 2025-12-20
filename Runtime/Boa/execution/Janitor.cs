@@ -1,5 +1,6 @@
 ﻿using _UTIL_;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _COBRA_.Boa
 {
@@ -134,6 +135,10 @@ namespace _COBRA_.Boa
         protected override void OnDispose()
         {
             base.OnDispose();
+
+            if (vstack.Count > 0)
+                Debug.LogWarning($"{this} disposed of {vstack.Count} unused memory cells...");
+
             routine?.Dispose();
             executors.Clear();
             vstack.Clear();

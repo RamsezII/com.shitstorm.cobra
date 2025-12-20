@@ -28,6 +28,44 @@ namespace _COBRA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        protected override void OnTick()
+        {
+            for (int i = 0; i < janitors.Count; i++)
+            {
+                Janitor janitor = janitors[i];
+                janitor.OnTick(out ExecutionStatus output);
+
+                if (output.code == CMD_STATUS.ERROR)
+                {
+                    Debug.LogError($"{this} TICK_ERROR_bg: \"{output.error}\"");
+                    janitor.Dispose();
+                }
+
+                if (janitor.Disposed)
+                    janitors.RemoveAt(i--);
+            }
+
+            if (front_janitor != null)
+                if (!front_janitor.Disposed)
+                {
+                    front_janitor.OnTick(out ExecutionStatus status);
+
+                    if (status.code == CMD_STATUS.ERROR)
+                    {
+                        Debug.LogError($"{this} TICK_ERROR_bg: \"{status.error}\"");
+                        front_janitor.Dispose();
+                    }
+
+                    if (!front_janitor.Disposed)
+                        this.status.Value = status;
+                    else
+                    {
+                        front_janitor = null;
+                        this.status.Value = RegularStatus();
+                    }
+                }
+        }
+
         public override void OnReader(in CodeReader reader)
         {
             if (front_janitor != null)
@@ -78,46 +116,6 @@ namespace _COBRA_
                         status.Value = default;
                     }
             }
-        }
-
-        //----------------------------------------------------------------------------------------------------------
-
-        protected override void OnTick()
-        {
-            for (int i = 0; i < janitors.Count; i++)
-            {
-                Janitor janitor = janitors[i];
-                janitor.OnTick(out ExecutionStatus output);
-
-                if (output.code == CMD_STATUS.ERROR)
-                {
-                    Debug.LogError($"{this} TICK_ERROR_bg: \"{output.error}\"");
-                    janitor.Dispose();
-                }
-
-                if (janitor.Disposed)
-                    janitors.RemoveAt(i--);
-            }
-
-            if (front_janitor != null)
-                if (!front_janitor.Disposed)
-                {
-                    front_janitor.OnTick(out ExecutionStatus status);
-
-                    if (status.code == CMD_STATUS.ERROR)
-                    {
-                        Debug.LogError($"{this} TICK_ERROR_bg: \"{status.error}\"");
-                        front_janitor.Dispose();
-                    }
-
-                    if (!front_janitor.Disposed)
-                        this.status.Value = status;
-                    else
-                    {
-                        front_janitor = null;
-                        this.status.Value = RegularStatus();
-                    }
-                }
         }
     }
 }

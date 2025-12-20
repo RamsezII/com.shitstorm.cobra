@@ -94,10 +94,10 @@ namespace _COBRA_
             int read_old = read_i;
             value = null;
 
-            foreach (var match in matches)
+            foreach (var m in matches)
             {
-                skippables = skippables.RemoveChars(match);
-                stoppers = stoppers.RemoveChars(match);
+                skippables = skippables.RemoveChars(m);
+                stoppers = stoppers.RemoveChars(m);
             }
 
             if (HasNext(ignore_case: ignore_case, skippables: skippables) && TryReadArgument(out value, as_function_argument: as_function_argument, lint: lint, skippables: skippables, stoppers: stoppers))

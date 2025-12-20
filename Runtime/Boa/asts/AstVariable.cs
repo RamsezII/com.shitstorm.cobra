@@ -19,8 +19,14 @@ namespace _COBRA_.Boa
         {
             base.OnExecutorsQueue(janitor);
 
-            janitor.shell.scope.TryGet(var_name, out var cell);
-            janitor.vstack.Add(cell);
+            janitor.executors.Enqueue(new(
+                name: $"var({var_name})",
+                action_SIG_EXE: janitor =>
+                {
+                    janitor.shell.scope.TryGet(var_name, out var cell);
+                    janitor.vstack.Add(cell);
+                }
+            ));
         }
 
         //----------------------------------------------------------------------------------------------------------

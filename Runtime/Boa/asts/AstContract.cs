@@ -121,6 +121,16 @@ namespace _COBRA_.Boa
                 vopts = new();
                 for (int i = 0; i < topts.Count; i++)
                     topts[i].ast.OnExecutorsQueue(janitor);
+
+                janitor.executors.Enqueue(new(
+                    name: $"pop options for contract({contract.name})",
+                    action_SIG_EXE: janitor =>
+                    {
+                        for (int i = topts.Count; i > 0; i--)
+                            vopts.Add(topts[^i].name, janitor.vstack[^i]);
+                        janitor.vstack.RemoveRange(janitor.vstack.Count - topts.Count, topts.Count);
+                    }
+                ));
             }
 
             if (targs != null)
@@ -128,27 +138,17 @@ namespace _COBRA_.Boa
                 vargs = new();
                 for (int i = 0; i < targs.Count; i++)
                     targs[i].OnExecutorsQueue(janitor);
-            }
 
-            janitor.executors.Enqueue(new(
-                name: $"pop options and arguments for contract({contract.name})",
-                action_SIG_EXE: janitor =>
-                {
-                    if (topts != null)
-                    {
-                        for (int i = topts.Count; i > 0; i--)
-                            vopts.Add(topts[^i].name, janitor.vstack[^i]);
-                        janitor.vstack.RemoveRange(janitor.vstack.Count - topts.Count, topts.Count);
-                    }
-
-                    if (targs != null)
+                janitor.executors.Enqueue(new(
+                    name: $"pop arguments for contract({contract.name})",
+                    action_SIG_EXE: janitor =>
                     {
                         for (int i = targs.Count; i > 0; i--)
                             vargs.Add(janitor.vstack[^i]);
                         janitor.vstack.RemoveRange(janitor.vstack.Count - targs.Count, targs.Count);
                     }
-                }
-            ));
+                ));
+            }
 
             DevContract.Parameters prms = new(janitor, vopts, vargs);
 

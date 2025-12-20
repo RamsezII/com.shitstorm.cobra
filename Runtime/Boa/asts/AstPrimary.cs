@@ -9,12 +9,6 @@ namespace _COBRA_.Boa
         {
             ast_factor = null;
 
-            if (expected_type != null)
-                DevTypes.TryDevType(reader, expected_type, out ast_factor);
-
-            if (reader.StopParsing())
-                goto failure;
-
             if (expected_type == typeof(BoaPath))
                 if (reader.TryParsePath(FS_TYPES.BOTH, false, out string path))
                 {
@@ -122,6 +116,10 @@ namespace _COBRA_.Boa
 
             if (reader.StopParsing())
                 goto failure;
+
+            if (expected_type != null)
+                if (DevTypes.TryDevType(reader, expected_type, out ast_factor))
+                    return true;
 
             if (AstVariable.TryParseVariable(reader, scope, expected_type, out var ast_variable))
             {

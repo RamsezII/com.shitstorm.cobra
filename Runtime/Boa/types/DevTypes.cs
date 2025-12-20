@@ -53,8 +53,8 @@ namespace _COBRA_.Boa
         internal static bool TryDevType(in CodeReader reader, in Type expected_type, out AstExpression ast_literal)
         {
             if (all_types.TryGetValue(expected_type, out var devtype))
-                if (reader.TryReadString_matches_out(out string match, false, devtype.lint, devtype.candidates.Keys, stoppers: " \n\r[]{}(),;'\"\\=-*/%<>|&"))
-                //if (reader.TryLonguestMatch(out string match, devtype.lint, true, devtype.candidates.Keys))
+                //if (reader.TryReadString_matches_out(out string match, false, devtype.lint, devtype.candidates.Keys, stoppers: " \n\r[]{}(),;'\"\\=-*/%<>|&"))
+                if (reader.TryMatchLonguestCandidate(out string match, true, devtype.lint, devtype.candidates.Keys, stops: string.Empty))
                 {
                     object value = devtype.candidates[match];
                     ast_literal = new AstLiteral(value, devtype.target_type);
