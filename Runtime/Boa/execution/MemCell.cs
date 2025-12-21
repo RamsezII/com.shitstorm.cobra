@@ -36,24 +36,24 @@ namespace _COBRA_.Boa
         public static implicit operator bool(MemCell a) => (bool)a._value;
         public static implicit operator MemCell(bool a) => new(a);
 
-        public static implicit operator int(MemCell a) => a._value is int i ? i : Mathf.RoundToInt((float)a._value);
+        public static implicit operator int(MemCell a) => a._value is int i ? i : Mathf.RoundToInt((float)a);
         public static implicit operator MemCell(int a) => new(a);
 
         public static implicit operator float(MemCell a) => a._value is int i ? i : (float)a._value;
         public static implicit operator MemCell(float a) => new(a);
 
-        public static MemCell operator +(MemCell a) => a._value is int i ? i : (float)a._value;
-        public static MemCell operator -(MemCell a) => a._value is int i ? -i : -(float)a._value;
-        public static MemCell operator !(MemCell a) => !(bool)a._value;
+        public static MemCell operator +(MemCell a) => a._value is int i ? i : (float)a;
+        public static MemCell operator -(MemCell a) => a._value is int i ? -i : -(float)a;
+        public static MemCell operator !(MemCell a) => !(bool)a;
 
         public static MemCell operator ==(MemCell a, MemCell b) => a._value.Equals(b._value);
         public static MemCell operator !=(MemCell a, MemCell b) => !a._value.Equals(b._value);
 
-        public static MemCell operator +(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia + ib : (float)a._value + (float)b._value;
-        public static MemCell operator -(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia - ib : (float)a._value - (float)b._value;
-        public static MemCell operator *(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia * ib : (float)a._value * (float)b._value;
-        public static MemCell operator /(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia / ib : (float)a._value / (float)b._value;
-        public static MemCell operator %(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia % ib : (float)a._value % (float)b._value;
+        public static MemCell operator +(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia + ib : (float)a + (float)b;
+        public static MemCell operator -(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia - ib : (float)a - (float)b;
+        public static MemCell operator *(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia * ib : (float)a * (float)b;
+        public static MemCell operator /(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia / ib : (float)a / (float)b;
+        public static MemCell operator %(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia % ib : (float)a % (float)b;
 
         public static MemCell operator &(MemCell a, MemCell b) => a._value is bool ba && b._value is bool bb ? ba && bb : (int)a._value & (int)b._value;
         public static MemCell operator |(MemCell a, MemCell b) => a._value is bool ba && b._value is bool bb ? ba || bb : (int)a._value | (int)b._value;
