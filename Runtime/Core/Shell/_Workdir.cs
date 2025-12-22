@@ -18,5 +18,7 @@ namespace _COBRA_
         //--------------------------------------------------------------------------------------------------------------
 
         internal void ChangeWorkdir(in string path) => workdir.Value = Util_cobra.PathCheck(workdir._value, path, PathModes.ForceFull, false, false, out _, out _);
+
+        public string PathCheck(in string path, in PathModes mode) => Util_cobra.PathCheck(workdir._value, path, mode, true, false, out _, out _);
     }
 }
