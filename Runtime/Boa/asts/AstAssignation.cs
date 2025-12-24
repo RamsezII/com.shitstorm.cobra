@@ -60,7 +60,7 @@ namespace _COBRA_.Boa
                 action_SIG_EXE: janitor =>
                 {
                     MemCell popped = janitor.vstack.PopLast();
-                    if (!janitor.shell.scope.TryGet(var_name, out var existant))
+                    if (!janitor.shell.scope.TryGetVariable(var_name, out var existant))
                         janitor.shell.scope._vars.Add(var_name, popped);
                     else
                     {
@@ -77,7 +77,7 @@ namespace _COBRA_.Boa
                             Codes.No => !popped,
                             _ => popped,
                         };
-                        janitor.shell.scope.TrySet(var_name, assigned);
+                        janitor.shell.scope.TrySetVariable(var_name, assigned);
                     }
                 }
             ));
@@ -105,7 +105,7 @@ namespace _COBRA_.Boa
                 )
                 {
                     Codes code = codes[op_name];
-                    scope.TryGet(var_name, out var cell);
+                    scope.TryGetVariable(var_name, out var cell);
 
                     if (AstExpression.TryExpr(reader, scope, false, cell._type, out AstExpression expr))
                     {
@@ -120,7 +120,7 @@ namespace _COBRA_.Boa
                 if (reader.TryReadChar_match('=', reader.lint_theme.operators))
                     if (AstExpression.TryExpr(reader, scope, false, typeof(object), out var ast_expr))
                     {
-                        scope._vars.Add(var_name, new MemCell(ast_expr.output_type, null));
+                        scope.TrySetVariable(var_name, new MemCell(ast_expr.output_type, null));
                         ast_assign = new AstAssignation(var_name, ast_expr, Codes.Assign);
                         return true;
                     }

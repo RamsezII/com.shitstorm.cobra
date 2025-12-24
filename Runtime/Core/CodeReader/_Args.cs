@@ -18,7 +18,7 @@ namespace _COBRA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryReadArgument(in string text, out int start_i, ref int read_i, out string argument, in string skippables = _empties_, in string stoppers = _stoppers_)
+        static bool TryReadArgument(in string text, out int start_i, ref int read_i, out string argument, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
             text.HasNext(ref read_i, skippables: skippables);
             start_i = read_i;

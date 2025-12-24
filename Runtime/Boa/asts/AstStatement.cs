@@ -4,7 +4,7 @@ namespace _COBRA_.Boa
 {
     internal abstract class AstStatement : AstAbstract
     {
-        public static bool TryStatement(in CodeReader reader, in MemScope tscope, out AstStatement ast_statement)
+        public static bool TryStatement(in CodeReader reader, in MemScope scope, out AstStatement ast_statement)
         {
         skipped_comments:
             if (reader.TryReadChar_match('#', lint: reader.lint_theme.comments))
@@ -19,17 +19,22 @@ namespace _COBRA_.Boa
                 return true;
             }
 
-            if (AstBlock.TryBlock(reader, tscope, out var ast_block))
+            if (AstCreateMethod.TryParse(reader, scope, out var createMethod))
+            {
+                ast_statement = createMethod;
+                return true;
+            }
+            else if (AstBlock.TryBlock(reader, scope, out var ast_block))
             {
                 ast_statement = ast_block;
                 return true;
             }
-            else if (AstAssignation.TryAssign(reader, tscope, out var ast_decl))
+            else if (AstAssignation.TryAssign(reader, scope, out var ast_decl))
             {
                 ast_statement = ast_decl;
                 return true;
             }
-            else if (AstExprStatement.TryExprStatement(reader, tscope, out var ast_expr))
+            else if (AstExprStatement.TryExprStatement(reader, scope, out var ast_expr))
             {
                 ast_statement = ast_expr;
                 return true;

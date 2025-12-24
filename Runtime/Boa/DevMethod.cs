@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace _COBRA_.Boa
 {
+    /// <summary>
+    /// instance and class methods
+    /// </summary>
     public abstract class DevMethod
     {
         internal readonly string name;

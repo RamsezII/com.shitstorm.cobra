@@ -24,7 +24,7 @@ namespace _COBRA_.Boa
                 name: $"var({var_name})",
                 action_SIG_EXE: janitor =>
                 {
-                    janitor.shell.scope.TryGet(var_name, out var cell);
+                    janitor.shell.scope.TryGetVariable(var_name, out var cell);
                     janitor.vstack.Add(cell);
                 }
             ));
@@ -37,7 +37,7 @@ namespace _COBRA_.Boa
             int read_old = reader.read_i;
 
             if (reader.TryReadString_matches_out(out string var_name, false, reader.lint_theme.variables, tscope.EVarNames()))
-                if (tscope.TryGet(var_name, out var cell))
+                if (tscope.TryGetVariable(var_name, out var cell))
                 {
                     ast_variable = new AstVariable(var_name, cell._type);
                     return true;

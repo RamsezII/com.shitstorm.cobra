@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace _COBRA_.Boa
 {
+    /// <summary>
+    /// global methods
+    /// </summary>
     public sealed class DevContract
     {
         public readonly struct OptionKey
