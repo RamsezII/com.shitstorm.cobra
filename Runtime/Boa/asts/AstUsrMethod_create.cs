@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace _COBRA_.Boa
 {
-    internal class AstCreateMethod : AstStatement
+    internal class AstUsrMethod_create : AstStatement
     {
         readonly MemMethod method;
 
         //----------------------------------------------------------------------------------------------------------
 
-        AstCreateMethod(in MemMethod method)
+        AstUsrMethod_create(in MemMethod method)
         {
             this.method = method;
         }
@@ -29,7 +29,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryParse(in CodeReader reader, in MemScope scope, out AstCreateMethod ast_createMethod)
+        public static bool TryParse(in CodeReader reader, in MemScope scope, out AstUsrMethod_create ast_createMethod)
         {
             if (reader.TryReadString_match("def", false, reader.lint_theme.keywords, true, false))
                 if (!reader.TryReadArgument(out string met_name, false, reader.lint_theme.functions))
@@ -80,14 +80,17 @@ namespace _COBRA_.Boa
                     foreach (var (type, name) in targs)
                         subscope._vars.Add(name, new MemCell(type, null));
 
-                    if (!TryStatement(reader, subscope, out var body))
+                    if (!TryStatement(reader, subscope, out var ast_body))
                     {
                         reader.CompilationError($"expected method body");
                         goto failure;
                     }
 
-                    MemMethod method = new(met_name, body, typeof(object));
+                    MemMethod method = new(met_name, ast_body, typeof(object));
+                    foreach (var (type, name) in targs)
+                        method.targs.Add(new MemMethod.TArgument(name, type));
                     scope.TrySetMethod(met_name, method);
+
                     ast_createMethod = new(method);
 
                     return true;

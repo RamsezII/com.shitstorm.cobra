@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace _COBRA_.Boa
 {
-    internal class AstContract : AstExpression
+    internal class AstDevContract_call : AstExpression
     {
         class TOptions : List<(DevContract.OptionKey name, AstExpression ast)>
         {
@@ -20,7 +20,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        AstContract(in DevContract contract, in TOptions topts, in TArgs targs) : base(contract.output_type)
+        AstDevContract_call(in DevContract contract, in TOptions topts, in TArgs targs) : base(contract.output_type)
         {
             this.contract = contract;
             this.topts = topts;
@@ -29,7 +29,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryParseContract(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstContract ast_contract)
+        public static bool TryParseContract(in CodeReader reader, in MemScope tscope, in Type expected_type, out AstDevContract_call ast_contract)
         {
             if (reader.TryReadString_matches_out(out string cont_name, as_function_argument: false, lint: reader.lint_theme.contracts, matches: DevContract.contracts.Keys.ToArray()))
                 if (!DevContract.contracts.TryGetValue(cont_name, out var contract))
@@ -98,7 +98,7 @@ namespace _COBRA_.Boa
                         goto failure;
                     }
 
-                    ast_contract = new AstContract(contract, topts, targs);
+                    ast_contract = new AstDevContract_call(contract, topts, targs);
                     return true;
                 }
 

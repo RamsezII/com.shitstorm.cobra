@@ -106,7 +106,7 @@ namespace _COBRA_.Boa
             if (reader.StopParsing())
                 goto failure;
 
-            if (AstContract.TryParseContract(reader, scope, expected_type, out var ast_contract))
+            if (AstDevContract_call.TryParseContract(reader, scope, expected_type, out var ast_contract))
             {
                 ast_factor = ast_contract;
                 return true;
@@ -114,7 +114,7 @@ namespace _COBRA_.Boa
             else if (reader.sig_error != null)
                 goto failure;
 
-            if (AstCallMethod.TryParseCall(reader, scope, expected_type, out var ast_call))
+            if (AstUsrMethod_call.TryParseCall(reader, scope, expected_type, out var ast_call))
             {
                 ast_factor = ast_call;
                 return true;

@@ -19,7 +19,7 @@ namespace _COBRA_.Boa
                     ast_statement = null;
                     return true;
                 }
-                else if (AstCreateMethod.TryParse(reader, scope, out var createMethod))
+                else if (AstUsrMethod_create.TryParse(reader, scope, out var createMethod))
                 {
                     ast_statement = createMethod;
                     return true;
