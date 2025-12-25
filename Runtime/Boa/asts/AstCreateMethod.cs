@@ -31,16 +31,26 @@ namespace _COBRA_.Boa
         public static bool TryParse(in CodeReader reader, in MemScope scope, out AstCreateMethod ast_createMethod)
         {
             if (reader.TryReadString_match("def", false, reader.lint_theme.keywords, true, false))
-                if (reader.TryReadArgument(out string met_name, false, reader.lint_theme.functions))
+                if (!reader.TryReadArgument(out string met_name, false, reader.lint_theme.functions))
                 {
-                    bool got_braquet = reader.TryReadChar_match('(');
-                    if (got_braquet)
-                        reader.LintOpeningBraquet();
+                    reader.CompilationError("expected new method name after operator 'def'");
+                    goto failure;
+                }
+                else if (!reader.TryReadChar_match('('))
+                {
+                    reader.CompilationError("expected '(' after method name");
+                    goto failure;
+                }
+                else
+                {
+                    reader.LintOpeningBraquet();
 
-                    char stopchar = got_braquet ? ')' : ':';
-                    List<(Type, string)> targs = new();
+                    List<(Type type, string name)> targs = new();
 
-                    if (!reader.TryPeekChar_match(stopchar, out _))
+                    if (reader.TryReadChar_match(')'))
+                        reader.CloseBraquetLint();
+                    else
+                    {
                         do
                         {
                             if (!reader.TryReadArgument(out string arg_type, false, reader.lint_theme.types, stoppers: " \n\r[]{}(),;'\"\\=-*/%<>|&"))
@@ -48,7 +58,7 @@ namespace _COBRA_.Boa
                                 reader.CompilationError($"expected a type");
                                 goto failure;
                             }
-                            else if (!Util.TryGetType(arg_type, out Type type, include_abstracts: true))
+                            else if (!BoaTypes.types.TryGetValue(arg_type, out Type type))
                             {
                                 reader.CompilationError($"could not parse type \"{arg_type}\"");
                                 goto failure;
@@ -61,14 +71,15 @@ namespace _COBRA_.Boa
                             else
                                 targs.Add((type, arg_name));
                         }
-                        while (!reader.TryReadChar_match(stopchar));
-
-                    if (got_braquet)
+                        while (!reader.TryReadChar_match(')'));
                         reader.CloseBraquetLint();
-                    else
-                        reader.LintToThisPosition(reader.lint_theme.operators, true);
+                    }
 
-                    if (!TryStatement(reader, scope, out var body))
+                    MemScope subscope = new(scope);
+                    foreach (var (type, name) in targs)
+                        subscope._vars.Add(name, new MemCell(type, null));
+
+                    if (!TryStatement(reader, subscope, out var body))
                     {
                         reader.CompilationError($"expected method body");
                         goto failure;

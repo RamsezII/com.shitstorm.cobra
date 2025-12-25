@@ -19,6 +19,12 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
+        public void PropagateAmnesia()
+        {
+            _vars.Clear();
+            _methods.Clear();
+        }
+
         public IEnumerable<string> EVarNames()
         {
             if (_parent != null)

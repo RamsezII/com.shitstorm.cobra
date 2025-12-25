@@ -114,6 +114,14 @@ namespace _COBRA_.Boa
             else if (reader.sig_error != null)
                 goto failure;
 
+            if (AstCallMethod.TryParseCall(reader, scope, expected_type, out var ast_call))
+            {
+                ast_factor = ast_call;
+                return true;
+            }
+            else if (reader.sig_error != null)
+                goto failure;
+
             if (reader.StopParsing())
                 goto failure;
 
