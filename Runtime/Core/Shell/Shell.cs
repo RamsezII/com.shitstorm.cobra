@@ -7,7 +7,7 @@ namespace _COBRA_
     public abstract partial class Shell : Disposable
     {
         public readonly ValueHandler<ExecutionStatus> status = new();
-        public Action<object, string> on_output;
+        public Action<object, string> stdout, stderr;
 
         //----------------------------------------------------------------------------------------------------------
 

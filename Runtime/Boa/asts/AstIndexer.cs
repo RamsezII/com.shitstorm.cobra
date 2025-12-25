@@ -18,31 +18,33 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
             MemCell cell_index = default;
 
-            ast_expr.OnExecutorsQueue(executors);
+            ast_expr.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"indexer(retreive indexable)",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
-                    cell_index = janitor.vstack.PopLast();
+                    cell_index = memstack.PopLast();
                 }
             ));
 
-            ast_idx.OnExecutorsQueue(executors);
+            ast_idx.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"indexer(retreive and apply index)",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
-                    MemCell popped = janitor.vstack.PopLast();
+                    MemCell popped = memstack.PopLast();
                     object value = ((IList)popped._value)[cell_index];
-                    janitor.vstack.Add(new MemCell(value));
+                    memstack.Add(new MemCell(value));
                 }
             ));
         }

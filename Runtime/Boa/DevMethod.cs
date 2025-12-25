@@ -34,19 +34,19 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal protected abstract void OnExecution(in Janitor janitor, in List<MemCell> args, in object target);
+        internal protected abstract void OnExecution(in MemStack memstack, in MemScope memscope, in List<MemCell> args, in object target);
     }
 
     public sealed class DevMethod<TClass, TAttr> : DevMethod
     {
-        internal readonly Action<Janitor, List<MemCell>, TClass> onExecution;
+        internal readonly Action<MemStack, MemScope, List<MemCell>, TClass> onExecution;
 
         //----------------------------------------------------------------------------------------------------------
 
         public DevMethod(
             in string name,
             in List<Type> targs,
-            in Action<Janitor, List<MemCell>, TClass> onExecution
+            in Action<MemStack, MemScope, List<MemCell>, TClass> onExecution
             ) : base(
                 name: name,
                 targs: targs,
@@ -68,9 +68,9 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecution(in Janitor janitor, in List<MemCell> args, in object target)
+        protected internal override void OnExecution(in MemStack memstack, in MemScope memscope, in List<MemCell> args, in object target)
         {
-            onExecution(janitor, args, (TClass)target);
+            onExecution(memstack, memscope, args, (TClass)target);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal protected virtual void OnExecutorsQueue(in Queue<Executor> executors)
+        internal protected virtual void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
         }
     }

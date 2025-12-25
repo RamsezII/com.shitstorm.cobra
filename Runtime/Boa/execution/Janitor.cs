@@ -9,7 +9,7 @@ namespace _COBRA_.Boa
         public readonly BoaShell shell;
         readonly Queue<AstAbstract> asts;
 
-        public readonly List<MemCell> vstack = new();
+        public readonly MemStack vstack = new();
         internal readonly Queue<Executor> executors = new();
 
         internal CodeReader reader;
@@ -31,7 +31,7 @@ namespace _COBRA_.Boa
         {
             while (asts.TryDequeue(out var ast))
             {
-                ast.OnExecutorsQueue(executors);
+                ast.OnExecutorsQueue(vstack, shell.scope, executors);
             before_executor:
                 while (executors.TryDequeue(out var executor))
                     if (!executor.Disposed)
@@ -69,7 +69,7 @@ namespace _COBRA_.Boa
                                     break;
 
                             if (!executor.Disposed)
-                                executor.action_SIG_EXE(this);
+                                executor.action_SIG_EXE();
                         }
 
                         if (executor.routine_SIG_EXE != null)
@@ -85,7 +85,7 @@ namespace _COBRA_.Boa
                             if (executor.Disposed)
                                 goto before_executor;
 
-                            using var routine = executor.routine_SIG_EXE(this);
+                            using var routine = executor.routine_SIG_EXE();
 
                             while (true)
                                 if (executor.Disposed)

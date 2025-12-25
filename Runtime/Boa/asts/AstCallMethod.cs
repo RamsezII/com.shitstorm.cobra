@@ -1,15 +1,14 @@
 ﻿using _UTIL_;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace _COBRA_.Boa
 {
     internal class AstCallMethod : AstExpression
     {
         readonly MemMethod method;
-        readonly List<(MemMethod.OptionKey names, AstExpression ast)> asts_opts = new();
-        readonly List<AstExpression> asts_args = new();
+        readonly List<(MemMethod.OptionKey names, AstExpression ast)> asts_opts;
+        readonly List<AstExpression> asts_args;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -22,66 +21,63 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
-            if (asts_opts != null)
+            MemScope subscope = memscope.GetSubScope();
+
+            if (asts_opts != null && asts_opts.Count > 0)
             {
                 for (int i = 0; i < asts_opts.Count; i++)
-                    asts_opts[i].ast.OnExecutorsQueue(executors);
+                    asts_opts[i].ast.OnExecutorsQueue(memstack, memscope, executors);
 
                 executors.Enqueue(new(
                     name: $"pop options for method({method.name})",
-                    action_SIG_EXE: janitor =>
+                    scope: memscope,
+                    action_SIG_EXE: () =>
                     {
-                        Debug.LogWarning($"TODO: add options to scope");
-
                         for (int i = asts_opts.Count; i > 0; i--)
                         {
                             var (names, ast) = asts_opts[^i];
-                            MemCell cell = janitor.vstack[^i];
-
-                            MemScope scope = new();
-                            scope._vars.Add(names.short_name.ToString(), cell);
-                            scope._vars.Add(names.long_name, cell);
+                            MemCell cell = memstack[^i];
+                            subscope._vars.Add(names.short_name.ToString(), cell);
+                            subscope._vars.Add(names.long_name, cell);
                         }
 
-                        janitor.vstack.RemoveRange(janitor.vstack.Count - asts_opts.Count, asts_opts.Count);
+                        memstack.RemoveRange(memstack.Count - asts_opts.Count, asts_opts.Count);
                     }
                 ));
             }
 
-            if (asts_args != null)
+            if (asts_args != null && asts_args.Count > 0)
             {
                 for (int i = 0; i < asts_args.Count; i++)
-                    asts_args[i].OnExecutorsQueue(executors);
+                    asts_args[i].OnExecutorsQueue(memstack, memscope, executors);
 
                 executors.Enqueue(new(
                     name: $"pop arguments for method( {method.name})",
-                    action_SIG_EXE: janitor =>
+                    scope: memscope,
+                    action_SIG_EXE: () =>
                     {
-                        Debug.LogWarning($"TODO: add arguments to scope");
-
                         for (int i = asts_args.Count; i > 0; i--)
                         {
                             var ast = asts_args[i];
-                            MemCell cell = janitor.vstack[^i];
-
-                            MemScope scope = new();
-                            scope._vars.Add(method.targs[i].name, cell);
+                            MemCell cell = memstack[^i];
+                            subscope._vars.Add(method.targs[i].name, cell);
                         }
 
-                        janitor.vstack.RemoveRange(janitor.vstack.Count - asts_args.Count, asts_args.Count);
+                        memstack.RemoveRange(memstack.Count - asts_args.Count, asts_args.Count);
                     }
                 ));
             }
 
-            method.ast.OnExecutorsQueue(executors);
+            method.ast.OnExecutorsQueue(memstack, subscope, executors);
 
             executors.Enqueue(new(
                 name: "push empty in stack",
-                action_SIG_EXE: static janitor => janitor.vstack.Add(new MemCell(new NamedDummy("method call")))
+                scope: subscope,
+                action_SIG_EXE: () => memstack.Add(new MemCell(new NamedDummy("method call")))
             ));
         }
 

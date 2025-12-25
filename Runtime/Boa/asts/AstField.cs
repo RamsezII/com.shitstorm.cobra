@@ -18,18 +18,19 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
-            ast_expr.OnExecutorsQueue(executors);
+            ast_expr.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"field({field})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
-                    MemCell popped = janitor.vstack.PopLast();
-                    field.OnExecution(janitor, popped._value);
+                    MemCell popped = memstack.PopLast();
+                    field.OnExecution(memstack, memscope, popped._value);
                 }
             ));
         }

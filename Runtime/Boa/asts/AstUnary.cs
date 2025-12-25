@@ -34,17 +34,18 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack vstack, MemScope scope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(vstack, scope, executors);
 
-            ast_factor.OnExecutorsQueue(executors);
+            ast_factor.OnExecutorsQueue(vstack, scope, executors);
 
             executors.Enqueue(new(
                 name: $"unary({code})",
-                action_SIG_EXE: janitor =>
+                scope: scope,
+                action_SIG_EXE: () =>
                 {
-                    MemCell popped = janitor.vstack.PopLast();
+                    MemCell popped = vstack.PopLast();
                     MemCell assigned = code switch
                     {
                         Codes.Positive => +popped,
@@ -53,7 +54,7 @@ namespace _COBRA_.Boa
                         Codes.Anti => ~popped,
                         _ => throw new NotImplementedException($"(unary) unimplemented code \"{code}\""),
                     };
-                    janitor.vstack.Add(assigned);
+                    vstack.Add(assigned);
                 }
             ));
         }

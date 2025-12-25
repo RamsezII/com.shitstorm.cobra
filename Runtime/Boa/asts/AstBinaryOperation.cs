@@ -82,21 +82,22 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
-            astL.OnExecutorsQueue(executors);
-            astR.OnExecutorsQueue(executors);
+            astL.OnExecutorsQueue(memstack, memscope, executors);
+            astR.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"op({code})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
                     var exc = new Exception($"wrong operation: {code}");
 
-                    MemCell poppedR = janitor.vstack.PopLast();
-                    MemCell poppedL = janitor.vstack.PopLast();
+                    MemCell poppedR = memstack.PopLast();
+                    MemCell poppedL = memstack.PopLast();
 
                     MemCell assigned = code switch
                     {
@@ -116,7 +117,7 @@ namespace _COBRA_.Boa
                         _ => throw exc,
                     };
 
-                    janitor.vstack.Add(assigned);
+                    memstack.Add(assigned);
                 }
             ));
         }

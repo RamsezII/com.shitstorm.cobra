@@ -11,27 +11,58 @@ namespace _COBRA_.Boa.contracts
         static void Init()
         {
             DevContract.AddContract(new(
+                name: "echo",
+                output_type: typeof(object),
+                arguments: new() { typeof(object), },
+                action: static (memstack, memscope, args) =>
+                {
+                    var cell = args.arguments[0];
+                    memstack.Add(cell);
+                }
+            ));
+
+            DevContract.AddContract(new(
+                name: "read_entry",
+                output_type: typeof(string),
+                arguments: new() { typeof(string), },
+                routine_READER: static (memstack, memscope, prms, janitor) =>
+                {
+                    string entry = prms.arguments[0]._value.ToString();
+                    return ERoutine(memstack, memscope, janitor, entry);
+                    static IEnumerator<ExecutionStatus> ERoutine(MemStack mstack, MemScope mscope, Janitor janitor, string entry)
+                    {
+                        while (janitor.reader == null || !janitor.reader.sig_flags.HasFlag(SIG_FLAGS.SUBMIT))
+                            yield return new(CMD_STATUS.WAIT_FOR_STDIN, prefixe: new(entry));
+
+                        string read = janitor.reader.ReadAll();
+                        mstack.Add(new MemCell(read));
+                    }
+                }
+            ));
+
+            DevContract.AddContract(new(
                 name: "typeof",
                 output_type: typeof(Type),
                 arguments: new() { typeof(object), },
-                action: static (janitor, prms) =>
+                action: static (memstack, memscope, prms) =>
                 {
                     MemCell cell = prms.arguments[0];
                     Type type = cell._type;
-                    janitor.vstack.Add(new(type));
+                    memstack.Add(new(type));
                 }
             ));
 
             DevContract.AddContract(new(
                 name: "check_script",
+                output_type: typeof(bool),
                 arguments: new() { typeof(BoaFPath), },
-                action: static (janitor, prms) =>
+                action: static (memstack, memscope, prms) =>
                 {
                     string fpath = (string)prms.arguments[0]._value;
                     string text = File.ReadAllText(fpath);
 
-                    CodeReader reader = new(SIG_FLAGS.CHECK, janitor.shell.workdir._value, null, false, text, fpath);
-                    MemScope scope = new();
+                    CodeReader reader = new(SIG_FLAGS.CHECK, memscope.shell.workdir._value, null, false, text, fpath);
+                    MemScope scope = new(memscope.shell);
                     Queue<AstAbstract> asts = new();
 
                     while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
@@ -45,24 +76,26 @@ namespace _COBRA_.Boa.contracts
 
                     if (reader.sig_error != null)
                     {
+                        memstack.Add(new MemCell(false));
                         reader.LocalizeError();
-                        janitor.shell.on_output(reader.sig_long_error, reader.sig_long_error.SetColor(Color.orange));
+                        memscope.shell.stderr(reader.sig_long_error, reader.sig_long_error.SetColor(Color.yellow));
                     }
                     else
-                        janitor.shell.on_output("no compilation error", null);
+                        memstack.Add(new MemCell(true));
                 }
             ));
 
             DevContract.AddContract(new(
                 name: "run_script",
+                output_type: typeof(bool),
                 arguments: new() { typeof(BoaFPath), },
-                action: static (janitor, prms) =>
+                action: static (memstack, memscope, prms) =>
                 {
                     string fpath = (string)prms.arguments[0]._value;
                     string text = File.ReadAllText(fpath);
 
-                    CodeReader reader = new(SIG_FLAGS.CHECK, janitor.shell.workdir._value, null, false, text, fpath);
-                    MemScope scope = new();
+                    CodeReader reader = new(SIG_FLAGS.CHECK, memscope.shell.workdir._value, null, false, text, fpath);
+                    MemScope scope = new(memscope.shell);
                     Queue<AstAbstract> asts = new();
 
                     while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
@@ -76,12 +109,16 @@ namespace _COBRA_.Boa.contracts
 
                     if (reader.sig_error != null)
                     {
+                        memstack.Add(new MemCell(false));
                         reader.LocalizeError();
-                        janitor.shell.on_output(reader.sig_long_error, reader.sig_long_error.SetColor(Color.red));
+                        memscope.shell.stderr(reader.sig_long_error, reader.sig_long_error.SetColor(Color.orange));
                     }
                     else
+                    {
+                        memstack.Add(new MemCell(true));
                         foreach (var ast in asts)
-                            ast.OnExecutorsQueue(janitor.executors);
+                            ast.OnExecutorsQueue(memstack, memscope, memscope.shell.front_janitor.executors);
+                    }
                 }
             ));
         }

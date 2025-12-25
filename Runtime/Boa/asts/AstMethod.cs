@@ -20,31 +20,32 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
-            ast_target.OnExecutorsQueue(executors);
+            ast_target.OnExecutorsQueue(memstack, memscope, executors);
 
             if (ast_args != null)
                 for (int i = 0; i < ast_args.Count; i++)
-                    ast_args[i].OnExecutorsQueue(executors);
+                    ast_args[i].OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"field({method})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
                     List<MemCell> cells = new(ast_args.Count);
 
                     if (ast_args != null)
                     {
                         for (int i = ast_args.Count; i > 0; --i)
-                            cells.Add(janitor.vstack[^i]);
-                        janitor.vstack.RemoveRange(janitor.vstack.Count - ast_args.Count, ast_args.Count);
+                            cells.Add(memstack[^i]);
+                        memstack.RemoveRange(memstack.Count - ast_args.Count, ast_args.Count);
                     }
 
-                    MemCell popped = janitor.vstack.PopLast();
-                    method.OnExecution(janitor, cells, popped._value);
+                    MemCell popped = memstack.PopLast();
+                    method.OnExecution(memstack, memscope, cells, popped._value);
                 }
             ));
         }

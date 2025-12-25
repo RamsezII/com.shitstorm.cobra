@@ -61,8 +61,9 @@ namespace _COBRA_.Boa
         public readonly Type output_type;
         internal readonly Dictionary<OptionKey, Type> options;
         internal readonly List<Type> arguments;
-        internal readonly Action<Janitor, Parameters> action;
-        internal readonly Func<Janitor, Parameters, IEnumerator<ExecutionStatus>> routine, routine_READER;
+        internal readonly Action<MemStack, MemScope, Parameters> action;
+        internal readonly Func<MemStack, MemScope, Parameters, IEnumerator<ExecutionStatus>> routine;
+        internal readonly Func<MemStack, MemScope, Parameters, Janitor, IEnumerator<ExecutionStatus>> routine_READER;
 
         internal static readonly Dictionary<string, DevContract> contracts = new(StringComparer.OrdinalIgnoreCase);
 
@@ -90,9 +91,9 @@ namespace _COBRA_.Boa
             in Type output_type = null,
             in Dictionary<OptionKey, Type> options = null,
             in List<Type> arguments = null,
-            in Action<Janitor, Parameters> action = null,
-            in Func<Janitor, Parameters, IEnumerator<ExecutionStatus>> routine = null,
-            in Func<Janitor, Parameters, IEnumerator<ExecutionStatus>> routine_READER = null
+            in Action<MemStack, MemScope, Parameters> action = null,
+            in Func<MemStack, MemScope, Parameters, IEnumerator<ExecutionStatus>> routine = null,
+            in Func<MemStack, MemScope, Parameters, Janitor, IEnumerator<ExecutionStatus>> routine_READER = null
             )
         {
             this.name = name;

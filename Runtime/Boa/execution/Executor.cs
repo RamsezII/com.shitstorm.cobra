@@ -5,11 +5,13 @@ using System.Collections.Generic;
 
 namespace _COBRA_
 {
-    internal sealed class Executor : Disposable
+    public sealed class Executor : Disposable
     {
         internal readonly string name;
-        internal readonly Action<Janitor> action_SIG_EXE;
-        internal readonly Func<Janitor, IEnumerator<ExecutionStatus>> routine_SIG_EXE, routine_SIG_READER;
+        internal readonly MemScope scope;
+        internal readonly Action action_SIG_EXE;
+        internal readonly Func<IEnumerator<ExecutionStatus>> routine_SIG_EXE;
+        internal readonly Func<Janitor, IEnumerator<ExecutionStatus>> routine_SIG_READER;
 
         public override string ToString() => $"exec[{name}]";
 
@@ -17,12 +19,14 @@ namespace _COBRA_
 
         public Executor(
             in string name,
-            in Action<Janitor> action_SIG_EXE = null,
-            in Func<Janitor, IEnumerator<ExecutionStatus>> routine_SIG_EXE = null,
+            in MemScope scope,
+            in Action action_SIG_EXE = null,
+            in Func<IEnumerator<ExecutionStatus>> routine_SIG_EXE = null,
             in Func<Janitor, IEnumerator<ExecutionStatus>> routine_SIG_READER = null
         )
         {
             this.name = name;
+            this.scope = scope;
             this.action_SIG_EXE = action_SIG_EXE;
             this.routine_SIG_EXE = routine_SIG_EXE;
             this.routine_SIG_READER = routine_SIG_READER;

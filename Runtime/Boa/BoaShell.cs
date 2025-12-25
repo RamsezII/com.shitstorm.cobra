@@ -22,17 +22,24 @@ namespace _COBRA_
 
         */
 
-        readonly List<Janitor> janitors = new();
-        Janitor front_janitor;
-        public readonly MemScope scope = new();
+        internal readonly List<Janitor> background_janitors = new();
+        internal Janitor front_janitor;
+        public readonly MemScope scope;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public BoaShell()
+        {
+            scope = new(this);
+        }
 
         //----------------------------------------------------------------------------------------------------------
 
         protected override void OnTick()
         {
-            for (int i = 0; i < janitors.Count; i++)
+            for (int i = 0; i < background_janitors.Count; i++)
             {
-                Janitor janitor = janitors[i];
+                Janitor janitor = background_janitors[i];
                 janitor.OnTick(out ExecutionStatus output);
 
                 if (output.code == CMD_STATUS.ERROR)
@@ -42,7 +49,7 @@ namespace _COBRA_
                 }
 
                 if (janitor.Disposed)
-                    janitors.RemoveAt(i--);
+                    background_janitors.RemoveAt(i--);
             }
 
             if (front_janitor != null)
@@ -90,9 +97,9 @@ namespace _COBRA_
             {
                 Queue<AstAbstract> asts = new();
 
-                MemScope scope = new(this.scope);
+                MemScope ast_scope = scope.GetSubScope();
 
-                while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
+                while (reader.HasNext() && AstStatement.TryStatement(reader, ast_scope, out var ast))
                     if (ast != null)
                         asts.Enqueue(ast);
 
@@ -109,7 +116,7 @@ namespace _COBRA_
                         status.Value = RegularStatus();
                     }
                     else if (execute_in_background)
-                        janitors.Add(new(this, asts));
+                        background_janitors.Add(new(this, asts));
                     else
                     {
                         front_janitor = new(this, asts);

@@ -16,16 +16,17 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"var({var_name})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
-                    janitor.shell.scope.TryGetVariable(var_name, out var cell);
-                    janitor.vstack.Add(cell);
+                    memscope.TryGetVariable(var_name, out var cell);
+                    memstack.Add(cell);
                 }
             ));
         }

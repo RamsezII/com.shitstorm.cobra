@@ -13,32 +13,32 @@ namespace _COBRA_.Boa
                 goto skipped_comments;
             }
 
-            if (reader.TryReadChar_match(';', lint: reader.lint_theme.command_separators))
-            {
-                ast_statement = null;
-                return true;
-            }
-
-            if (AstCreateMethod.TryParse(reader, scope, out var createMethod))
-            {
-                ast_statement = createMethod;
-                return true;
-            }
-            else if (AstBlock.TryBlock(reader, scope, out var ast_block))
-            {
-                ast_statement = ast_block;
-                return true;
-            }
-            else if (AstAssignation.TryAssign(reader, scope, out var ast_decl))
-            {
-                ast_statement = ast_decl;
-                return true;
-            }
-            else if (AstExprStatement.TryExprStatement(reader, scope, out var ast_expr))
-            {
-                ast_statement = ast_expr;
-                return true;
-            }
+            if (reader.HasNext() && !reader.TryPeekChar_match('}', out _))
+                if (reader.TryReadChar_match(';', lint: reader.lint_theme.command_separators))
+                {
+                    ast_statement = null;
+                    return true;
+                }
+                else if (AstCreateMethod.TryParse(reader, scope, out var createMethod))
+                {
+                    ast_statement = createMethod;
+                    return true;
+                }
+                else if (AstBlock.TryBlock(reader, scope, out var ast_block))
+                {
+                    ast_statement = ast_block;
+                    return true;
+                }
+                else if (AstAssignation.TryAssign(reader, scope, out var ast_decl))
+                {
+                    ast_statement = ast_decl;
+                    return true;
+                }
+                else if (AstExprStatement.TryExprStatement(reader, scope, out var ast_expr))
+                {
+                    ast_statement = ast_expr;
+                    return true;
+                }
 
             ast_statement = null;
             return false;
@@ -79,20 +79,21 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
-            expression.OnExecutorsQueue(executors);
+            expression.OnExecutorsQueue(memstack, memscope, executors);
 
             if (expression.output_type != null)
                 executors.Enqueue(new(
                     name: "expr_statement(pop vstack last)",
-                    action_SIG_EXE: static janitor =>
+                    scope: memscope,
+                    action_SIG_EXE: () =>
                     {
-                        MemCell cell = janitor.vstack.PopLast();
+                        MemCell cell = memstack.PopLast();
                         if (cell._value is not BoaNull)
-                            janitor.shell.on_output(cell._value, null);
+                            memscope.shell.stdout(cell._value, null);
                     }));
         }
     }

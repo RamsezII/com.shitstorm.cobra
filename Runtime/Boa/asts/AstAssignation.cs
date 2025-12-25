@@ -49,19 +49,20 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
-            ast_expr.OnExecutorsQueue(executors);
+            ast_expr.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"var({var_name})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
-                    MemCell popped = janitor.vstack.PopLast();
-                    if (!janitor.shell.scope.TryGetVariable(var_name, out var existant))
-                        janitor.shell.scope._vars.Add(var_name, popped);
+                    MemCell popped = memstack.PopLast();
+                    if (!memscope.TryGetVariable(var_name, out var existant))
+                        memscope._vars.Add(var_name, popped);
                     else
                     {
                         MemCell assigned = code switch
@@ -77,7 +78,7 @@ namespace _COBRA_.Boa
                             Codes.No => !popped,
                             _ => popped,
                         };
-                        janitor.shell.scope.TrySetVariable(var_name, assigned);
+                        memscope.TrySetVariable(var_name, assigned);
                     }
                 }
             ));

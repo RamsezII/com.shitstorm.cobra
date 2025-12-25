@@ -17,25 +17,26 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
             for (int i = 0; i < asts.Count; i++)
-                asts[i].OnExecutorsQueue(executors);
+                asts[i].OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"string({asts.Count})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
                     StringBuilder sb = new();
                     for (int i = asts.Count; i > 0; i--)
                     {
-                        string s = janitor.vstack[^i]._value.ToString();
+                        string s = memstack[^i]._value.ToString();
                         sb.Append(s);
                     }
-                    janitor.vstack.RemoveRange(janitor.vstack.Count - asts.Count, asts.Count);
-                    janitor.vstack.Add(new MemCell(sb.ToString()));
+                    memstack.RemoveRange(memstack.Count - asts.Count, asts.Count);
+                    memstack.Add(new MemCell(sb.ToString()));
                 }
             ));
         }

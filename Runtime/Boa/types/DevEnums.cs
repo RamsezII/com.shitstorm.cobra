@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _COBRA_.Boa
 {
-    public class DevType
+    public class DevEnum
     {
         internal readonly Type target_type, accepted_type;
         internal readonly Color lint;
@@ -12,7 +12,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected DevType(in Type target_type, in Type accepted_type, in Color lint, in Dictionary<string, object> candidates = null)
+        protected DevEnum(in Type target_type, in Type accepted_type, in Color lint, in Dictionary<string, object> candidates = null)
         {
             this.target_type = target_type;
             this.accepted_type = accepted_type;
@@ -21,43 +21,43 @@ namespace _COBRA_.Boa
         }
     }
 
-    public class DevType<TargetType, AcceptedType> : DevType
+    public class DevType<TargetType, AcceptedType> : DevEnum
     {
         public DevType(in Color lint, in Dictionary<string, object> candidates = null) : base(typeof(TargetType), typeof(AcceptedType), lint, candidates)
         {
         }
     }
 
-    public static class DevTypes
+    public static class DevEnums
     {
-        static readonly Dictionary<Type, DevType> all_types = new();
+        static readonly Dictionary<Type, DevEnum> all_enums = new();
 
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
         {
-            all_types.Clear();
+            all_enums.Clear();
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static DevType AddType(in DevType dtype)
+        public static DevEnum AddEnum(in DevEnum dev_enum)
         {
-            all_types.Add(dtype.target_type, dtype);
-            return dtype;
+            all_enums.Add(dev_enum.target_type, dev_enum);
+            return dev_enum;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         internal static bool TryDevType(in CodeReader reader, in Type expected_type, out AstExpression ast_literal)
         {
-            if (all_types.TryGetValue(expected_type, out var devtype))
+            if (all_enums.TryGetValue(expected_type, out var dev_enum))
                 //if (reader.TryReadString_matches_out(out string match, false, devtype.lint, devtype.candidates.Keys, stoppers: " \n\r[]{}(),;'\"\\=-*/%<>|&"))
-                if (reader.TryMatchLonguestCandidate(out string match, true, devtype.lint, devtype.candidates.Keys, stops: string.Empty))
+                if (reader.TryMatchLonguestCandidate(out string match, true, dev_enum.lint, dev_enum.candidates.Keys, stops: string.Empty))
                 {
-                    object value = devtype.candidates[match];
-                    ast_literal = new AstLiteral(value, devtype.target_type);
+                    object value = dev_enum.candidates[match];
+                    ast_literal = new AstLiteral(value, dev_enum.target_type);
                     return true;
                 }
             ast_literal = null;

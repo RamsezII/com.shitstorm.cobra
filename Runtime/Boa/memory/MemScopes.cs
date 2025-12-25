@@ -6,14 +6,22 @@ namespace _COBRA_.Boa
 {
     public sealed class MemScope
     {
+        internal readonly BoaShell shell;
         public readonly MemScope _parent;
         public readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
         internal readonly Dictionary<string, MemMethod> _methods = new(StringComparer.Ordinal);
+        public MemScope GetSubScope() => new(this);
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal MemScope(in MemScope parent = null)
+        internal MemScope(in BoaShell shell)
         {
+            this.shell = shell;
+        }
+
+        MemScope(in MemScope parent)
+        {
+            shell = parent.shell;
             _parent = parent;
         }
 

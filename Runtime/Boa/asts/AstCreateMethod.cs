@@ -16,13 +16,14 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"declare function ({method.name})",
-                action_SIG_EXE: janitor => janitor.shell.scope.TrySetMethod(method.name, method)
+                scope: memscope,
+                action_SIG_EXE: () => memscope.TrySetMethod(method.name, method)
             ));
         }
 
@@ -75,7 +76,7 @@ namespace _COBRA_.Boa
                         reader.CloseBraquetLint();
                     }
 
-                    MemScope subscope = new(scope);
+                    MemScope subscope = scope.GetSubScope();
                     foreach (var (type, name) in targs)
                         subscope._vars.Add(name, new MemCell(type, null));
 

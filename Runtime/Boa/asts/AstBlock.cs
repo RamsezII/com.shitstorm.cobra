@@ -15,13 +15,13 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryBlock(in CodeReader reader, in MemScope scope, out AstBlock ast_block)
+        public static bool TryBlock(in CodeReader reader, in MemScope memscope, out AstBlock ast_block)
         {
             if (reader.TryReadChar_match('{'))
             {
                 reader.LintOpeningBraquet();
 
-                var sub_scope = new MemScope(scope);
+                var sub_scope = memscope.GetSubScope();
                 var asts = new List<AstStatement>();
 
                 while (TryStatement(reader, sub_scope, out var ast_statement))
@@ -49,11 +49,14 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> queue)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(queue);
-            for (int i = asts.Count - 1; i >= 0; i--)
-                asts[i].OnExecutorsQueue(queue);
+            base.OnExecutorsQueue(memstack, memscope, executors);
+
+            var subscope = memscope.GetSubScope();
+
+            for (int i = 0; i < asts.Count; ++i)
+                asts[i].OnExecutorsQueue(memstack, subscope, executors);
         }
     }
 }

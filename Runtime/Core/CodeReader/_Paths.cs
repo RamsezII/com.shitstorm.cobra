@@ -17,11 +17,7 @@ namespace _COBRA_
             if (sig_error != null)
                 goto failure;
 
-            int read_old = read_i;
-            HasNext();
-            if (!IsOnCursor())
-                read_i = read_old;
-            else
+            if (IsOnCursor())
             {
                 stop_completing = true;
                 completion_l = completion_r = null;

@@ -18,28 +18,30 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
             bool cond = false;
 
             List<Executor> exe_yes = new(), exe_no = new();
 
-            ast_cond.OnExecutorsQueue(executors);
+            ast_cond.OnExecutorsQueue(memstack, memscope, executors);
 
             executors.Enqueue(new(
                 name: $"ternary(retreive cond: {ast_cond} ? {ast_yes} : {ast_no})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
-                    var cell = janitor.vstack.PopLast();
+                    var cell = memstack.PopLast();
                     cond = (bool)cell._value;
                 }
             ));
 
             executors.Enqueue(new(
                 name: $"ternary({cond}:{(cond ? ast_yes : ast_no)})",
-                action_SIG_EXE: janitor =>
+                scope: memscope,
+                action_SIG_EXE: () =>
                 {
                     foreach (var exe in cond ? exe_no : exe_yes)
                         exe.Dispose();
@@ -47,9 +49,9 @@ namespace _COBRA_.Boa
             ));
 
             int index1 = executors.Count;
-            ast_yes.OnExecutorsQueue(executors);
+            ast_yes.OnExecutorsQueue(memstack, memscope, executors);
             int index2 = executors.Count;
-            ast_no.OnExecutorsQueue(executors);
+            ast_no.OnExecutorsQueue(memstack, memscope, executors);
             int index3 = executors.Count;
 
             int index = 0;

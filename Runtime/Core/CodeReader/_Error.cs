@@ -1,10 +1,25 @@
 using System.Text;
+using UnityEngine;
 
 namespace _COBRA_
 {
     partial class CodeReader
     {
         public int sig_error_lineNumber;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public void CompilationError(in string error)
+        {
+            if (sig_error == null)
+                if (sig_flags.HasFlag(SIG_FLAGS.SUBMIT))
+                    Debug.LogError(error);
+                else if (sig_flags.HasFlag(SIG_FLAGS.CHECK))
+                    Debug.LogWarning(error);
+
+            sig_error ??= error;
+            err_trace ??= Util.GetStackTrace().GetFrame(1).ToString();
+        }
 
         public void LocalizeError()
         {

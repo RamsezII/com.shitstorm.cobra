@@ -29,18 +29,18 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal protected abstract void OnExecution(in Janitor janitor, in object target);
+        internal protected abstract void OnExecution(in MemStack memstack, in MemScope memscope, in object target);
     }
 
     public sealed class DevField<TClass, TAttr> : DevField
     {
-        internal readonly Action<Janitor, TClass> onExecution;
+        internal readonly Action<MemStack, MemScope, TClass> onExecution;
 
         //----------------------------------------------------------------------------------------------------------
 
         public DevField(
             in string name,
-            in Action<Janitor, TClass> onExecution
+            in Action<MemStack, MemScope, TClass> onExecution
             ) : base(
                 name: name,
                 output_type: typeof(TAttr)
@@ -61,9 +61,9 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecution(in Janitor janitor, in object target)
+        protected internal override void OnExecution(in MemStack memstack, in MemScope memscope, in object target)
         {
-            onExecution(janitor, (TClass)target);
+            onExecution(memstack, memscope, (TClass)target);
         }
     }
 }

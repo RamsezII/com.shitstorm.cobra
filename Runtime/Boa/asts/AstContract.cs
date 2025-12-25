@@ -109,9 +109,9 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected internal override void OnExecutorsQueue(in Queue<Executor> executors)
+        protected internal override void OnExecutorsQueue(MemStack memstack, MemScope memscope, in Queue<Executor> executors)
         {
-            base.OnExecutorsQueue(executors);
+            base.OnExecutorsQueue(memstack, memscope, executors);
 
             DevContract.VOptions vopts = null;
             DevContract.VArguments vargs = null;
@@ -120,15 +120,16 @@ namespace _COBRA_.Boa
             {
                 vopts = new();
                 for (int i = 0; i < topts.Count; i++)
-                    topts[i].ast.OnExecutorsQueue(executors);
+                    topts[i].ast.OnExecutorsQueue(memstack, memscope, executors);
 
                 executors.Enqueue(new(
                     name: $"pop options for contract({contract.name})",
-                    action_SIG_EXE: janitor =>
+                    scope: memscope,
+                    action_SIG_EXE: () =>
                     {
                         for (int i = topts.Count; i > 0; i--)
-                            vopts.Add(topts[^i].name, janitor.vstack[^i]);
-                        janitor.vstack.RemoveRange(janitor.vstack.Count - topts.Count, topts.Count);
+                            vopts.Add(topts[^i].name, memstack[^i]);
+                        memstack.RemoveRange(memstack.Count - topts.Count, topts.Count);
                     }
                 ));
             }
@@ -137,15 +138,16 @@ namespace _COBRA_.Boa
             {
                 vargs = new();
                 for (int i = 0; i < targs.Count; i++)
-                    targs[i].OnExecutorsQueue(executors);
+                    targs[i].OnExecutorsQueue(memstack, memscope, executors);
 
                 executors.Enqueue(new(
                     name: $"pop arguments for contract({contract.name})",
-                    action_SIG_EXE: janitor =>
+                    scope: memscope,
+                    action_SIG_EXE: () =>
                     {
                         for (int i = targs.Count; i > 0; i--)
-                            vargs.Add(janitor.vstack[^i]);
-                        janitor.vstack.RemoveRange(janitor.vstack.Count - targs.Count, targs.Count);
+                            vargs.Add(memstack[^i]);
+                        memstack.RemoveRange(memstack.Count - targs.Count, targs.Count);
                     }
                 ));
             }
@@ -155,19 +157,22 @@ namespace _COBRA_.Boa
             if (contract.action != null)
                 executors.Enqueue(new(
                     name: $"action(tick) for contract({contract.name})",
-                    action_SIG_EXE: janitor => contract.action(janitor, prms)
+                    scope: memscope,
+                    action_SIG_EXE: () => contract.action(memstack, memscope, prms)
                 ));
 
             if (contract.routine != null)
                 executors.Enqueue(new(
                     name: $"routine(tick) for contract({contract.name})",
-                    routine_SIG_EXE: janitor => contract.routine(janitor, prms)
+                    scope: memscope,
+                    routine_SIG_EXE: () => contract.routine(memstack, memscope, prms)
                 ));
 
             if (contract.routine_READER != null)
                 executors.Enqueue(new(
                     name: $"routine(reader) for contract({contract.name})",
-                    routine_SIG_READER: janitor => contract.routine_READER(janitor, prms)
+                    scope: memscope,
+                    routine_SIG_READER: janitor => contract.routine_READER(memstack, memscope, prms, janitor)
                 ));
         }
     }
