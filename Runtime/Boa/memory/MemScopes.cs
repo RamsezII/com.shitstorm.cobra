@@ -60,7 +60,8 @@ namespace _COBRA_.Boa
             }
             else if (_parent != null)
                 return _parent.TrySetVariable(name, cell);
-            return false;
+            _vars[name] = cell;
+            return true;
         }
 
         internal bool TrySetMethod(in string name, in MemMethod method)
@@ -72,7 +73,8 @@ namespace _COBRA_.Boa
             }
             else if (_parent != null)
                 return _parent.TrySetMethod(name, method);
-            return false;
+            _methods[name] = method;
+            return true;
         }
     }
 }

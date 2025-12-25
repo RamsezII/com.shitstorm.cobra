@@ -23,7 +23,7 @@ namespace _COBRA_.Boa.contracts
             ));
 
             DevContract.AddContract(new(
-                name: "script_check",
+                name: "check_script",
                 arguments: new() { typeof(BoaFPath), },
                 action: static (janitor, prms) =>
                 {
@@ -54,7 +54,7 @@ namespace _COBRA_.Boa.contracts
             ));
 
             DevContract.AddContract(new(
-                name: "script_run",
+                name: "run_script",
                 arguments: new() { typeof(BoaFPath), },
                 action: static (janitor, prms) =>
                 {

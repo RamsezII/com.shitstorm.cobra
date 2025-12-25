@@ -107,9 +107,14 @@ namespace _COBRA_.Boa
                     Codes code = codes[op_name];
                     scope.TryGetVariable(var_name, out var cell);
 
-                    if (AstExpression.TryExpr(reader, scope, false, cell._type, out AstExpression expr))
+                    if (AstExpression.TryExpr(reader, scope, false, cell._type, out AstExpression ast_expr))
                     {
-                        ast_assign = new AstAssignation(var_name, expr, code);
+                        if (!scope.TrySetVariable(var_name, new MemCell(ast_expr.output_type, null)))
+                        {
+                            reader.CompilationError($"could not set variable \"{var_name}\"");
+                            goto failure;
+                        }
+                        ast_assign = new AstAssignation(var_name, ast_expr, code);
                         return true;
                     }
                     else
@@ -120,11 +125,16 @@ namespace _COBRA_.Boa
                 if (reader.TryReadChar_match('=', reader.lint_theme.operators))
                     if (AstExpression.TryExpr(reader, scope, false, typeof(object), out var ast_expr))
                     {
-                        scope.TrySetVariable(var_name, new MemCell(ast_expr.output_type, null));
+                        if (!scope.TrySetVariable(var_name, new MemCell(ast_expr.output_type, null)))
+                        {
+                            reader.CompilationError($"could not declare variable \"{var_name}\"");
+                            goto failure;
+                        }
                         ast_assign = new AstAssignation(var_name, ast_expr, Codes.Assign);
                         return true;
                     }
 
+                failure:
             reader.read_i = read_old;
             ast_assign = null;
             return false;

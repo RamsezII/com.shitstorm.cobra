@@ -84,7 +84,10 @@ namespace _COBRA_.Boa
                             reader.LintToThisPosition(reader.lint_theme.quotes, false);
 
                             if (current_fragment.Length > 0)
+                            {
                                 asts.Add(new AstLiteral(current_fragment));
+                                current_fragment = string.Empty;
+                            }
 
                             if (TryExpr(reader, tscope, false, typeof(object), out AstExpression expression))
                                 asts.Add(expression);
@@ -115,7 +118,10 @@ namespace _COBRA_.Boa
                             reader.cpl_end = reader.read_i - 1;
 
                             if (current_fragment.Length > 0)
+                            {
                                 asts.Add(new AstLiteral(current_fragment));
+                                current_fragment = string.Empty;
+                            }
 
                             ast_string = new AstString(asts);
                         }
