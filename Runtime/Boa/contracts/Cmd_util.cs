@@ -56,13 +56,32 @@ namespace _COBRA_.Boa.contracts
             DevContract.AddContract(new(
                 name: "script_run",
                 arguments: new() { typeof(BoaFPath), },
-                routine_READER: static (janitor, prms) =>
+                action: static (janitor, prms) =>
                 {
-                    return ERoutine(janitor);
-                    static IEnumerator<ExecutionStatus> ERoutine(Janitor janitor)
+                    string fpath = (string)prms.arguments[0]._value;
+                    string text = File.ReadAllText(fpath);
+
+                    CodeReader reader = new(SIG_FLAGS.CHECK, janitor.shell.workdir._value, null, false, text, fpath);
+                    MemScope scope = new();
+                    Queue<AstAbstract> asts = new();
+
+                    while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
+                        if (ast != null)
+                            asts.Enqueue(ast);
+
+                    bool execute_in_background = reader.TryReadChar_match('&', lint: reader.lint_theme.command_separators);
+
+                    if (reader.TryPeekChar_out(out char peek, out _))
+                        reader.CompilationError($"could not parse everything ({nameof(peek)}: '{peek}').");
+
+                    if (reader.sig_error != null)
                     {
-                        yield break;
+                        reader.LocalizeError();
+                        janitor.shell.on_output(reader.sig_long_error, reader.sig_long_error.SetColor(Color.red));
                     }
+                    else
+                        foreach (var ast in asts)
+                            ast.OnExecutorsQueue(janitor.executors);
                 }
             ));
         }
