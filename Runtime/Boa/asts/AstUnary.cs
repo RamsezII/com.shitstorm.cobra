@@ -42,7 +42,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"unary({code})",
-                scope: scope,
                 action_SIG_EXE: () =>
                 {
                     MemCell popped = vstack.PopLast();

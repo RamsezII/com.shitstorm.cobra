@@ -8,26 +8,49 @@ namespace _COBRA_
     {
         public readonly ValueHandler<ExecutionStatus> status = new();
         public Action<object, string> stdout, stderr;
+        public Action beforeTick, afterTick;
+        public bool started;
+        public int tick_count;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public virtual void Init()
+        protected Shell(in string name) : base(name)
         {
             status.Value = RegularStatus();
-            Util.AddAction(ref NUCLEOR.delegates.Update_OnShellTick, OnTick);
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public void ToggleTick(in bool toggle)
+        {
+            NUCLEOR.delegates.Update_OnShellTick -= Tick;
+            if (toggle)
+                NUCLEOR.delegates.Update_OnShellTick += Tick;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         public abstract void OnReader(in CodeReader reader);
 
+        public void Tick()
+        {
+            beforeTick?.Invoke();
+            OnTick();
+            afterTick?.Invoke();
+            started = true;
+            ++tick_count;
+        }
         protected abstract void OnTick();
 
         //----------------------------------------------------------------------------------------------------------
 
         protected override void OnDispose()
         {
-            NUCLEOR.delegates.Update_OnShellTick -= OnTick;
+            beforeTick = afterTick = null;
+
+            NUCLEOR.delegates.Update_OnShellTick -= Tick;
+
+            stdout = stderr = null;
 
             base.OnDispose();
 

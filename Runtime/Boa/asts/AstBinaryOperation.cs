@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _COBRA_.Boa
 {
@@ -91,13 +92,15 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"op({code})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     var exc = new Exception($"wrong operation: {code}");
 
                     MemCell poppedR = memstack.PopLast();
                     MemCell poppedL = memstack.PopLast();
+
+                    if (poppedL._value == null || poppedR._value == null)
+                        Debug.LogError($"empty value in binary operation (cellL({poppedL._value}) cellR({poppedR._value})) in scope ({memscope})");
 
                     MemCell assigned = code switch
                     {

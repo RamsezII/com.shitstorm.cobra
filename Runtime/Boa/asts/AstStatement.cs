@@ -88,7 +88,6 @@ namespace _COBRA_.Boa
             if (expression.output_type != null)
                 executors.Enqueue(new(
                     name: "expr_statement(pop vstack last)",
-                    scope: memscope,
                     action_SIG_EXE: () =>
                     {
                         MemCell cell = memstack.PopLast();

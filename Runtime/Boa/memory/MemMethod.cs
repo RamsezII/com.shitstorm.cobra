@@ -28,6 +28,7 @@ namespace _COBRA_.Boa
         }
 
         public readonly string name;
+        public readonly MemScope scope;
         public readonly Dictionary<OptionKey, Type> topts;
         public readonly List<TArgument> targs;
         public readonly AstStatement ast;
@@ -35,9 +36,10 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal MemMethod(in string name, in AstStatement ast, in Type output_type)
+        internal MemMethod(in string name, in MemScope scope, in AstStatement ast, in Type output_type)
         {
             this.name = name;
+            this.scope = scope;
             topts = new();
             targs = new();
             this.ast = ast;

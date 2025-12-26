@@ -21,7 +21,7 @@ namespace _COBRA_.Boa
             {
                 reader.LintOpeningBraquet();
 
-                var sub_scope = memscope.GetSubScope();
+                var sub_scope = memscope.GetSubScope("block_scope");
                 var asts = new List<AstStatement>();
 
                 while (TryStatement(reader, sub_scope, out var ast_statement))
@@ -53,7 +53,7 @@ namespace _COBRA_.Boa
         {
             base.OnExecutorsQueue(memstack, memscope, executors);
 
-            var subscope = memscope.GetSubScope();
+            var subscope = memscope.GetSubScope("block_scope");
 
             for (int i = 0; i < asts.Count; ++i)
                 asts[i].OnExecutorsQueue(memstack, subscope, executors);

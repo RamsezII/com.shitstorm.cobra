@@ -28,7 +28,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"indexer(retreive indexable)",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     cell_index = memstack.PopLast();
@@ -39,7 +38,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"indexer(retreive and apply index)",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     MemCell popped = memstack.PopLast();

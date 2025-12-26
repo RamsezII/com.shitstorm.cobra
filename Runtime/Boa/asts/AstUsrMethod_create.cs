@@ -22,7 +22,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"declare function ({method.name})",
-                scope: memscope,
                 action_SIG_EXE: () => memscope.TrySetMethod(method.name, method)
             ));
         }
@@ -76,7 +75,7 @@ namespace _COBRA_.Boa
                         reader.CloseBraquetLint();
                     }
 
-                    MemScope subscope = scope.GetSubScope();
+                    MemScope subscope = scope.GetSubScope($"method_scope({met_name})");
                     foreach (var (type, name) in targs)
                         subscope._vars.Add(name, new MemCell(type, null));
 
@@ -86,7 +85,7 @@ namespace _COBRA_.Boa
                         goto failure;
                     }
 
-                    MemMethod method = new(met_name, ast_body, typeof(object));
+                    MemMethod method = new(met_name, scope, ast_body, typeof(object));
                     foreach (var (type, name) in targs)
                         method.targs.Add(new MemMethod.TArgument(name, type));
                     scope.TrySetMethod(met_name, method);

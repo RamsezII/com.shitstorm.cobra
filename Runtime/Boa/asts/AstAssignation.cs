@@ -57,11 +57,10 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"var({var_name})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     MemCell popped = memstack.PopLast();
-                    if (!memscope.TryGetVariable(var_name, out var existant, out _))
+                    if (!memscope.TryGetVariable(var_name, out var existant, out var var_scope))
                         memscope._vars.Add(var_name, popped);
                     else
                     {
@@ -78,7 +77,7 @@ namespace _COBRA_.Boa
                             Codes.No => !popped,
                             _ => popped,
                         };
-                        memscope.TrySetVariable(var_name, assigned);
+                        var_scope.TrySetVariable(var_name, assigned);
                     }
                 }
             ));

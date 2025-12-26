@@ -22,7 +22,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"literal({value})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     memstack.Add(item: new MemCell(value));

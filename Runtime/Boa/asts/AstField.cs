@@ -26,7 +26,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"field({field})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     MemCell popped = memstack.PopLast();

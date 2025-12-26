@@ -22,7 +22,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"var({var_name})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     memscope.TryGetVariable(var_name, out var cell, out _);

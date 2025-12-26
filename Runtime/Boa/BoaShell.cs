@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using _COBRA_.Boa;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,20 +30,25 @@ namespace _COBRA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public BoaShell()
+        public BoaShell(in string name) : base(name)
         {
-            scope = new(this);
+            scope = new("root_scope", this);
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected override void OnTick()
+        void ReassignGlobalVars()
         {
             scope._vars["_time"] = Time.time;
             scope._vars["_ftime"] = Time.fixedTime;
             scope._vars["_dtime"] = Time.deltaTime;
             scope._vars["_frame"] = Time.frameCount;
             scope._vars["_fframe"] = NUCLEOR.instance.fixedFrameCount;
+        }
+
+        protected override void OnTick()
+        {
+            ReassignGlobalVars();
 
             for (int i = 0; i < background_janitors.Count; i++)
             {
@@ -82,6 +88,8 @@ namespace _COBRA_
 
         public override void OnReader(in CodeReader reader)
         {
+            ReassignGlobalVars();
+
             if (front_janitor != null)
             {
                 front_janitor.OnReader(reader, out ExecutionStatus status);
@@ -106,7 +114,7 @@ namespace _COBRA_
 
                 MemScope ast_scope = reader.sig_flags.HasFlag(SIG_FLAGS.SUBMIT)
                     ? scope
-                    : scope.GetSubScope();
+                    : scope.GetSubScope("ast_scope");
 
                 while (reader.HasNext() && AstStatement.TryStatement(reader, ast_scope, out var ast))
                     if (ast != null)
@@ -125,10 +133,10 @@ namespace _COBRA_
                         status.Value = RegularStatus();
                     }
                     else if (execute_in_background)
-                        background_janitors.Add(new(this, asts));
+                        background_janitors.Add(new("background_janitor", this, asts));
                     else
                     {
-                        front_janitor = new(this, asts);
+                        front_janitor = new("front_janitor", this, asts);
                         status.Value = default;
                     }
             }

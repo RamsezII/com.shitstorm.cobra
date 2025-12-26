@@ -18,7 +18,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Janitor(in BoaShell shell, in Queue<AstAbstract> asts)
+        public Janitor(in string name, in BoaShell shell, in Queue<AstAbstract> asts):base($"{shell.name}->{name}")
         {
             this.shell = shell;
             this.asts = asts;

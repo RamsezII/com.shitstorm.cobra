@@ -105,7 +105,7 @@ namespace _COBRA_.Boa
         {
             base.OnExecutorsQueue(memstack, memscope, executors);
 
-            MemScope subscope = memscope.GetSubScope();
+            MemScope subscope = method.scope.GetSubScope($"method_scope({method.name})");
 
             if (asts_opts != null && asts_opts.Count > 0)
             {
@@ -114,7 +114,6 @@ namespace _COBRA_.Boa
 
                 executors.Enqueue(new(
                     name: $"pop options for method({method.name})",
-                    scope: memscope,
                     action_SIG_EXE: () =>
                     {
                         for (int i = asts_opts.Count; i > 0; i--)
@@ -137,7 +136,6 @@ namespace _COBRA_.Boa
 
                 executors.Enqueue(new(
                     name: $"pop arguments for method( {method.name})",
-                    scope: memscope,
                     action_SIG_EXE: () =>
                     {
                         for (int i = 0; i < asts_args.Count; i++)
@@ -156,7 +154,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: "push empty in stack (TODO: remplacer par 'return' statements)",
-                scope: subscope,
                 action_SIG_EXE: () => memstack.Add(new MemCell(new NamedDummy("method call")))
             ));
         }

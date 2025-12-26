@@ -1,25 +1,26 @@
-﻿using System;
+﻿using _UTIL_;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace _COBRA_.Boa
 {
-    public sealed class MemScope
+    public sealed class MemScope : Disposable
     {
-        internal readonly BoaShell shell;
+        public readonly BoaShell shell;
         public readonly MemScope _parent;
         public readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
         public readonly Dictionary<string, MemMethod> _methods = new(StringComparer.Ordinal);
-        public MemScope GetSubScope() => new(this);
+        public MemScope GetSubScope(in string name) => new(name, this);
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal MemScope(in BoaShell shell)
+        internal MemScope(in string name, in BoaShell shell) : base($"{shell.name}->{name}")
         {
             this.shell = shell;
         }
 
-        MemScope(in MemScope parent)
+        MemScope(in string name, in MemScope parent) : base($"{parent.name}->{name}")
         {
             shell = parent.shell;
             _parent = parent;

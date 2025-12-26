@@ -62,7 +62,7 @@ namespace _COBRA_.Boa.contracts
                     string text = File.ReadAllText(fpath);
 
                     CodeReader reader = new(SIG_FLAGS.CHECK, memscope.shell.workdir._value, null, false, text, fpath);
-                    MemScope scope = new(memscope.shell);
+                    MemScope scope = new("check_script_scope", memscope.shell);
                     Queue<AstAbstract> asts = new();
 
                     while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
@@ -95,7 +95,7 @@ namespace _COBRA_.Boa.contracts
                     string text = File.ReadAllText(fpath);
 
                     CodeReader reader = new(SIG_FLAGS.CHECK, memscope.shell.workdir._value, null, false, text, fpath);
-                    MemScope scope = new(memscope.shell);
+                    MemScope scope = new("un_script_scope", memscope.shell);
                     Queue<AstAbstract> asts = new();
 
                     while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))

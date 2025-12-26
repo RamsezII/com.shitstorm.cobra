@@ -124,7 +124,6 @@ namespace _COBRA_.Boa
 
                 executors.Enqueue(new(
                     name: $"pop options for contract({contract.name})",
-                    scope: memscope,
                     action_SIG_EXE: () =>
                     {
                         for (int i = topts.Count; i > 0; i--)
@@ -142,7 +141,6 @@ namespace _COBRA_.Boa
 
                 executors.Enqueue(new(
                     name: $"pop arguments for contract({contract.name})",
-                    scope: memscope,
                     action_SIG_EXE: () =>
                     {
                         for (int i = targs.Count; i > 0; i--)
@@ -157,21 +155,18 @@ namespace _COBRA_.Boa
             if (contract.action != null)
                 executors.Enqueue(new(
                     name: $"action(tick) for contract({contract.name})",
-                    scope: memscope,
                     action_SIG_EXE: () => contract.action(memstack, memscope, prms)
                 ));
 
             if (contract.routine != null)
                 executors.Enqueue(new(
                     name: $"routine(tick) for contract({contract.name})",
-                    scope: memscope,
                     routine_SIG_EXE: () => contract.routine(memstack, memscope, prms)
                 ));
 
             if (contract.routine_READER != null)
                 executors.Enqueue(new(
                     name: $"routine(reader) for contract({contract.name})",
-                    scope: memscope,
                     routine_SIG_READER: janitor => contract.routine_READER(memstack, memscope, prms, janitor)
                 ));
         }

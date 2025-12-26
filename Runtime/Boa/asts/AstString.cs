@@ -26,7 +26,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"string({asts.Count})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     StringBuilder sb = new();

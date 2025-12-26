@@ -32,7 +32,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"field({method})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     List<MemCell> cells = new(ast_args.Count);

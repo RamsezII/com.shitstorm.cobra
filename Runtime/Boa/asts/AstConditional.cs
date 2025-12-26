@@ -30,7 +30,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"ternary(retreive cond: {ast_cond} ? {ast_yes} : {ast_no})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     var cell = memstack.PopLast();
@@ -40,7 +39,6 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"ternary({cond}:{(cond ? ast_yes : ast_no)})",
-                scope: memscope,
                 action_SIG_EXE: () =>
                 {
                     foreach (var exe in cond ? exe_no : exe_yes)
