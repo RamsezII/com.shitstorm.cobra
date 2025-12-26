@@ -18,7 +18,7 @@ namespace _COBRA_.Boa
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal Janitor(in BoaShell shell, in Queue<AstAbstract> asts)
+        public Janitor(in BoaShell shell, in Queue<AstAbstract> asts)
         {
             this.shell = shell;
             this.asts = asts;

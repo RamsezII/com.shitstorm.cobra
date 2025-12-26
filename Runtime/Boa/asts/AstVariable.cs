@@ -25,7 +25,7 @@ namespace _COBRA_.Boa
                 scope: memscope,
                 action_SIG_EXE: () =>
                 {
-                    memscope.TryGetVariable(var_name, out var cell);
+                    memscope.TryGetVariable(var_name, out var cell, out _);
                     memstack.Add(cell);
                 }
             ));
@@ -38,7 +38,7 @@ namespace _COBRA_.Boa
             int read_old = reader.read_i;
 
             if (reader.TryReadString_matches_out(out string var_name, false, reader.lint_theme.variables, tscope.EVarNames()))
-                if (tscope.TryGetVariable(var_name, out var cell))
+                if (tscope.TryGetVariable(var_name, out var cell, out _))
                 {
                     ast_variable = new AstVariable(var_name, cell._type);
                     return true;

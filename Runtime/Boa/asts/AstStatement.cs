@@ -2,7 +2,7 @@
 
 namespace _COBRA_.Boa
 {
-    internal abstract class AstStatement : AstAbstract
+    public abstract class AstStatement : AstAbstract
     {
         public static bool TryStatement(in CodeReader reader, in MemScope scope, out AstStatement ast_statement)
         {

@@ -1,4 +1,5 @@
-﻿using _COBRA_.Boa;
+﻿using _ARK_;
+using _COBRA_.Boa;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,8 +23,8 @@ namespace _COBRA_
 
         */
 
-        internal readonly List<Janitor> background_janitors = new();
-        internal Janitor front_janitor;
+        public readonly List<Janitor> background_janitors = new();
+        public Janitor front_janitor;
         public readonly MemScope scope;
 
         //----------------------------------------------------------------------------------------------------------
@@ -37,6 +38,12 @@ namespace _COBRA_
 
         protected override void OnTick()
         {
+            scope._vars["_time"] = Time.time;
+            scope._vars["_ftime"] = Time.fixedTime;
+            scope._vars["_dtime"] = Time.deltaTime;
+            scope._vars["_frame"] = Time.frameCount;
+            scope._vars["_fframe"] = NUCLEOR.instance.fixedFrameCount;
+
             for (int i = 0; i < background_janitors.Count; i++)
             {
                 Janitor janitor = background_janitors[i];
@@ -97,7 +104,9 @@ namespace _COBRA_
             {
                 Queue<AstAbstract> asts = new();
 
-                MemScope ast_scope = scope.GetSubScope();
+                MemScope ast_scope = reader.sig_flags.HasFlag(SIG_FLAGS.SUBMIT)
+                    ? scope
+                    : scope.GetSubScope();
 
                 while (reader.HasNext() && AstStatement.TryStatement(reader, ast_scope, out var ast))
                     if (ast != null)

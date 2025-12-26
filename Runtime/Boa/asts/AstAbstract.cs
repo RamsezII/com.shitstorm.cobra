@@ -2,7 +2,7 @@
 
 namespace _COBRA_.Boa
 {
-    internal abstract class AstAbstract
+    public abstract class AstAbstract
     {
         //----------------------------------------------------------------------------------------------------------
 

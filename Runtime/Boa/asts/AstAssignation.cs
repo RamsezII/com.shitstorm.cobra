@@ -61,7 +61,7 @@ namespace _COBRA_.Boa
                 action_SIG_EXE: () =>
                 {
                     MemCell popped = memstack.PopLast();
-                    if (!memscope.TryGetVariable(var_name, out var existant))
+                    if (!memscope.TryGetVariable(var_name, out var existant, out _))
                         memscope._vars.Add(var_name, popped);
                     else
                     {
@@ -106,7 +106,7 @@ namespace _COBRA_.Boa
                 )
                 {
                     Codes code = codes[op_name];
-                    scope.TryGetVariable(var_name, out var cell);
+                    scope.TryGetVariable(var_name, out var cell, out _);
 
                     if (AstExpression.TryExpr(reader, scope, false, cell._type, out AstExpression ast_expr))
                     {

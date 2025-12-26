@@ -24,7 +24,7 @@ namespace _COBRA_.Boa
         public static bool TryParseCall(in CodeReader reader, in MemScope scope, in Type expected_type, out AstUsrMethod_call ast_call)
         {
             if (reader.TryReadString_matches_out(out string met_name, false, reader.lint_theme.functions, scope.EMetNames()))
-                if (!scope.TryGetMethod(met_name, out var method))
+                if (!scope.TryGetMethod(met_name, out var method, out _))
                 {
                     reader.CompilationError($"no method named '{met_name}'.");
                     goto failure;

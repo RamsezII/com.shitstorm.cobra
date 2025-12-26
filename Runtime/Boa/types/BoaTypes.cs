@@ -17,6 +17,7 @@ namespace _COBRA_.Boa
 
             types.Add("bool", typeof(bool));
             types.Add("int", typeof(int));
+            types.Add("float", typeof(float));
             types.Add("string", typeof(string));
         }
     }

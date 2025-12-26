@@ -9,7 +9,7 @@ namespace _COBRA_.Boa
         internal readonly BoaShell shell;
         public readonly MemScope _parent;
         public readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
-        internal readonly Dictionary<string, MemMethod> _methods = new(StringComparer.Ordinal);
+        public readonly Dictionary<string, MemMethod> _methods = new(StringComparer.Ordinal);
         public MemScope GetSubScope() => new(this);
 
         //----------------------------------------------------------------------------------------------------------
@@ -40,53 +40,57 @@ namespace _COBRA_.Boa
             return _vars.Keys;
         }
 
-        internal IEnumerable<string> EMetNames()
+        public IEnumerable<string> EMetNames()
         {
             if (_parent != null)
                 return _methods.Keys.Union(_parent.EMetNames());
             return _methods.Keys;
         }
 
-        public bool TryGetVariable(in string name, out MemCell value)
+        public bool TryGetVariable(in string name, out MemCell value, out MemScope scope)
         {
             if (_vars.TryGetValue(name, out value))
+            {
+                scope = this;
                 return true;
+            }
             else if (_parent != null)
-                return _parent.TryGetVariable(name, out value);
+                return _parent.TryGetVariable(name, out value, out scope);
+            scope = null;
             return false;
         }
 
-        internal bool TryGetMethod(in string name, out MemMethod value)
+        public bool TryGetMethod(in string name, out MemMethod value, out MemScope scope)
         {
             if (_methods.TryGetValue(name, out value))
+            {
+                scope = this;
                 return true;
+            }
             else if (_parent != null)
-                return _parent.TryGetMethod(name, out value);
+                return _parent.TryGetMethod(name, out value, out scope);
+            scope = null;
             return false;
         }
 
         public bool TrySetVariable(in string name, in MemCell cell)
         {
-            if (_vars.ContainsKey(name))
+            if (TryGetVariable(name, out _, out var scope))
             {
-                _vars[name] = cell;
+                scope._vars[name] = cell;
                 return true;
             }
-            else if (_parent != null)
-                return _parent.TrySetVariable(name, cell);
             _vars[name] = cell;
             return true;
         }
 
         internal bool TrySetMethod(in string name, in MemMethod method)
         {
-            if (_methods.ContainsKey(name))
+            if (TryGetMethod(name, out _, out var scope))
             {
-                _methods[name] = method;
+                scope._methods[name] = method;
                 return true;
             }
-            else if (_parent != null)
-                return _parent.TrySetMethod(name, method);
             _methods[name] = method;
             return true;
         }

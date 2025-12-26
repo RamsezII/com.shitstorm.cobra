@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace _COBRA_.Boa
 {
-    internal readonly struct MemMethod
+    public readonly struct MemMethod
     {
         public readonly struct OptionKey
         {
