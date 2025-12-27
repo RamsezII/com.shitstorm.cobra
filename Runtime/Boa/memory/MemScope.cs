@@ -1,7 +1,9 @@
-﻿using _UTIL_;
+﻿using _ARK_;
+using _UTIL_;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace _COBRA_.Boa
 {
@@ -9,9 +11,31 @@ namespace _COBRA_.Boa
     {
         public readonly BoaShell shell;
         public readonly MemScope _parent;
+        static readonly Dictionary<string, MemCell> _svars = new(StringComparer.Ordinal);
         public readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
         public readonly Dictionary<string, MemMethod> _methods = new(StringComparer.Ordinal);
         public MemScope GetSubScope(in string name) => new(name, this);
+
+        //----------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            _svars.Clear();
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void OnAfterSceneLoad()
+        {
+            NUCLEOR.delegates.Update_OnShellTick_before += static () =>
+            {
+                _svars["_time"] = Time.time;
+                _svars["_ftime"] = Time.fixedTime;
+                _svars["_dtime"] = Time.deltaTime;
+                _svars["_frame"] = Time.frameCount;
+                _svars["_fframe"] = NUCLEOR.instance.fixedFrameCount;
+            };
+        }
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -36,9 +60,10 @@ namespace _COBRA_.Boa
 
         public IEnumerable<string> EVarNames()
         {
+            IEnumerable<string> names = _svars.Keys.Union(_vars.Keys);
             if (_parent != null)
-                return _vars.Keys.Union(_parent.EVarNames());
-            return _vars.Keys;
+                return names.Union(_parent.EVarNames());
+            return names;
         }
 
         public IEnumerable<string> EMetNames()
@@ -50,7 +75,12 @@ namespace _COBRA_.Boa
 
         public bool TryGetVariable(in string name, out MemCell value, out MemScope scope)
         {
-            if (_vars.TryGetValue(name, out value))
+            if (_svars.TryGetValue(name, out value))
+            {
+                scope = null;
+                return true;
+            }
+            else if (_vars.TryGetValue(name, out value))
             {
                 scope = this;
                 return true;
@@ -78,7 +108,10 @@ namespace _COBRA_.Boa
         {
             if (TryGetVariable(name, out _, out var scope))
             {
-                scope._vars[name] = cell;
+                if (scope == null)
+                    Debug.LogWarning($"tried setting read-only var: '{name}'");
+                else
+                    scope._vars[name] = cell;
                 return true;
             }
             _vars[name] = cell;

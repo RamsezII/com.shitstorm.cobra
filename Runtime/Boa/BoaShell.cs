@@ -37,19 +37,8 @@ namespace _COBRA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        void ReassignGlobalVars()
-        {
-            scope._vars["_time"] = Time.time;
-            scope._vars["_ftime"] = Time.fixedTime;
-            scope._vars["_dtime"] = Time.deltaTime;
-            scope._vars["_frame"] = Time.frameCount;
-            scope._vars["_fframe"] = NUCLEOR.instance.fixedFrameCount;
-        }
-
         protected override void OnTick()
         {
-            ReassignGlobalVars();
-
             for (int i = 0; i < background_janitors.Count; i++)
             {
                 Janitor janitor = background_janitors[i];
@@ -88,8 +77,6 @@ namespace _COBRA_
 
         public override void OnReader(in CodeReader reader)
         {
-            ReassignGlobalVars();
-
             if (front_janitor != null)
             {
                 front_janitor.OnReader(reader, out ExecutionStatus status);
