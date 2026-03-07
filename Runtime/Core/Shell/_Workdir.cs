@@ -10,8 +10,8 @@ namespace _COBRA_
         public ExecutionStatus RegularStatus() => new(
             code: CMD_STATUS.WAIT_FOR_STDIN,
             prefixe: new(
-                text: $"{ArkMachine.user_name.Value}:{workdir._value}$ ",
-                lint: $"{ArkMachine.user_name.Value.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
+                text: $"{ArkMachine.CurrentUserName}:{workdir._value}$ ",
+                lint: $"{ArkMachine.CurrentUserName.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
                 )
         );
 
