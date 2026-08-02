@@ -5,7 +5,7 @@ namespace _COBRA_
 {
     partial class Shell
     {
-        public readonly ValueHandler<string> workdir = new(ArkMachine.DFHome.FullName);
+        public readonly ValueNotifier<string> workdir = new(ArkMachine.DFHome.FullName);
 
         public ExecutionStatus RegularStatus() => new(
             code: CMD_STATUS.WAIT_FOR_STDIN,

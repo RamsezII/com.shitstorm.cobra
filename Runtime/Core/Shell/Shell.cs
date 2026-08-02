@@ -6,7 +6,7 @@ namespace _COBRA_
 {
     public abstract partial class Shell : Disposable
     {
-        public readonly ValueHandler<ExecutionStatus> status = new();
+        public readonly ValueNotifier<ExecutionStatus> status = new();
         public Action<object, string> stdout, stderr;
         public Action beforeTick, afterTick;
         public bool started;
