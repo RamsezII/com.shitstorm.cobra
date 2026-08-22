@@ -1,4 +1,5 @@
 ﻿using _UTIL_;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,65 +33,46 @@ namespace _COBRA_.Boa
             while (asts.TryDequeue(out var ast))
             {
                 ast.OnExecutorsQueue(vstack, shell.scope, executors);
-            before_executor:
+
                 while (executors.TryDequeue(out var executor))
-                    if (!executor.Disposed)
+                {
+                    if (executor.Disposed)
+                        continue;
+
+                    try
                     {
                         if (executor.routine_SIG_READER != null)
                         {
-                            while (true)
-                                if (executor.Disposed)
-                                    goto before_executor;
-                                else
-                                    break;
-
-                            if (executor.Disposed)
-                                goto before_executor;
-
                             using var routine = executor.routine_SIG_READER(this);
 
-                            while (true)
-                                if (executor.Disposed)
-                                    goto before_executor;
-                                else if (routine.MoveNext())
-                                    yield return routine.Current;
-                                else
-                                    break;
+                            while (!executor.Disposed && routine.MoveNext())
+                                yield return routine.Current;
                         }
+
+                        if (executor.Disposed)
+                            continue;
 
                         if (executor.action_SIG_EXE != null)
                         {
-                            while (true)
-                                if (executor.Disposed)
-                                    goto before_executor;
-                                else if (reader != null)
-                                    yield return default;
-                                else
-                                    break;
+                            while (!executor.Disposed && reader != null)
+                                yield return default;
 
                             if (!executor.Disposed)
                                 executor.action_SIG_EXE();
                         }
 
+                        if (executor.Disposed)
+                            continue;
+
                         if (executor.routine_SIG_EXE != null)
                         {
-                            while (true)
-                                if (executor.Disposed)
-                                    goto before_executor;
-                                else if (reader != null)
-                                    yield return default;
-                                else
-                                    break;
-
-                            if (executor.Disposed)
-                                goto before_executor;
+                            while (!executor.Disposed && reader != null)
+                                yield return default;
 
                             using var routine = executor.routine_SIG_EXE();
 
-                            while (true)
-                                if (executor.Disposed)
-                                    goto before_executor;
-                                else if (reader != null)
+                            while (!executor.Disposed)
+                                if (reader != null)
                                     yield return default;
                                 else if (routine.MoveNext())
                                     yield return routine.Current;
@@ -98,16 +80,25 @@ namespace _COBRA_.Boa
                                     break;
                         }
                     }
+                    finally
+                    {
+                        executor.Dispose();
+                    }
+                }
             }
-            Dispose();
         }
 
         public bool OnReader(in CodeReader reader, out ExecutionStatus output)
         {
             this.reader = reader;
-            bool moveNext = OnTick(out output);
-            this.reader = null;
-            return moveNext;
+            try
+            {
+                return OnTick(out output);
+            }
+            finally
+            {
+                this.reader = null;
+            }
         }
 
         public bool OnTick(out ExecutionStatus output)
@@ -116,13 +107,24 @@ namespace _COBRA_.Boa
             {
                 int loops = 0;
             again:
-                if (routine.MoveNext())
+                try
                 {
-                    if (routine.Current.code == CMD_STATUS.RETURN)
-                        if (++loops < 100)
-                            goto again;
+                    if (routine.MoveNext())
+                    {
+                        if (routine.Current.code == CMD_STATUS.RETURN)
+                            if (++loops < 100)
+                                goto again;
 
-                    output = routine.Current;
+                        output = routine.Current;
+                        return true;
+                    }
+
+                    Dispose();
+                }
+                catch (Exception exception)
+                {
+                    output = new(CMD_STATUS.ERROR, error: exception.ToString());
+                    Dispose();
                     return true;
                 }
             }
@@ -140,7 +142,11 @@ namespace _COBRA_.Boa
                 Debug.LogWarning($"{this} disposed of {vstack.Count} unused memory cells...");
 
             routine?.Dispose();
-            executors.Clear();
+
+            while (executors.TryDequeue(out Executor executor))
+                executor.Dispose();
+
+            asts.Clear();
             vstack.Clear();
         }
     }

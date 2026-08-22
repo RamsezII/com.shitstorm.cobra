@@ -19,7 +19,7 @@ namespace _COBRA_.Boa
         public MemCell(in object value)
         {
             _value = value;
-            _type = value.GetType();
+            _type = value?.GetType() ?? typeof(object);
         }
 
         public MemCell(in Type type, in object value)
@@ -46,8 +46,8 @@ namespace _COBRA_.Boa
         public static MemCell operator -(MemCell a) => a._value is int i ? -i : -(float)a;
         public static MemCell operator !(MemCell a) => !(bool)a;
 
-        public static MemCell operator ==(MemCell a, MemCell b) => a._value.Equals(b._value);
-        public static MemCell operator !=(MemCell a, MemCell b) => !a._value.Equals(b._value);
+        public static MemCell operator ==(MemCell a, MemCell b) => Equals(a._value, b._value);
+        public static MemCell operator !=(MemCell a, MemCell b) => !Equals(a._value, b._value);
 
         public static MemCell operator +(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia + ib : (float)a + (float)b;
         public static MemCell operator -(MemCell a, MemCell b) => a._value is int ia && b._value is int ib ? ia - ib : (float)a - (float)b;
@@ -60,6 +60,6 @@ namespace _COBRA_.Boa
         public static MemCell operator ^(MemCell a, MemCell b) => a._value is bool ba && b._value is bool bb ? ba ^ bb : (int)a._value ^ (int)b._value;
 
         public static MemCell operator ++(MemCell a) => a._value is int i ? 1 + i : 1 + (float)a._value;
-        public static MemCell operator --(MemCell a) => a._value is int i ? 1 - i : 1 - (float)a._value;
+        public static MemCell operator --(MemCell a) => a._value is int i ? i - 1 : (float)a._value - 1;
     }
 }

@@ -17,13 +17,11 @@ namespace _COBRA_.Boa
             And,
             Or,
             Xor,
-            No,
         }
 
         static readonly Dictionary<string, Codes> codes = new(StringComparer.OrdinalIgnoreCase)
         {
             { "=", Codes.Assign },
-            { "!=", Codes.No },
             { "+=", Codes.Incr },
             { "-=", Codes.Decr },
             { "*=", Codes.Mult },
@@ -74,7 +72,6 @@ namespace _COBRA_.Boa
                             Codes.And => existant && popped,
                             Codes.Or => existant || popped,
                             Codes.Xor => existant ^= popped,
-                            Codes.No => !popped,
                             _ => popped,
                         };
                         var_scope.TrySetVariable(var_name, assigned);

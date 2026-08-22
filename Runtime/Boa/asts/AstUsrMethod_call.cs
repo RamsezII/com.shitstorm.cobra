@@ -105,7 +105,10 @@ namespace _COBRA_.Boa
         {
             base.OnExecutorsQueue(memstack, memscope, executors);
 
-            MemScope subscope = method.scope.GetSubScope($"method_scope({method.name})");
+            if (!memscope.TryGetMethod(method.name, out MemMethod runtime_method, out _))
+                throw new InvalidOperationException($"method '{method.name}' no longer exists in the execution scope");
+
+            MemScope subscope = runtime_method.scope.GetSubScope($"method_scope({runtime_method.name})");
 
             if (asts_opts != null && asts_opts.Count > 0)
             {
@@ -142,7 +145,7 @@ namespace _COBRA_.Boa
                         {
                             var ast = asts_args[i];
                             MemCell cell = memstack[memstack.Count - asts_args.Count + i];
-                            subscope._vars.Add(method.targs[i].name, cell);
+                            subscope._vars.Add(runtime_method.targs[i].name, cell);
                         }
 
                         memstack.RemoveRange(memstack.Count - asts_args.Count, asts_args.Count);
@@ -150,12 +153,14 @@ namespace _COBRA_.Boa
                 ));
             }
 
-            method.ast.OnExecutorsQueue(memstack, subscope, executors);
+            runtime_method.ast.OnExecutorsQueue(memstack, subscope, executors);
 
-            executors.Enqueue(new(
+            Executor conclude_call = new(
                 name: "push empty in stack (TODO: remplacer par 'return' statements)",
                 action_SIG_EXE: () => memstack.Add(new MemCell(new NamedDummy("method call")))
-            ));
+            );
+            conclude_call.onDispose += subscope.Dispose;
+            executors.Enqueue(conclude_call);
         }
     }
 }

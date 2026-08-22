@@ -22,7 +22,18 @@ namespace _COBRA_.Boa
 
             executors.Enqueue(new(
                 name: $"declare function ({method.name})",
-                action_SIG_EXE: () => memscope.TrySetMethod(method.name, method)
+                action_SIG_EXE: () =>
+                {
+                    MemMethod runtime_method = new(method.name, memscope, method.ast, method.output_type);
+
+                    foreach (var option in method.topts)
+                        runtime_method.topts.Add(option.Key, option.Value);
+
+                    for (int i = 0; i < method.targs.Count; ++i)
+                        runtime_method.targs.Add(method.targs[i]);
+
+                    memscope.TrySetMethod(runtime_method.name, runtime_method);
+                }
             ));
         }
 
@@ -78,6 +89,11 @@ namespace _COBRA_.Boa
                     MemScope subscope = scope.GetSubScope($"method_scope({met_name})");
                     foreach (var (type, name) in targs)
                         subscope._vars.Add(name, new MemCell(type, null));
+
+                    MemMethod signature = new(met_name, scope, null, typeof(object));
+                    foreach (var (type, name) in targs)
+                        signature.targs.Add(new MemMethod.TArgument(name, type));
+                    scope.TrySetMethod(met_name, signature);
 
                     if (!TryStatement(reader, subscope, out var ast_body))
                     {

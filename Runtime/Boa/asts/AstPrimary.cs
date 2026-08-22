@@ -36,43 +36,6 @@ namespace _COBRA_.Boa
                     return true;
                 }
 
-            if (reader.ContinueParsing())
-                if (ast_factor != null)
-                {
-                    int read_old_accessor = reader.read_i;
-                    if (reader.TryReadPrefixeString_match("->"))
-                    {
-                        reader.LintToThisPosition(reader.lint_theme.operators, true);
-                        var ast_old = ast_factor;
-
-                        if (ast_factor.output_type != null)
-                            if (AstField.TryField(reader, ast_factor, out var ast_accessor))
-                                ast_factor = ast_accessor;
-                            else if (reader.sig_error != null)
-                                goto failure;
-                            else
-                                reader.read_i = read_old_accessor;
-
-                        if (ast_factor.output_type != null)
-                            if (AstMethod.TryMethod(reader, scope, ast_factor, out var ast_accessor))
-                                ast_factor = ast_accessor;
-                            else if (reader.sig_error != null)
-                                goto failure;
-                            else
-                                reader.read_i = read_old_accessor;
-
-                        if (ast_old != ast_factor)
-                        {
-                            reader.CompilationError($"expected field or method name after operator '->'");
-                            ast_factor = null;
-                            goto failure;
-                        }
-                    }
-                }
-
-            if (reader.StopParsing())
-                goto failure;
-
             if (reader.TryReadChar_match('('))
             {
                 reader.LintOpeningBraquet();

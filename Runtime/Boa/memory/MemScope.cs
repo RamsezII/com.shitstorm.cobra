@@ -11,10 +11,15 @@ namespace _COBRA_.Boa
     {
         public readonly BoaShell shell;
         public readonly MemScope _parent;
+        readonly HashSet<MemScope> _children = new();
+        readonly bool local_writes_only;
+
+        internal int ChildCount => _children.Count;
         static readonly Dictionary<string, MemCell> _svars = new(StringComparer.Ordinal);
         public readonly Dictionary<string, MemCell> _vars = new(StringComparer.Ordinal);
         public readonly Dictionary<string, MemMethod> _methods = new(StringComparer.Ordinal);
-        public MemScope GetSubScope(in string name) => new(name, this);
+        public MemScope GetSubScope(in string name) => new(name, this, local_writes_only);
+        internal MemScope GetParsingScope(in string name) => new(name, this, true);
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -44,10 +49,12 @@ namespace _COBRA_.Boa
             this.shell = shell;
         }
 
-        MemScope(in string name, in MemScope parent) : base($"{parent.name}->{name}")
+        MemScope(in string name, in MemScope parent, in bool local_writes_only) : base($"{parent.name}->{name}")
         {
             shell = parent.shell;
             _parent = parent;
+            this.local_writes_only = local_writes_only;
+            parent._children.Add(this);
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -106,10 +113,19 @@ namespace _COBRA_.Boa
 
         public bool TrySetVariable(in string name, in MemCell cell)
         {
+            if (local_writes_only)
+            {
+                _vars[name] = cell;
+                return true;
+            }
+
             if (TryGetVariable(name, out _, out var scope))
             {
                 if (scope == null)
+                {
                     Debug.LogWarning($"tried setting read-only var: '{name}'");
+                    return false;
+                }
                 else
                     scope._vars[name] = cell;
                 return true;
@@ -120,6 +136,12 @@ namespace _COBRA_.Boa
 
         internal bool TrySetMethod(in string name, in MemMethod method)
         {
+            if (local_writes_only)
+            {
+                _methods[name] = method;
+                return true;
+            }
+
             if (TryGetMethod(name, out _, out var scope))
             {
                 scope._methods[name] = method;
@@ -127,6 +149,21 @@ namespace _COBRA_.Boa
             }
             _methods[name] = method;
             return true;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        protected override void OnDispose()
+        {
+            foreach (MemScope child in new List<MemScope>(_children))
+                child.Dispose();
+
+            _children.Clear();
+            _vars.Clear();
+            _methods.Clear();
+            _parent?._children.Remove(this);
+
+            base.OnDispose();
         }
     }
 }

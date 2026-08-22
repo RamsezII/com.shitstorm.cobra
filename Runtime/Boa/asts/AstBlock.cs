@@ -57,6 +57,13 @@ namespace _COBRA_.Boa
 
             for (int i = 0; i < asts.Count; ++i)
                 asts[i].OnExecutorsQueue(memstack, subscope, executors);
+
+            Executor dispose_scope = new(
+                name: "dispose block scope",
+                action_SIG_EXE: static () => { }
+            );
+            dispose_scope.onDispose += subscope.Dispose;
+            executors.Enqueue(dispose_scope);
         }
     }
 }

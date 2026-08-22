@@ -81,25 +81,49 @@ namespace _COBRA_.Boa
             // postfix
             else if (AstPrimary.TryPrimary(reader, scope, expected_type, out ast_unary))
             {
-                if (reader.TryReadChar_match('['))
+                while (reader.ContinueParsing())
                 {
-                    reader.LintOpeningBraquet();
-                    if (TryExpr(reader, scope, false, typeof(int), out var ast_index))
-                        if (reader.TryReadChar_match(']'))
-                        {
-                            reader.LintClosingBraquet();
-                            ast_unary = new AstIndexer(ast_unary, ast_index, ast_unary.output_type);
-                        }
+                    if (reader.TryReadChar_match('['))
+                    {
+                        reader.LintOpeningBraquet();
+                        if (TryExpr(reader, scope, false, typeof(int), out var ast_index))
+                            if (reader.TryReadChar_match(']'))
+                            {
+                                reader.LintClosingBraquet();
+                                ast_unary = new AstIndexer(ast_unary, ast_index, ast_unary.output_type);
+                            }
+                            else
+                            {
+                                reader.CompilationError($"expected ']' after indexer");
+                                goto failure;
+                            }
                         else
                         {
-                            reader.CompilationError($"expected ']' after indexer");
+                            reader.CompilationError($"expected expression after '['");
                             goto failure;
                         }
-                    else
-                    {
-                        reader.CompilationError($"expected expression after '['");
-                        goto failure;
                     }
+                    else if (reader.TryReadPrefixeString_match("->"))
+                    {
+                        reader.LintToThisPosition(reader.lint_theme.operators, true);
+                        int member_start = reader.read_i;
+
+                        if (ast_unary.output_type != null && AstField.TryField(reader, ast_unary, out var ast_field))
+                            ast_unary = ast_field;
+                        else
+                        {
+                            reader.read_i = member_start;
+                            if (ast_unary.output_type != null && AstMethod.TryMethod(reader, scope, ast_unary, out var ast_method))
+                                ast_unary = ast_method;
+                            else
+                            {
+                                reader.CompilationError($"expected field or method name after operator '->'");
+                                goto failure;
+                            }
+                        }
+                    }
+                    else
+                        break;
                 }
                 return true;
             }

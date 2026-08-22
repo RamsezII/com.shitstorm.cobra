@@ -1,0 +1,22 @@
+{
+    "name": "shitstorm._COBRA_.Tests",
+    "rootNamespace": "_COBRA_.Tests",
+    "references": [
+        "shitstorm._COBRA_",
+        "shitstorm._UTIL_"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

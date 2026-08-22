@@ -62,19 +62,7 @@ namespace _COBRA_.Boa.contracts
                     string text = File.ReadAllText(fpath);
 
                     CodeReader reader = new(SIG_FLAGS.CHECK, memscope.shell.workdir._value, null, false, text, fpath);
-                    MemScope scope = new("check_script_scope", memscope.shell);
-                    Queue<AstAbstract> asts = new();
-
-                    while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
-                        if (ast != null)
-                            asts.Enqueue(ast);
-
-                    bool execute_in_background = reader.TryReadChar_match('&', lint: reader.lint_theme.command_separators);
-
-                    if (reader.TryPeekChar_out(out char peek, out _))
-                        reader.CompilationError($"could not parse everything ({nameof(peek)}: '{peek}').");
-
-                    if (reader.sig_error != null)
+                    if (!memscope.shell.TryCompile(reader, memscope, out _, out _))
                     {
                         memstack.Add(new MemCell(false));
                         reader.LocalizeError();
@@ -95,19 +83,7 @@ namespace _COBRA_.Boa.contracts
                     string text = File.ReadAllText(fpath);
 
                     CodeReader reader = new(SIG_FLAGS.CHECK, memscope.shell.workdir._value, null, false, text, fpath);
-                    MemScope scope = new("un_script_scope", memscope.shell);
-                    Queue<AstAbstract> asts = new();
-
-                    while (reader.HasNext() && AstStatement.TryStatement(reader, scope, out var ast))
-                        if (ast != null)
-                            asts.Enqueue(ast);
-
-                    bool execute_in_background = reader.TryReadChar_match('&', lint: reader.lint_theme.command_separators);
-
-                    if (reader.TryPeekChar_out(out char peek, out _))
-                        reader.CompilationError($"could not parse everything ({nameof(peek)}: '{peek}').");
-
-                    if (reader.sig_error != null)
+                    if (!memscope.shell.TryCompile(reader, memscope, out Queue<AstAbstract> asts, out _))
                     {
                         memstack.Add(new MemCell(false));
                         reader.LocalizeError();

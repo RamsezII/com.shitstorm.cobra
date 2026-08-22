@@ -75,6 +75,32 @@ namespace _COBRA_
                 }
         }
 
+        internal bool TryCompile(in CodeReader reader, in MemScope execution_scope, out Queue<AstAbstract> asts, out bool execute_in_background)
+        {
+            asts = new();
+            execute_in_background = false;
+
+            using MemScope parsing_scope = execution_scope.GetParsingScope("parsing_scope");
+
+            try
+            {
+                while (reader.HasNext() && AstStatement.TryStatement(reader, parsing_scope, out var ast))
+                    if (ast != null)
+                        asts.Enqueue(ast);
+
+                execute_in_background = reader.TryReadChar_match('&', lint: reader.lint_theme.command_separators);
+
+                if (reader.TryPeekChar_out(out char peek, out _))
+                    reader.CompilationError($"could not parse everything ({nameof(peek)}: '{peek}').");
+            }
+            catch (Exception exception)
+            {
+                reader.CompilationError($"internal parser error: {exception.Message}");
+            }
+
+            return reader.sig_error == null;
+        }
+
         public override void OnReader(in CodeReader reader)
         {
             if (front_janitor != null)
@@ -97,23 +123,10 @@ namespace _COBRA_
             }
             else
             {
-                Queue<AstAbstract> asts = new();
-
-                MemScope ast_scope = reader.sig_flags.HasFlag(SIG_FLAGS.SUBMIT)
-                    ? scope
-                    : scope.GetSubScope("ast_scope");
-
-                while (reader.HasNext() && AstStatement.TryStatement(reader, ast_scope, out var ast))
-                    if (ast != null)
-                        asts.Enqueue(ast);
-
-                bool execute_in_background = reader.TryReadChar_match('&', lint: reader.lint_theme.command_separators);
-
-                if (reader.TryPeekChar_out(out char peek, out _))
-                    reader.CompilationError($"could not parse everything ({nameof(peek)}: '{peek}').");
+                bool compiled = TryCompile(reader, scope, out Queue<AstAbstract> asts, out bool execute_in_background);
 
                 if (reader.sig_flags.HasFlag(SIG_FLAGS.SUBMIT))
-                    if (reader.sig_error != null)
+                    if (!compiled)
                     {
                         reader.LocalizeError();
                         Debug.LogError(reader.sig_long_error);
@@ -127,6 +140,22 @@ namespace _COBRA_
                         status.Value = default;
                     }
             }
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        protected override void OnDispose()
+        {
+            front_janitor?.Dispose();
+            front_janitor = null;
+
+            for (int i = 0; i < background_janitors.Count; ++i)
+                background_janitors[i].Dispose();
+            background_janitors.Clear();
+
+            scope.Dispose();
+
+            base.OnDispose();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace _COBRA_.Boa
                 name: $"field({method})",
                 action_SIG_EXE: () =>
                 {
-                    List<MemCell> cells = new(ast_args.Count);
+                    List<MemCell> cells = new(ast_args?.Count ?? 0);
 
                     if (ast_args != null)
                     {
