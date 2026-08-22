@@ -103,8 +103,9 @@ namespace _COBRA_.Boa
                 {
                     Codes code = codes[op_name];
                     scope.TryGetVariable(var_name, out var cell, out _);
+                    Type expected_type = code == Codes.Assign ? typeof(object) : cell._type;
 
-                    if (AstExpression.TryExpr(reader, scope, false, cell._type, out AstExpression ast_expr))
+                    if (AstExpression.TryExpr(reader, scope, false, expected_type, out AstExpression ast_expr))
                     {
                         if (!scope.TrySetVariable(var_name, new MemCell(ast_expr.output_type, null)))
                         {

@@ -75,6 +75,35 @@ namespace _COBRA_.Tests
         }
 
         [Test]
+        public void AssignmentCanChangeTheRuntimeTypeOfAVariable()
+        {
+            BoaShell shell = new("dynamic_assignment_test");
+
+            try
+            {
+                CodeReader assign_int = Reader(SIG_FLAGS.SUBMIT, "x = 3");
+                shell.OnReader(assign_int);
+                shell.Tick();
+
+                Assert.That(assign_int.sig_error, Is.Null);
+                Assert.That(shell.scope._vars["x"]._type, Is.EqualTo(typeof(int)));
+                Assert.That(shell.scope._vars["x"]._value, Is.EqualTo(3));
+
+                CodeReader assign_string = Reader(SIG_FLAGS.SUBMIT, "x = \"hmm\"");
+                shell.OnReader(assign_string);
+                shell.Tick();
+
+                Assert.That(assign_string.sig_error, Is.Null);
+                Assert.That(shell.scope._vars["x"]._type, Is.EqualTo(typeof(string)));
+                Assert.That(shell.scope._vars["x"]._value, Is.EqualTo("hmm"));
+            }
+            finally
+            {
+                shell.Dispose();
+            }
+        }
+
+        [Test]
         public void ArrowAccessorExecutesRegisteredField()
         {
             const string field_name = "cobra_test_value";
