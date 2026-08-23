@@ -4,6 +4,7 @@ using System;
 
 namespace _COBRA_
 {
+    [Serializable]
     public abstract partial class Shell : Disposable
     {
         public readonly ValueNotifier<ExecutionStatus> status = new();
