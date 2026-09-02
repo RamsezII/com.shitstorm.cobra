@@ -5,13 +5,13 @@ namespace _COBRA_
 {
     partial class Shell
     {
-        public readonly ValueNotifier<string> workdir = new(ArkMachine.DFHome.FullName);
+        public readonly ValueNotifier<string> workdir = new(NUCLEOR.DFHome.FullName);
 
         public ExecutionStatus RegularStatus() => new(
             code: CMD_STATUS.WAIT_FOR_STDIN,
             prefixe: new(
-                text: $"{ArkMachine.user_name._value}:{workdir._value}$ ",
-                lint: $"{ArkMachine.user_name._value.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
+                text: $"{NUCLEOR.user_name._value}:{workdir._value}$ ",
+                lint: $"{NUCLEOR.user_name._value.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
                 )
         );
 
