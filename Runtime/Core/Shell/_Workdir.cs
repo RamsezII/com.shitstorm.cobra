@@ -10,8 +10,8 @@ namespace _COBRA_
         public ExecutionStatus RegularStatus() => new(
             code: CMD_STATUS.WAIT_FOR_STDIN,
             prefixe: new(
-                text: $"{NUCLEOR.user_name._value}:{workdir._value}$ ",
-                lint: $"{NUCLEOR.user_name._value.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
+                text: $"{NUCLEOR.instance.user_name._value}:{workdir._value}$ ",
+                lint: $"{NUCLEOR.instance.user_name._value.SetColor("#73CC26")}:{workdir._value.SetColor("#73B2D9")}$ "
                 )
         );
 
