@@ -24,9 +24,9 @@ namespace _COBRA_
 
         public void ToggleTick(in bool toggle)
         {
-            NUCLEOR.delegates.Update_OnShellTick -= Tick;
+            NUCLEOR.delegates.Update_ShellTick -= Tick;
             if (toggle)
-                NUCLEOR.delegates.Update_OnShellTick += Tick;
+                NUCLEOR.delegates.Update_ShellTick += Tick;
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ namespace _COBRA_
         {
             beforeTick = afterTick = null;
 
-            NUCLEOR.delegates.Update_OnShellTick -= Tick;
+            NUCLEOR.delegates.Update_ShellTick -= Tick;
 
             stdout = stderr = null;
 

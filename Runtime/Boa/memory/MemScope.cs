@@ -32,7 +32,7 @@ namespace _COBRA_.Boa
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            NUCLEOR.delegates.Update_OnShellTick_before += static () =>
+            NUCLEOR.delegates.Update_ShellTick_before += static () =>
             {
                 _svars["_time"] = Time.time;
                 _svars["_ftime"] = Time.fixedTime;
