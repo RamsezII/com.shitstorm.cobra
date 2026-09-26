@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Unity.Scripting.LifecycleManagement;
 
 namespace _COBRA_.Boa
 {
     /// <summary>
     /// global methods
     /// </summary>
-    public sealed class DevContract
+    public sealed partial class DevContract
     {
         public readonly struct OptionKey
         {
@@ -65,15 +65,7 @@ namespace _COBRA_.Boa
         internal readonly Func<MemStack, MemScope, Parameters, IEnumerator<ExecutionStatus>> routine;
         internal readonly Func<MemStack, MemScope, Parameters, Janitor, IEnumerator<ExecutionStatus>> routine_READER;
 
-        internal static readonly Dictionary<string, DevContract> contracts = new(StringComparer.OrdinalIgnoreCase);
-
-        //----------------------------------------------------------------------------------------------------------
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ResetStatics()
-        {
-            contracts.Clear();
-        }
+        [AutoStaticsCleanup] internal static readonly Dictionary<string, DevContract> contracts = new(StringComparer.OrdinalIgnoreCase);
 
         //----------------------------------------------------------------------------------------------------------
 
