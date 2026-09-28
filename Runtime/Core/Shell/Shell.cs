@@ -55,7 +55,7 @@ namespace _COBRA_
 
             base.OnDispose();
 
-            status.Dispose();
+            status.Clear();
         }
     }
 }
