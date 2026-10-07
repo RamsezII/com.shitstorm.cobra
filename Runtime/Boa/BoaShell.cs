@@ -1,8 +1,11 @@
 ﻿using _ARK_;
 using _COBRA_.Boa;
+using _UTIL_;
 using System;
 using System.Collections.Generic;
+using Unity.Scripting.LifecycleManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace _COBRA_
 {
@@ -26,13 +29,53 @@ namespace _COBRA_
 
         public readonly List<Janitor> background_janitors = new();
         public Janitor front_janitor;
+        [SerializeField] CodeInterpreter interpreter;
         public readonly MemScope scope;
+        [NoAutoStaticsCleanup]
+        static readonly CodeInterpreter static_interpreter = new()
+        {
+            linter = (in string text, in int charIndex, in LintTheme lint_theme, out string lint_text, out string error) =>
+            {
+                using BoaShell shell = new("script_view");
+
+                CodeReader reader = new(
+                    sig_flags: SIG_FLAGS.CHANGE | SIG_FLAGS.LINT,
+                    workdir: shell.workdir._value,
+                    lint_theme: lint_theme,
+                    strict_syntax: false,
+                    text: text,
+                    script_path: null,
+                    cursor_i: charIndex
+                );
+
+                shell.OnReader(reader);
+
+                lint_text = Util.ForceCharacterWrap(reader.GetLintResult());
+
+                if (reader.sig_error == null)
+                    error = null;
+                else
+                {
+                    reader.LocalizeError();
+                    error = Util.ForceCharacterWrap(reader.sig_long_error);
+                }
+            },
+        };
+
+        //----------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void JoinCodeInterpreters()
+        {
+            CodeInterpreter.instances.Add("boa1", static_interpreter);
+        }
 
         //----------------------------------------------------------------------------------------------------------
 
         public BoaShell(in string name) : base(name)
         {
             scope = new("root_scope", this);
+            interpreter = static_interpreter;
         }
 
         //----------------------------------------------------------------------------------------------------------
