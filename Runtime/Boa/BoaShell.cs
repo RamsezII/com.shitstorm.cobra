@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using Unity.Scripting.LifecycleManagement;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace _COBRA_
 {
@@ -29,10 +28,11 @@ namespace _COBRA_
 
         public readonly List<Janitor> background_janitors = new();
         public Janitor front_janitor;
-        [SerializeField] CodeInterpreter interpreter;
         public readonly MemScope scope;
+        [SerializeField] CodeInterpreter interpreter;
+
         [NoAutoStaticsCleanup]
-        static readonly CodeInterpreter static_interpreter = new()
+        static readonly CodeInterpreter static_interpreter = new(name: "COBRA", extension: ".cobra.txt")
         {
             linter = (in string text, in int charIndex, in LintTheme lint_theme, out string lint_text, out string error) =>
             {
@@ -65,9 +65,9 @@ namespace _COBRA_
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void JoinCodeInterpreters()
+        static void InitInterpreter()
         {
-            CodeInterpreter.instances.Add("boa1", static_interpreter);
+            CodeInterpreter.instances.Add(static_interpreter);
         }
 
         //----------------------------------------------------------------------------------------------------------

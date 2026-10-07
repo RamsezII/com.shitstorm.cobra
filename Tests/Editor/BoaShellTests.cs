@@ -1,6 +1,5 @@
 using _COBRA_.Boa;
 using NUnit.Framework;
-using System;
 using System.IO;
 
 namespace _COBRA_.Tests
